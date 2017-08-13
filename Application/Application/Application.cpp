@@ -141,12 +141,16 @@ void Application::initWindowWidgets() {
 
 void Application::onClickOpenFile() {
 	QStringList files = QFileDialog::getOpenFileNames(this, tr("DialogTitleOpenFiles"));
-	encryptFiles(files);
+	if (!files.isEmpty()) {
+		encryptFiles(files);
+	}
 }
 
 void Application::onClickOpenFolder() {
 	QString folder = QFileDialog::getExistingDirectory(this, tr("DialogTitleOpenFolder"));
-	encryptFiles(enumFiles(folder));
+	if (!folder.isEmpty()) {
+		encryptFiles(enumFiles(folder));
+	}
 }
 
 void Application::timerEvent(QTimerEvent *event) {
