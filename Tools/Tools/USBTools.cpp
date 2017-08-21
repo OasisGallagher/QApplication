@@ -13,27 +13,16 @@ USBTools::~USBTools() {
 }
 
 void USBTools::scan() {
-	char diskPath[5] = { 0 };
 	DWORD allDisk = GetLogicalDrives(); //返回一个32位整数，将他转换成二进制后，表示磁盘,最低位为A盘  
 	if (allDisk == 0) { return; }
 
-	for (int i = 0; i < 13; i++)     //假定最多有12个磁盘从A开始计数  
-	{
-		if ((allDisk & 1) != 1) { continue; }
-		sprintf(diskPath, "%c", 'A' + i);
-		strcat(diskPath, ":");
-		LPCWSTR rootPath = (LPCWSTR)QString(diskPath).utf16();
-
-		if (GetDriveType(rootPath) == DRIVE_REMOVABLE) {
-			if (GetVolumeInformation(rootPath, 0, 0, 0, 0, 0, 0, 0)) //判断驱动是否准备就绪  
-			{
-				qDebug() << "U盘准备就绪！" << diskPath;
-				QString  path(diskPath);
-				addDisk(path);
-			}
+	for (int i = 0; i < 13; allDisk >>= 1, i++) {
+		if ((allDisk & 1) == 0) { continue; }
+		QString root = QString("%1:\\").arg(char('A' + i));
+		const wchar_t* wptr = (const wchar_t*)root.utf16();
+		if (GetDriveType(wptr) == DRIVE_REMOVABLE && GetVolumeInformation(wptr, 0, 0, 0, 0, 0, 0, 0)) {
+			addDisk(root);
 		}
-
-		allDisk = allDisk >> 1;
 	}
 }
 
