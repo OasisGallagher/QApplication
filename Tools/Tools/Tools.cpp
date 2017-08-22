@@ -39,24 +39,9 @@ void testXml(QString path) {
 	qDebug() << list.size();
 }
 
-void testCavans(QWidget* cavans) {
-	
-	
-
-	//一旦释放环境,glGetString函数将总是返回空值
-
-	//wglMakeCurrent(NULL, NULL);
-
-	//wglDeleteContext(hRC);
-
-	//ReleaseDC(hWnd, hDC);
-}
-
 Tools::Tools(QWidget *parent)
 	: QDialog(parent) {
 	ui.setupUi(this);
-
-	testCavans(ui.canvas);
 
 	testXml("C:/Users/liam.wang/Desktop/1.xml");
 

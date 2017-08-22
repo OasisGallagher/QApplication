@@ -1,15 +1,16 @@
 #pragma once
-#include <QWidget>
+#include <QtOpenGL/QGLWidget>
 
-class GLWidget : public QWidget {
+class GLWidget : public QGLWidget {
 public:
 	GLWidget(QWidget* parent = Q_NULLPTR);
-	~GLWidget();
+	~GLWidget() {}
 
-public:
-	virtual void paintEvent(QPaintEvent *event);
-	virtual QPaintEngine* paintEngine();
-
-private:
-	HDC dc_;
+protected:
+	virtual void initializeGL();
+	virtual void resizeGL(int w, int h);
+	virtual void paintGL();
+	virtual void mousePressEvent(QMouseEvent *event);
+	virtual void mouseMoveEvent(QMouseEvent *event);
+	virtual void keyPressEvent(QKeyEvent *event);
 };

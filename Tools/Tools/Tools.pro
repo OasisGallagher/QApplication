@@ -5,7 +5,7 @@
 TEMPLATE = app
 TARGET = Tools
 DESTDIR = ../x64/Debug
-QT += core widgets gui xml
+QT += core widgets gui xml opengl
 CONFIG += debug
 DEFINES += WIN64 QT_DLL QT_WIDGETS_LIB
 INCLUDEPATH += ./GeneratedFiles \

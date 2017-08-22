@@ -1,14 +1,80 @@
-#include <windows.h>
-
 #include <QDebug>
+#include <QPaintEvent>
+#include <QTimerEvent>
+#include <QtGui/QMouseEvent>
+
+#include "3rdParty/glew-2.1.0/include/GL/glew.h"
 
 #include "GLWidget.h"
-#include "3rdParty/glew-2.1.0/include/GL/glew.h"
 
 #pragma comment(lib, "opengl32.lib")
 #pragma comment(lib, "3rdParty/glew-2.1.0/lib/Release/x64/glew32.lib")
 
-void GLAPIENTRY debugOutputCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const GLvoid* userParam) {
+void APIENTRY debugOutputCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const GLvoid* userParam);
+
+GLWidget::GLWidget(QWidget* parent) : QGLWidget(parent) {
+}
+
+void GLWidget::initializeGL() {
+	glewExperimental = true;
+	if (glewInit() != GLEW_OK) {
+		qFatal("failed to initialize GLEW\n");
+		return;
+	}
+	glDebugMessageCallback(debugOutputCallback, NULL);
+
+	glDisable(GL_ONE_MINUS_SRC_ALPHA);
+	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_COLOR_MATERIAL);
+	glEnable(GL_BLEND);
+	glEnable(GL_POLYGON_SMOOTH);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glClearColor(0, 0, 0, 0);
+
+	/*if (GLEW_ARB_debug_output) {
+		glDebugMessageCallback(debugOutputCallback, NULL);
+		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
+	}*/
+}
+
+void GLWidget::resizeGL(int w, int h) {
+	glViewport(0, 0, w, h);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glOrtho(0, w, 0, h, -1, 1);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+}
+
+void GLWidget::paintGL() {
+	glClear(GL_COLOR_BUFFER_BIT);
+	glColor3f(1, 0, 0);
+	glBegin(GL_POLYGON);
+	glVertex2f(0, 0);
+	glVertex2f(100, 500);
+	glVertex2f(500, 100);
+	glEnd();
+}
+
+void GLWidget::mousePressEvent(QMouseEvent *event) {
+
+}
+void GLWidget::mouseMoveEvent(QMouseEvent *event) {
+	printf("%d, %d\n", event->x(), event->y());
+}
+
+void GLWidget::keyPressEvent(QKeyEvent* event) {
+	switch (event->key()) {
+	case Qt::Key_Escape:
+		close();
+		break;
+	default:
+		event->ignore();
+		break;
+	}
+}
+
+void APIENTRY debugOutputCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const GLvoid* userParam) {
 	// Shader.
 	if (source == GL_DEBUG_SOURCE_SHADER_COMPILER_ARB) {
 		return;
@@ -47,65 +113,4 @@ void GLAPIENTRY debugOutputCallback(GLenum source, GLenum type, GLuint id, GLenu
 	else {
 		qDebug() << text;
 	}
-}
-
-GLWidget::GLWidget(QWidget* parent) :QWidget(parent) {
-	setAttribute(Qt::WA_PaintOnScreen);
-	setAttribute(Qt::WA_NoSystemBackground);
-	setAutoFillBackground(true);
-
-	HWND hWnd = (HWND)winId();
-	dc_ = GetDC(hWnd);
-
-	PIXELFORMATDESCRIPTOR pfd;
-
-	SetPixelFormat(dc_, 1, &pfd);
-
-	HGLRC hRC = wglCreateContext(dc_);
-
-	wglMakeCurrent(dc_, hRC);
-
-	glewExperimental = true;
-	if (glewInit() != GLEW_OK) {
-		qFatal("failed to initialize GLEW\n");
-		return;
-	}
-
-	if (GLEW_ARB_debug_output) {
-		glDebugMessageCallback(debugOutputCallback, NULL);
-		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
-	}
-}
-
-GLWidget::~GLWidget() {
-}
-
-void GLWidget::paintEvent(QPaintEvent *event) {
-	glClearColor(1.0, 0, 0, 0.0);
-	/*
-	glMatrixMode(GL_PROJECTION);
-	glOrtho(0.0, 200.0, 0.0, 150.0, 1, 500);
-	*/
-	glClear(GL_COLOR_BUFFER_BIT);
-	/*
-	glEnable(GL_LINE_STIPPLE);
-	GLushort  patn = 0xFAFA;
-	glLineStipple(3, patn);
-	glColor3f(1.0, 0.0, 0.0);
-
-	glBegin(GL_LINE_LOOP);
-	glVertex2i(10, 10);
-	glVertex2f(100.0, 75.3);
-	glColor3f(0.0, 1.0, 0.0);
-	glVertex2i(70, 80);
-	glEnd();
-	*/
-	glFlush();
-	SwapBuffers(dc_);
-
-	repaint();
-}
-
-QPaintEngine*  GLWidget::paintEngine() {
-	return Q_NULLPTR;
 }

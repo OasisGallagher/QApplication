@@ -86,15 +86,15 @@
     <CustomBuild Include="USBTools.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
+    <CustomBuild Include="GLWidget.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GeneratedFiles\ui_Tools.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
     <ClInclude Include="Utility.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GLWidget.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
