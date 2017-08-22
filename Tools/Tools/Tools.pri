@@ -7,8 +7,11 @@
 message("You are running qmake on a generated .pro file. This may not work!")
 
 
-HEADERS += ./Tools.h
+HEADERS += ./Tools.h \
+    $$PWD/USBTools.h \
+    $$PWD/Utility.h
 SOURCES += ./main.cpp \
-    ./Tools.cpp
+    ./Tools.cpp \
+    $$PWD/USBTools.cpp
 FORMS += ./Tools.ui
 RESOURCES += Tools.qrc

@@ -1,4 +1,10 @@
 <RCC>
-    <qresource prefix="Tools">
+    <qresource prefix="/Tools"/>
+    <qresource prefix="/lang">
+        <file alias="zh">Resources/lang/zh.qm</file>
+    </qresource>
+    <qresource prefix="/img">
+        <file alias="file">Resources/img/documents.png</file>
+        <file alias="dir">Resources/img/folder.png</file>
     </qresource>
 </RCC>

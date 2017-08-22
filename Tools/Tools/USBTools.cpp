@@ -6,69 +6,59 @@
 #include <QDebug>
 #include "USBTools.h"
 
-USBTools::USBTools() {
-}
-
-USBTools::~USBTools() {
-}
-
 void USBTools::scan() {
-	DWORD allDisk = GetLogicalDrives(); //返回一个32位整数，将他转换成二进制后，表示磁盘,最低位为A盘  
-	if (allDisk == 0) { return; }
-
-	for (int i = 0; i < 13; allDisk >>= 1, i++) {
-		if ((allDisk & 1) == 0) { continue; }
+	DWORD drivers = GetLogicalDrives();
+	
+	for (int i = 0; drivers != 0 && i < 13; drivers >>= 1, i++) {
+		if ((drivers & 1) == 0) { continue; }
 		QString root = QString("%1:\\").arg(char('A' + i));
-		const wchar_t* wptr = (const wchar_t*)root.utf16();
-		if (GetDriveType(wptr) == DRIVE_REMOVABLE && GetVolumeInformation(wptr, 0, 0, 0, 0, 0, 0, 0)) {
+		LPCWSTR wptr = (LPCWSTR)root.utf16();
+		WCHAR name[MAX_PATH + 1];
+		if (GetDriveType(wptr) == DRIVE_REMOVABLE) {
 			addDisk(root);
 		}
 	}
 }
 
-void USBTools::addDisk(QString& disk) {
-	int iter = 0;
-	if (!searchDisk(disk, iter)) {
-		disks_.push_back(disk);
-		emit onDiskAdded(disk);
+void USBTools::addDisk(const QString& root) {
+	if (findDisk(root) >= 0) { return; }
+	WCHAR name[MAX_PATH + 1];
+	if(!GetVolumeInformation((LPCWSTR)root.utf16(), name, _countof(name), NULL, NULL, NULL, NULL, NULL)) {
+		//QMessageBox::
+	}
+	USBDisk disk = { root , QString::fromWCharArray(name) };
+	disks_.push_back(disk);
+	emit onDiskAdded(disk);
+}
+
+void USBTools::deleteDisk(const QString& root) {
+	int pos = 0;
+	if ((pos = findDisk(root)) >= 0) {
+		emit onDiskRemoved(disks_[pos]);
+		disks_.remove(pos);
 	}
 }
 
-void USBTools::deleteDisk(QString& disk) {
-	int iter = 0;
-	if (searchDisk(disk, iter)) {
-		disks_.remove(iter);
-		emit onDiskRemoved(disk);
-	}
-}
-
-bool USBTools::searchDisk(QString& disk, int& iter) {
-	for (int i = 0; i < this->disks_.size(); i++) {
-		if (disks_.at(i).compare(disk) == 0) {
-			iter = i;
-			return true;
+int USBTools::findDisk(const QString& root) const {
+	for (int i = 0; i < disks_.size(); i++) {
+		if (disks_[i].root == root) {
+			return i;
 		}
 	}
 
-	return false;
+	return -1;
 }
 
 bool USBTools::onWinEvent(MSG* msg, long *result) {
-	QString dirPath;
-	int msgType = msg->message;
-	if (msgType == WM_DEVICECHANGE) {
-		qDebug() << "winEvent in MgFrame : WM_DEVICECHANGE";
+	int type = msg->message;
+	if (type == WM_DEVICECHANGE) {
 		PDEV_BROADCAST_HDR lpdb = (PDEV_BROADCAST_HDR)msg->lParam;
 		switch (msg->wParam) {
 		case DBT_DEVICEARRIVAL:
 			if (lpdb->dbch_devicetype == DBT_DEVTYP_VOLUME) {
 				PDEV_BROADCAST_VOLUME lpdbv = (PDEV_BROADCAST_VOLUME)lpdb;
 				if (lpdbv->dbcv_flags == 0) {
-					//插入U盘，获取盘符  
-					dirPath = QString(firstDriveFromMask(lpdbv->dbcv_unitmask));
-					dirPath += ":";
-					addDisk(dirPath);
-					qDebug() << "this->USBDisk Path =" << dirPath;
+					addDisk(QString(firstDriveFromMask(lpdbv->dbcv_unitmask)) + ":\\");
 				}
 			}
 			break;
@@ -76,12 +66,7 @@ bool USBTools::onWinEvent(MSG* msg, long *result) {
 			if (lpdb->dbch_devicetype == DBT_DEVTYP_VOLUME) {
 				PDEV_BROADCAST_VOLUME lpdbv = (PDEV_BROADCAST_VOLUME)lpdb;
 				if (lpdbv->dbcv_flags == 0) {
-					qDebug() << "USB_Removed";
-
-					dirPath = QString(firstDriveFromMask(lpdbv->dbcv_unitmask));
-					dirPath += ":";
-					deleteDisk(dirPath);
-					qDebug() << "this-delete is =" << dirPath;
+					deleteDisk(QString(firstDriveFromMask(lpdbv->dbcv_unitmask)) + ":\\");
 				}
 			}
 			break;

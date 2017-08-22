@@ -5,11 +5,11 @@
 
 #include "ui_Tools.h"
 
-class USBTools;
+#include "USBTools.h"
 
 enum {
-	IconFirst,
-	IconSecond,
+	IconFile,
+	IconDirectory,
 	IconCount,
 };
 
@@ -25,18 +25,28 @@ protected:
 	virtual bool nativeEvent(const QByteArray &eventType, void *message, long *result);
 
 private slots:
-	void treeItemChanged(QStandardItem* item);
-	
+	void onTreeItemChanged(QStandardItem* item);
+	void onDiskAdded(const USBDisk& disk);
+	void onDiskRemoved(const USBDisk& disk);
+	void onVideosContextMenu(const QPoint& point);
+	void onToggleVideosView();
+
 private:
+	void updateTree(const USBDisk& disk);
+	void updateVideosModel(const USBDisk& disk);
+
 	void checkAllChild(QStandardItem* item, bool check);
 	void onChildCheckStateChanged(QStandardItem* item);
 	Qt::CheckState checkSibling(QStandardItem* item);
 
 	void __testTree();
-	bool __testShowFiles(QString path, QStandardItemModel* model, QStandardItem *item);
+	bool initItemModel(QString path, QStandardItemModel* model, QStandardItem *item);
 
 private:
 	USBTools* usb_;
 	QIcon icons_[IconCount];
 	Ui::Tools ui;
+
+	QStandardItemModel* tree_model_;
+	QStandardItemModel* videos_model_;
 };

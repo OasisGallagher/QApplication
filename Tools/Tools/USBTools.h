@@ -4,27 +4,31 @@
 #include <QString>
 #include <windows.h>
 
+struct USBDisk {
+	QString root;
+	QString name;
+};
+
 class USBTools : public QObject {
 	Q_OBJECT
 public:
-	USBTools();
-	~USBTools();
+	USBTools() {}
+	~USBTools() {}
 
 public:
 	void scan();
 	bool onWinEvent(MSG* msg, long* result);
 
 signals:
-	void onDiskAdded(QString disk);
-	void onDiskRemoved(QString disk);
+	void onDiskAdded(const USBDisk& disk);
+	void onDiskRemoved(const USBDisk& disk);
 
 private:
-	void addDisk(QString& disk);
-	void deleteDisk(QString& disk);
-	bool searchDisk(QString& disk, int& iter);
-	char firstDriveFromMask(unsigned long unitmask);
+	void addDisk(const QString& root);
+	void deleteDisk(const QString& root);
+	int findDisk(const QString& root) const;
+	char firstDriveFromMask(unsigned long mask);
 
 private:
-	QVector<QString> disks_;
-	QString currentDisk_;
+	QVector<USBDisk> disks_;
 };

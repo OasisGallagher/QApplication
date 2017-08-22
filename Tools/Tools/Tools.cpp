@@ -1,28 +1,155 @@
+#include <QMenu>
 #include <QDebug>
+#include <QDirModel>
+#include <QTableView>
 #include <QMessageBox>
 
-#include <QDirModel>
+#include <QtXml/QDomDocument>
 
 #include "Tools.h"
-#include "USBTools.h"
+#include "Utility.h"
 
-#include <QStandardItemModel>
+void testXml(QString path) {
+	QFile file(path);
+	file.open(QIODevice::WriteOnly | QIODevice::Truncate);
+	
+	QTextStream out(&file);
+	
+	QDomDocument doc;
+	QDomProcessingInstruction instruction = doc.createProcessingInstruction("xml", "version = \'1.0\' encoding=\'UTF-8\'");
+	doc.appendChild(instruction);
+
+	QDomElement root = doc.createElement("root");
+	doc.appendChild(root);
+
+	QDomElement element = doc.createElement("objects");
+	QDomAttr attr = doc.createAttribute("name");
+	attr.setValue("first");
+	element.setAttributeNode(attr);
+
+	attr = doc.createAttribute("path");
+	attr.setValue(":/");
+	element.setAttributeNode(attr);
+
+	root.appendChild(element);
+	
+	doc.save(out, 4);
+
+	QDomNodeList list = doc.elementsByTagName("objects");
+	qDebug() << list.size();
+}
+
+void testCavans(QWidget* cavans) {
+	
+	
+
+	//一旦释放环境,glGetString函数将总是返回空值
+
+	//wglMakeCurrent(NULL, NULL);
+
+	//wglDeleteContext(hRC);
+
+	//ReleaseDC(hWnd, hDC);
+}
 
 Tools::Tools(QWidget *parent)
 	: QDialog(parent) {
 	ui.setupUi(this);
 
+	testCavans(ui.canvas);
+
+	testXml("C:/Users/liam.wang/Desktop/1.xml");
+
+	icons_[IconFile] = QIcon(":/img/file");
+	icons_[IconDirectory] = QIcon(":/img/dir");
+
+	tree_model_ = new QStandardItemModel(this);
+	ui.fileTree->setModel(tree_model_);
+	
+	QStringList headers;
+	headers << tr("Column 1") << tr("Column 2");
+	tree_model_->setHorizontalHeaderLabels(headers);
+
+	connect(tree_model_, SIGNAL(itemChanged(QStandardItem*)), this, SLOT(onTreeItemChanged(QStandardItem*)));
+
+	ui.videoList->setViewMode(QListView::IconMode);
+
+	videos_model_ = new QStandardItemModel(this);
+
+	ui.videoList->setModel(videos_model_);
+	ui.videoTable->setModel(videos_model_);
+
 	usb_ = new USBTools;
+	connect(usb_, SIGNAL(onDiskAdded(const USBDisk&)), this, SLOT(onDiskAdded(const USBDisk&)));
+	connect(usb_, SIGNAL(onDiskRemoved(const USBDisk&)), this, SLOT(onDiskRemoved(const USBDisk&)));
+
 	usb_->scan();
 
-	__testTree();
+	ui.videoList->setContextMenuPolicy(Qt::CustomContextMenu);
+	ui.videoTable->setContextMenuPolicy(Qt::CustomContextMenu);
+	connect(ui.videoList, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(onVideosContextMenu(const QPoint&)));
+	connect(ui.videoTable, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(onVideosContextMenu(const QPoint&)));
 }
 
 Tools::~Tools() {
 	delete usb_;
 }
 
-bool Tools::__testShowFiles(QString path, QStandardItemModel* model, QStandardItem *parent) {
+void Tools::onDiskAdded(const USBDisk& disk) {
+	updateTree(disk);
+	updateVideosModel(disk);
+}
+
+void Tools::onVideosContextMenu(const QPoint& point) {
+	QMenu* menu = new QMenu(this);
+	QAction* action = menu->addAction(ui.videos->currentIndex() == 0 ? tr("IconView") : tr("ListView"));
+
+	connect(action, SIGNAL(triggered(bool)), this, SLOT(onToggleVideosView()));
+
+	menu->exec(QCursor::pos());
+}
+
+void Tools::onToggleVideosView() {
+	ui.videos->setCurrentIndex(1 - ui.videos->currentIndex());
+}
+
+void Tools::updateVideosModel(const USBDisk& disk) {
+	QStringList headers;
+	headers << tr("Column 1") << tr("Column 2");
+
+	QDir dir(disk.root);
+
+	dir.setFilter(QDir::Dirs | QDir::Files | QDir::NoSymLinks | QDir::NoDotAndDotDot);
+	QFileInfoList list = dir.entryInfoList();
+	int size = list.size();
+	for (int i = 0; i < size; i++) {
+		QFileInfo info = list.at(i);
+		QFileIconProvider ip;
+
+		if (info.isDir()) {
+			QStandardItem* dirItem = new QStandardItem(ip.icon(info), info.fileName());
+			dirItem->setCheckable(true);
+
+			videos_model_->appendRow(dirItem);
+		}
+		else {
+			QStandardItem *fileItem = new QStandardItem(ip.icon(info), info.fileName());
+			fileItem->setCheckable(true);
+			videos_model_->appendRow(fileItem);
+		}
+	}
+}
+
+void Tools::updateTree(const USBDisk& disk) {
+	initItemModel(disk.root, tree_model_, nullptr);
+}
+
+void Tools::onDiskRemoved(const USBDisk& disk) {
+	tree_model_->clear();
+	videos_model_->clear();
+}
+
+bool Tools::initItemModel(QString path, QStandardItemModel* model, QStandardItem *parent) {
 	QDir dir(path);
 	if (!dir.exists()) { return false; }
 
@@ -31,9 +158,10 @@ bool Tools::__testShowFiles(QString path, QStandardItemModel* model, QStandardIt
 	int size = list.size();
 	for (int i = 0; i < size; i++) {
 		QFileInfo info = list.at(i);
+		QFileIconProvider ip;
 
 		if (info.isDir()) {
-			QStandardItem* dirItem = new QStandardItem(info.fileName());
+			QStandardItem* dirItem = new QStandardItem(ip.icon(info), info.fileName());
 			dirItem->setCheckable(true);
 			
 			if (parent == Q_NULLPTR) {
@@ -44,19 +172,20 @@ bool Tools::__testShowFiles(QString path, QStandardItemModel* model, QStandardIt
 				parent->setChild(dirItem->index().row(), 1, dirItem);
 			}
 
-			bool tristate = __testShowFiles(info.filePath(), model, dirItem);
+			bool tristate = initItemModel(info.filePath(), model, dirItem);
 			dirItem->setTristate(tristate);
 		}
 		else {
-			QStandardItem *fileItem = new QStandardItem(info.fileName());
+			QStandardItem *fileItem = new QStandardItem(ip.icon(info), info.fileName());
 			fileItem->setCheckable(true);
 			fileItem->setTristate(false);
 			if (parent == Q_NULLPTR) {
 				model->appendRow(fileItem);
+				model->setItem(model->indexFromItem(fileItem).row(), 1, new QStandardItem(Utility::encodeSize(info.size())));
 			}
 			else {
 				parent->appendRow(fileItem);
-				parent->setChild(fileItem->index().row(), 1, fileItem);
+				parent->setChild(fileItem->index().row(), 1, new QStandardItem(Utility::encodeSize(info.size())));
 			}
 		}
 	}
@@ -65,13 +194,14 @@ bool Tools::__testShowFiles(QString path, QStandardItemModel* model, QStandardIt
 }
 
 void Tools::__testTree() {
+	
 	QStandardItemModel* model = new QStandardItemModel(ui.fileTree);
 	
 	QStringList headers;
 	headers << tr("Column 1") << tr("Column 2");
 	model->setHorizontalHeaderLabels(headers);
 
-	__testShowFiles("C:/Users/liam.wang/Desktop/Player", model, nullptr);
+	initItemModel("C:/Users/liam.wang/Desktop/Player", model, nullptr);
 
 #if 0
 
@@ -112,13 +242,11 @@ void Tools::__testTree() {
 	}
 
 #endif
-	//关联项目属性改变的信号和槽
-	connect(model, SIGNAL(itemChanged(QStandardItem*)), this, SLOT(treeItemChanged(QStandardItem*)));
-	//connect(model,SIGNAL(itemChanged(QStandardItem*)),this,SLOT(treeItemChanged(QStandardItem*)));
+	connect(model, SIGNAL(itemChanged(QStandardItem*)), this, SLOT(onTreeItemChanged(QStandardItem*)));
 	ui.fileTree->setModel(model);
 }
 
-void Tools::treeItemChanged(QStandardItem* item) {
+void Tools::onTreeItemChanged(QStandardItem* item) {
 	if (item == Q_NULLPTR) { return; }
 	if (item->isCheckable()) {
 		//如果条目是存在复选框的，那么就进行下面的操作  
