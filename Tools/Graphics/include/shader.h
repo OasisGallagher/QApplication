@@ -3,6 +3,7 @@
 #include <string>
 #include <gl/glew.h>
 
+#include "defs.h"
 #include "ptr_table.h"
 
 enum ShaderType {
@@ -14,7 +15,7 @@ enum ShaderType {
 	ShaderTypeCount,
 };
 
-class Shader {
+class GRAPHICS_EXPORT Shader {
 private:
 	struct Uniform {
 		GLenum type;

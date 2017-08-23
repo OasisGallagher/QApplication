@@ -1,9 +1,10 @@
 #pragma once
 #include <string>
-
 #include <gl/glew.h>
 
-class Texture2D {
+#include "defs.h"
+
+class GRAPHICS_EXPORT Texture2D {
 public:
 	Texture2D();
 	~Texture2D();
@@ -21,7 +22,7 @@ private:
 	GLuint texture_;
 };
 
-class Texture3D {
+class GRAPHICS_EXPORT Texture3D {
 public:
 	Texture3D();
 	~Texture3D();
@@ -40,7 +41,7 @@ private:
 	GLuint texture_;
 };
 
-class RandomTexture {
+class GRAPHICS_EXPORT RandomTexture {
 public:
 	RandomTexture();
 	~RandomTexture();

@@ -1,7 +1,14 @@
 #pragma once
 #include <gl/glew.h>
+#include <glm/glm.hpp>
 
 #include "utilities.h"
+
+#ifdef _EXPORTING_GRAPHICS
+#define GRAPHICS_EXPORT __declspec(dllexport)
+#else
+#define GRAPHICS_EXPORT __declspec(dllimport)
+#endif
 
 namespace Globals {
 	static const int kWindowWidth =  1024;

@@ -1,7 +1,9 @@
 #pragma once
 #include <gl/glew.h>
 
-class RenderTarget {
+#include "defs.h"
+
+class GRAPHICS_EXPORT RenderTarget {
 public:
 	RenderTarget();
 	~RenderTarget();

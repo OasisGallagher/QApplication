@@ -2,7 +2,6 @@
 #include <glm/gtc/quaternion.hpp>
 
 #include "defs.h"
-#include "mathf.h"
 #include "debug.h"
 #include "camera.h"
 #include "utilities.h"

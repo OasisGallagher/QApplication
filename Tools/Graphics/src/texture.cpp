@@ -86,6 +86,7 @@ GLuint Texture3D::CreateCubeTexture(const std::string* textures) {
 	for (int i = 0; i < 6; ++i) {
 		Magick::Image image;
 		Magick::Blob blob;
+
 		try{
 			image.read(textures[i].c_str());
 			image.write(&blob, "RGBA");

@@ -35,21 +35,24 @@
       <Extensions>ts</Extensions>
       <ParseFiles>false</ParseFiles>
     </Filter>
-    <Filter Include="headers">
+    <Filter Include="Headers">
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
-    <Filter Include="sources">
+    <Filter Include="Sources">
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{cd2c2c05-8b73-4468-aa76-78377159ebfc}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
-      <Filter>sources</Filter>
+      <Filter>Sources</Filter>
     </ClCompile>
     <ClCompile Include="Tools.cpp">
-      <Filter>sources</Filter>
+      <Filter>Sources</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_Tools.cpp">
       <Filter>Generated Files\Debug</Filter>
@@ -61,7 +64,7 @@
       <Filter>Generated Files</Filter>
     </ClCompile>
     <ClCompile Include="USBTools.cpp">
-      <Filter>sources</Filter>
+      <Filter>Sources</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_USBTools.cpp">
       <Filter>Generated Files\Debug</Filter>
@@ -70,7 +73,7 @@
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
     <ClCompile Include="GLWidget.cpp">
-      <Filter>sources</Filter>
+      <Filter>Sources</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_GLWidget.cpp">
       <Filter>Generated Files\Debug</Filter>
@@ -79,36 +82,39 @@
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
     <ClCompile Include="engine\src\camera.cpp">
-      <Filter>sources</Filter>
+      <Filter>Sources</Filter>
     </ClCompile>
     <ClCompile Include="engine\src\loader.cpp">
-      <Filter>sources</Filter>
+      <Filter>Sources</Filter>
     </ClCompile>
     <ClCompile Include="engine\src\mesh.cpp">
-      <Filter>sources</Filter>
+      <Filter>Sources</Filter>
     </ClCompile>
     <ClCompile Include="engine\src\render_target.cpp">
-      <Filter>sources</Filter>
+      <Filter>Sources</Filter>
     </ClCompile>
     <ClCompile Include="engine\src\shader.cpp">
-      <Filter>sources</Filter>
+      <Filter>Sources</Filter>
     </ClCompile>
     <ClCompile Include="engine\src\texture.cpp">
-      <Filter>sources</Filter>
+      <Filter>Sources</Filter>
     </ClCompile>
     <ClCompile Include="engine\src\debug.cpp">
-      <Filter>sources</Filter>
+      <Filter>Sources</Filter>
     </ClCompile>
     <ClCompile Include="engine\src\mathf.cpp">
-      <Filter>sources</Filter>
+      <Filter>Sources</Filter>
     </ClCompile>
     <ClCompile Include="engine\src\utilities.cpp">
-      <Filter>sources</Filter>
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\src\skybox.cpp">
+      <Filter>Sources</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="Tools.h">
-      <Filter>headers</Filter>
+      <Filter>Headers</Filter>
     </CustomBuild>
     <CustomBuild Include="Tools.ui">
       <Filter>Form Files</Filter>
@@ -117,10 +123,10 @@
       <Filter>Resource Files</Filter>
     </CustomBuild>
     <CustomBuild Include="USBTools.h">
-      <Filter>headers</Filter>
+      <Filter>Headers</Filter>
     </CustomBuild>
     <CustomBuild Include="GLWidget.h">
-      <Filter>headers</Filter>
+      <Filter>Headers</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
@@ -128,46 +134,49 @@
       <Filter>Generated Files</Filter>
     </ClInclude>
     <ClInclude Include="Utility.h">
-      <Filter>headers</Filter>
+      <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="engine\include\camera.h">
-      <Filter>headers</Filter>
+      <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="engine\include\loader.h">
-      <Filter>headers</Filter>
+      <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="engine\include\mesh.h">
-      <Filter>headers</Filter>
+      <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="engine\include\render_state.h">
-      <Filter>headers</Filter>
+      <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="engine\include\render_target.h">
-      <Filter>headers</Filter>
+      <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="engine\include\shader.h">
-      <Filter>headers</Filter>
+      <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="engine\include\texture.h">
-      <Filter>headers</Filter>
+      <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="engine\include\debug.h">
-      <Filter>headers</Filter>
+      <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="engine\include\defs.h">
-      <Filter>headers</Filter>
+      <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="engine\include\mathf.h">
-      <Filter>headers</Filter>
+      <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="engine\include\ptr_table.h">
-      <Filter>headers</Filter>
+      <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="engine\include\reference_countable.h">
-      <Filter>headers</Filter>
+      <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="engine\include\utilities.h">
-      <Filter>headers</Filter>
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\include\skybox.h">
+      <Filter>Headers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -176,6 +185,18 @@
     </None>
     <None Include="Resources\lang\zh.ts">
       <Filter>Translation Files</Filter>
+    </None>
+    <None Include="shaders\simple.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\reflect.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\refract.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\skybox.glsl">
+      <Filter>Shaders</Filter>
     </None>
   </ItemGroup>
 </Project>

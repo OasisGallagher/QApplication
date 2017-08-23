@@ -13,22 +13,25 @@ std::stack<std::string> Debug::samples_;
 std::ofstream debug("main/debug/debug.txt");
 
 void Debug::Log(const std::string& text) {
+	//qDebug() << text.c_str();
 	//OS::SetConsoleColor(White);
 	std::cout << text << "\n";
 	debug << text << "\n";
 }
 
 void Debug::LogWarning(const std::string& text) {
+	//qWarning() << text.c_str();
 	//OS::SetConsoleColor(Yellow);
-	std::cout << "[W] " << text << "\n";
-	debug << "[W] " << text << "\n";
+	//std::cout << "[W] " << text << "\n";
+	//debug << "[W] " << text << "\n";
 	//OS::SetConsoleColor(White);
 }
 
 void Debug::LogError(const std::string& text) {
+	//qCritical() << text.c_str();
 	//OS::SetConsoleColor(Red);
-	std::cout << "[E] " << text << "\n";
-	debug << "[E] " << text << "\n";
+	//std::cout << "[E] " << text << "\n";
+	//debug << "[E] " << text << "\n";
 	//OS::SetConsoleColor(White);
 	//OS::Break(text.c_str());
 }
@@ -43,7 +46,8 @@ void Debug::Break(const std::string& expression, const std::string& message, con
 	std::ostringstream oss;
 	oss << expression + ":\n" + message << "\n";
 	oss << "at " << file << ":" << line;
-	Debug::LogError(oss.str());
+	//qFatal(oss.str().c_str());
+	//Debug::LogError(oss.str());
 
 	//OS::Break(oss.str().c_str());
 }

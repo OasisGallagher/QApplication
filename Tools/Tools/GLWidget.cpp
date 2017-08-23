@@ -1,48 +1,122 @@
 #include <QtGui/QMouseEvent>
+#include <gl/glew.h>
 
+#include "mesh.h"
+#include "defs.h"
+#include "debug.h"
+#include "skybox.h"
+#include "camera.h"
+#include "shader.h"
+#include "skybox.h"
+#include "texture.h"
 #include "GLWidget.h"
+
+#include "Header.h"
+
+void APIENTRY debugOutputCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const GLvoid* userParam);
+
+const GLfloat triangle_data[] = {
+	-1.0f, -1.0f, 0.0f,
+	1.0f, -1.0f, 0.0f,
+	0.0f, 1.0f, 0.0f,
+};
+
+Shader* reflect_, *refract_;
+SkyBox* skyBox_;
+GLuint vao_, vbo_;
+Camera* camera_;
+Mesh* mesh_;
 
 GLWidget::GLWidget(QWidget *parent) : QGLWidget(parent) {
 	setMouseTracking(true);
+	CBtt TT;
+	int x = TT.GetValue();
 }
 
 void GLWidget::initializeGL() {
-	QImage t;
-	QImage b;
-
-	if (!b.load("./star.bmp")) {
-		b = QImage(16, 16, QImage::Format_RGB32);
-		b.fill(Qt::green);
+	glewExperimental = true;
+	if (glewInit() != GLEW_OK) {
+		Debug::LogError("failed to initialize GLEW\n");
+		return;
 	}
 
-	t = QGLWidget::convertToGLFormat(b);
-	glGenTextures(1, &texture[0]);
-	glBindTexture(GL_TEXTURE_2D, texture[0]);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexImage2D(GL_TEXTURE_2D, 0, 3, t.width(), t.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, t.bits());
+	if (GLEW_ARB_debug_output) {
+		glDebugMessageCallbackARB(debugOutputCallback, nullptr);
+		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
+	}
 
-	glEnable(GL_TEXTURE_2D);
-	glShadeModel(GL_SMOOTH);
-	glClearColor(0.0f, 0.0f, 0.0f, 0.5f);
-	glClearDepth(1.0f);
-	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-	glEnable(GL_BLEND);
+	glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
+
+	camera_ = new Camera;
+	reflect_ = new Shader;
+	refract_ = new Shader;
+
+	std::string textures[] = {
+		"textures/lake_skybox/right.jpg",
+		"textures/lake_skybox/left.jpg",
+		"textures/lake_skybox/top.jpg",
+		"textures/lake_skybox/bottom.jpg",
+		"textures/lake_skybox/back.jpg",
+		"textures/lake_skybox/front.jpg",
+	};
+
+	skyBox_ = new SkyBox(camera_, textures);
+	mesh_ = new Mesh;
+
+	mesh_->Load("models/box.obj");
+
+	reflect_->Load("shaders/reflect.glsl");
+	reflect_->Link();
+
+	refract_->Load("shaders/refract.glsl");
+	refract_->Link();
+
+	camera_->Reset(glm::vec3(0, 1, 5), glm::vec3(0));
 }
 
 void GLWidget::resizeGL(int w, int h) {
 	glViewport(0, 0, w, h);
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(0, w, 0, h, -1, 1); // set origin to bottom left corner
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
+}
+
+void RenderRefract() {
+	glm::mat4 m;
+	m[3] = glm::vec4(1.3f, 0, 0, 1);
+	glm::mat4 mvp = camera_->GetProjMatrix() * camera_->GetViewMatrix() * m;
+	glm::mat4 mv = camera_->GetViewMatrix() * m;
+
+	refract_->SetUniform("MV", &mv);
+	refract_->SetUniform("MVP", &mvp);
+
+	refract_->SetUniform("cube", Globals::ColorTextureIndex);
+	skyBox_->GetTexture()->Bind(Globals::ColorTexture);
+
+	refract_->Bind();
+	mesh_->Render();
+}
+
+void RenderReflect() {
+	glm::mat4 m;
+	m[3] = glm::vec4(-1.3f, 0, 0, 1);
+
+	glm::mat4 mvp = camera_->GetProjMatrix() * camera_->GetViewMatrix() * m;
+	glm::mat4 mv = camera_->GetViewMatrix() * m;
+
+	reflect_->SetUniform("MV", &mv);
+	reflect_->SetUniform("MVP", &mvp);
+
+	reflect_->SetUniform("cube", Globals::ColorTextureIndex);
+	skyBox_->GetTexture()->Bind(Globals::ColorTexture);
+
+	reflect_->Bind();
+	mesh_->Render();
 }
 
 void GLWidget::paintGL() {
+	//RenderReflect();
+	//RenderRefract();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glBindTexture(GL_TEXTURE_2D, texture[0]);
+
+	skyBox_->Render();
 }
 
 void GLWidget::mousePressEvent(QMouseEvent *event) {
@@ -59,5 +133,46 @@ void GLWidget::keyPressEvent(QKeyEvent* event) {
 	default:
 		event->ignore();
 		break;
+	}
+}
+
+void APIENTRY debugOutputCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const GLvoid* userParam) {
+	// Shader.
+	if (source == GL_DEBUG_SOURCE_SHADER_COMPILER_ARB) {
+		return;
+	}
+
+	QString text = "OpenGL Debug Output message:\n";
+
+	if (source == GL_DEBUG_SOURCE_API_ARB)					text += "Source: API.\n";
+	else if (source == GL_DEBUG_SOURCE_WINDOW_SYSTEM_ARB)	text += "Source: WINDOW_SYSTEM.\n";
+	else if (source == GL_DEBUG_SOURCE_SHADER_COMPILER_ARB)	text += "Source: SHADER_COMPILER.\n";
+	else if (source == GL_DEBUG_SOURCE_THIRD_PARTY_ARB)		text += "Source: THIRD_PARTY.\n";
+	else if (source == GL_DEBUG_SOURCE_APPLICATION_ARB)		text += "Source: APPLICATION.\n";
+	else if (source == GL_DEBUG_SOURCE_OTHER_ARB)			text += "Source: OTHER.\n";
+
+	if (type == GL_DEBUG_TYPE_ERROR_ARB)					text += "Type: ERROR.\n";
+	else if (type == GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR_ARB)	text += "Type: DEPRECATED_BEHAVIOR.\n";
+	else if (type == GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR_ARB)	text += "Type: UNDEFINED_BEHAVIOR.\n";
+	else if (type == GL_DEBUG_TYPE_PORTABILITY_ARB)			text += "Type: PORTABILITY.\n";
+	else if (type == GL_DEBUG_TYPE_PERFORMANCE_ARB)			text += "Type: PERFORMANCE.\n";
+	else if (type == GL_DEBUG_TYPE_OTHER_ARB)				text += "Type: OTHER.\n";
+
+	if (severity == GL_DEBUG_SEVERITY_HIGH_ARB)				text += "Severity: HIGH.\n";
+	else if (severity == GL_DEBUG_SEVERITY_MEDIUM_ARB)		text += "Severity: MEDIUM.\n";
+	else if (severity == GL_DEBUG_SEVERITY_LOW_ARB)			text += "Severity: LOW.\n";
+
+	text += message;
+
+	Q_ASSERT_X(severity != GL_DEBUG_SEVERITY_HIGH_ARB, "", text.toLatin1());
+
+	if (severity == GL_DEBUG_SEVERITY_HIGH_ARB) {
+		qCritical() << text;
+	}
+	else if (severity == GL_DEBUG_SEVERITY_MEDIUM_ARB) {
+		qWarning() << text;
+	}
+	else {
+		qDebug() << text;
 	}
 }

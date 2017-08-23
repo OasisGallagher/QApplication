@@ -1,7 +1,10 @@
 #pragma once
 #include <glm/glm.hpp>
 
-class Camera {
+#pragma warning(push)
+#pragma warning(disable:4251)
+
+class GRAPHICS_EXPORT Camera {
 public:
 	Camera();
 	~Camera();
@@ -26,3 +29,5 @@ private:
 
 	glm::mat4 proj_, view_;
 };
+
+#pragma warning(pop)

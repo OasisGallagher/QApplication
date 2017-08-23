@@ -7,9 +7,14 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 
+#include "defs.h"
+
+#pragma warning(push)
+#pragma warning(disable:4251)
+
 class Texture2D;
 
-class Mesh {
+class GRAPHICS_EXPORT Mesh {
 public:
 	Mesh();
 	~Mesh();
@@ -152,3 +157,5 @@ private:
 	const aiScene* scene_;
 	Assimp::Importer importer_;
 };
+
+#pragma warning(pop)

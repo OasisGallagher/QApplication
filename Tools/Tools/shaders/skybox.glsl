@@ -22,6 +22,13 @@ in vec3 UV;
 
 uniform samplerCube textureSampler;
 
+uniform bool test = false;
+
 void main() {
-	color = texture(textureSampler, UV);
+	if (test) {
+		color = vec4(1, 0, 0, 1);
+	}
+	else {
+		color = texture(textureSampler, UV);
+	}
 }

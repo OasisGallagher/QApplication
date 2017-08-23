@@ -10,7 +10,7 @@ static char formatBuffer[FORMAT_BUFFER_LENGTH];
 
 std::string Utility::Heading(const std::string& text) {
 	Assert(HEADING_LENGTH >= (int)text.length(), "invalid parameter");
-	int left = (HEADING_LENGTH - text.length()) / 2;
+	int left = (int)(HEADING_LENGTH - text.length()) / 2;
 	std::string ans(HEADING_LENGTH, '=');
 	for (int i = 0; i < (int)text.length(); ++i) {
 		ans[left++] = text[i];
@@ -35,7 +35,7 @@ bool Utility::IsBlankText(const char* text, const char** pos) {
 
 std::string Utility::GetDirectoryPath(const std::string& path) {
 	std::string dir;
-	unsigned slash = path.find_last_of("/");
+	unsigned slash = (unsigned)path.find_last_of("/");
 
 	if (slash == std::string::npos) {
 		dir = ".";
