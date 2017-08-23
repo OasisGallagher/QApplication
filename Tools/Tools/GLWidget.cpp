@@ -1,17 +1,15 @@
+#include <QDebug>
 #include <QtGui/QMouseEvent>
 #include <gl/glew.h>
 
 #include "mesh.h"
 #include "defs.h"
-#include "debug.h"
 #include "skybox.h"
 #include "camera.h"
 #include "shader.h"
 #include "skybox.h"
 #include "texture.h"
 #include "GLWidget.h"
-
-#include "Header.h"
 
 void APIENTRY debugOutputCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const GLvoid* userParam);
 
@@ -29,14 +27,12 @@ Mesh* mesh_;
 
 GLWidget::GLWidget(QWidget *parent) : QGLWidget(parent) {
 	setMouseTracking(true);
-	CBtt TT;
-	int x = TT.GetValue();
 }
 
 void GLWidget::initializeGL() {
 	glewExperimental = true;
 	if (glewInit() != GLEW_OK) {
-		Debug::LogError("failed to initialize GLEW\n");
+		qCritical() << "failed to initialize GLEW\n";
 		return;
 	}
 
@@ -45,7 +41,17 @@ void GLWidget::initializeGL() {
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
 	}
 
+	glClearDepth(1);
 	glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
+
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
 
 	camera_ = new Camera;
 	reflect_ = new Shader;
@@ -63,7 +69,7 @@ void GLWidget::initializeGL() {
 	skyBox_ = new SkyBox(camera_, textures);
 	mesh_ = new Mesh;
 
-	mesh_->Load("models/box.obj");
+	mesh_->Load("models/cube.obj");
 
 	reflect_->Load("shaders/reflect.glsl");
 	reflect_->Link();
@@ -112,10 +118,10 @@ void RenderReflect() {
 }
 
 void GLWidget::paintGL() {
-	//RenderReflect();
-	//RenderRefract();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	RenderReflect();
+	RenderRefract();
 	skyBox_->Render();
 }
 
