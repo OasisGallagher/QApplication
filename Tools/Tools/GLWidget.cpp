@@ -1,66 +1,54 @@
-#include <QDebug>
-#include <QPaintEvent>
-#include <QTimerEvent>
 #include <QtGui/QMouseEvent>
-
-#include "3rdParty/glew-2.1.0/include/GL/glew.h"
 
 #include "GLWidget.h"
 
-#pragma comment(lib, "opengl32.lib")
-#pragma comment(lib, "3rdParty/glew-2.1.0/lib/Release/x64/glew32.lib")
-
-void APIENTRY debugOutputCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const GLvoid* userParam);
-
-GLWidget::GLWidget(QWidget* parent) : QGLWidget(parent) {
+GLWidget::GLWidget(QWidget *parent) : QGLWidget(parent) {
+	setMouseTracking(true);
 }
 
 void GLWidget::initializeGL() {
-	glewExperimental = true;
-	if (glewInit() != GLEW_OK) {
-		qFatal("failed to initialize GLEW\n");
-		return;
+	QImage t;
+	QImage b;
+
+	if (!b.load("./star.bmp")) {
+		b = QImage(16, 16, QImage::Format_RGB32);
+		b.fill(Qt::green);
 	}
-	glDebugMessageCallback(debugOutputCallback, NULL);
 
-	glDisable(GL_ONE_MINUS_SRC_ALPHA);
-	glDisable(GL_DEPTH_TEST);
-	glDisable(GL_COLOR_MATERIAL);
+	t = QGLWidget::convertToGLFormat(b);
+	glGenTextures(1, &texture[0]);
+	glBindTexture(GL_TEXTURE_2D, texture[0]);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexImage2D(GL_TEXTURE_2D, 0, 3, t.width(), t.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, t.bits());
+
+	glEnable(GL_TEXTURE_2D);
+	glShadeModel(GL_SMOOTH);
+	glClearColor(0.0f, 0.0f, 0.0f, 0.5f);
+	glClearDepth(1.0f);
+	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	glEnable(GL_BLEND);
-	glEnable(GL_POLYGON_SMOOTH);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glClearColor(0, 0, 0, 0);
-
-	/*if (GLEW_ARB_debug_output) {
-		glDebugMessageCallback(debugOutputCallback, NULL);
-		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
-	}*/
 }
 
 void GLWidget::resizeGL(int w, int h) {
 	glViewport(0, 0, w, h);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	glOrtho(0, w, 0, h, -1, 1);
+	glOrtho(0, w, 0, h, -1, 1); // set origin to bottom left corner
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 }
 
 void GLWidget::paintGL() {
-	glClear(GL_COLOR_BUFFER_BIT);
-	glColor3f(1, 0, 0);
-	glBegin(GL_POLYGON);
-	glVertex2f(0, 0);
-	glVertex2f(100, 500);
-	glVertex2f(500, 100);
-	glEnd();
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glBindTexture(GL_TEXTURE_2D, texture[0]);
 }
 
 void GLWidget::mousePressEvent(QMouseEvent *event) {
 
 }
 void GLWidget::mouseMoveEvent(QMouseEvent *event) {
-	printf("%d, %d\n", event->x(), event->y());
 }
 
 void GLWidget::keyPressEvent(QKeyEvent* event) {
@@ -71,46 +59,5 @@ void GLWidget::keyPressEvent(QKeyEvent* event) {
 	default:
 		event->ignore();
 		break;
-	}
-}
-
-void APIENTRY debugOutputCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const GLvoid* userParam) {
-	// Shader.
-	if (source == GL_DEBUG_SOURCE_SHADER_COMPILER_ARB) {
-		return;
-	}
-
-	QString text = "OpenGL Debug Output message:\n";
-
-	if (source == GL_DEBUG_SOURCE_API_ARB)					text += "Source: API.\n";
-	else if (source == GL_DEBUG_SOURCE_WINDOW_SYSTEM_ARB)	text += "Source: WINDOW_SYSTEM.\n";
-	else if (source == GL_DEBUG_SOURCE_SHADER_COMPILER_ARB)	text += "Source: SHADER_COMPILER.\n";
-	else if (source == GL_DEBUG_SOURCE_THIRD_PARTY_ARB)		text += "Source: THIRD_PARTY.\n";
-	else if (source == GL_DEBUG_SOURCE_APPLICATION_ARB)		text += "Source: APPLICATION.\n";
-	else if (source == GL_DEBUG_SOURCE_OTHER_ARB)			text += "Source: OTHER.\n";
-
-	if (type == GL_DEBUG_TYPE_ERROR_ARB)					text += "Type: ERROR.\n";
-	else if (type == GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR_ARB)	text += "Type: DEPRECATED_BEHAVIOR.\n";
-	else if (type == GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR_ARB)	text += "Type: UNDEFINED_BEHAVIOR.\n";
-	else if (type == GL_DEBUG_TYPE_PORTABILITY_ARB)			text += "Type: PORTABILITY.\n";
-	else if (type == GL_DEBUG_TYPE_PERFORMANCE_ARB)			text += "Type: PERFORMANCE.\n";
-	else if (type == GL_DEBUG_TYPE_OTHER_ARB)				text += "Type: OTHER.\n";
-
-	if (severity == GL_DEBUG_SEVERITY_HIGH_ARB)				text += "Severity: HIGH.\n";
-	else if (severity == GL_DEBUG_SEVERITY_MEDIUM_ARB)		text += "Severity: MEDIUM.\n";
-	else if (severity == GL_DEBUG_SEVERITY_LOW_ARB)			text += "Severity: LOW.\n";
-
-	text += message;
-
-	Q_ASSERT_X(severity != GL_DEBUG_SEVERITY_HIGH_ARB, "", text.toLatin1());
-
-	if (severity == GL_DEBUG_SEVERITY_HIGH_ARB) {
-		qCritical() << text;
-	}
-	else if (severity == GL_DEBUG_SEVERITY_MEDIUM_ARB) {
-		qWarning() << text;
-	}
-	else {
-		qDebug() << text;
 	}
 }

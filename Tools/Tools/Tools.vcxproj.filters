@@ -1,14 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
-    </Filter>
     <Filter Include="Resource Files">
       <UniqueIdentifier>{D9D6E242-F8AF-46E4-B9FD-80ECBC20BA3E}</UniqueIdentifier>
       <Extensions>qrc;*</Extensions>
@@ -43,13 +35,21 @@
       <Extensions>ts</Extensions>
       <ParseFiles>false</ParseFiles>
     </Filter>
+    <Filter Include="headers">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="sources">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>sources</Filter>
     </ClCompile>
     <ClCompile Include="Tools.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>sources</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_Tools.cpp">
       <Filter>Generated Files\Debug</Filter>
@@ -61,7 +61,7 @@
       <Filter>Generated Files</Filter>
     </ClCompile>
     <ClCompile Include="USBTools.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>sources</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_USBTools.cpp">
       <Filter>Generated Files\Debug</Filter>
@@ -70,12 +70,45 @@
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
     <ClCompile Include="GLWidget.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>sources</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_GLWidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_GLWidget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\src\camera.cpp">
+      <Filter>sources</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\src\loader.cpp">
+      <Filter>sources</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\src\mesh.cpp">
+      <Filter>sources</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\src\render_target.cpp">
+      <Filter>sources</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\src\shader.cpp">
+      <Filter>sources</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\src\texture.cpp">
+      <Filter>sources</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\src\debug.cpp">
+      <Filter>sources</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\src\mathf.cpp">
+      <Filter>sources</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\src\utilities.cpp">
+      <Filter>sources</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="Tools.h">
-      <Filter>Header Files</Filter>
+      <Filter>headers</Filter>
     </CustomBuild>
     <CustomBuild Include="Tools.ui">
       <Filter>Form Files</Filter>
@@ -84,10 +117,10 @@
       <Filter>Resource Files</Filter>
     </CustomBuild>
     <CustomBuild Include="USBTools.h">
-      <Filter>Header Files</Filter>
+      <Filter>headers</Filter>
     </CustomBuild>
     <CustomBuild Include="GLWidget.h">
-      <Filter>Header Files</Filter>
+      <Filter>headers</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
@@ -95,7 +128,46 @@
       <Filter>Generated Files</Filter>
     </ClInclude>
     <ClInclude Include="Utility.h">
-      <Filter>Header Files</Filter>
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\include\camera.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\include\loader.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\include\mesh.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\include\render_state.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\include\render_target.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\include\shader.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\include\texture.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\include\debug.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\include\defs.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\include\mathf.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\include\ptr_table.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\include\reference_countable.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\include\utilities.h">
+      <Filter>headers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

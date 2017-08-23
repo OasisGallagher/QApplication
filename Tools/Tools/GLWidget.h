@@ -1,16 +1,20 @@
 #pragma once
+
 #include <QtOpenGL/QGLWidget>
 
 class GLWidget : public QGLWidget {
+
+	Q_OBJECT // must include this if you use Qt signals/slots
+
 public:
-	GLWidget(QWidget* parent = Q_NULLPTR);
-	~GLWidget() {}
+	GLWidget(QWidget *parent = NULL);
 
 protected:
-	virtual void initializeGL();
-	virtual void resizeGL(int w, int h);
-	virtual void paintGL();
-	virtual void mousePressEvent(QMouseEvent *event);
-	virtual void mouseMoveEvent(QMouseEvent *event);
-	virtual void keyPressEvent(QKeyEvent *event);
+	void initializeGL();
+	void resizeGL(int w, int h);
+	void paintGL();
+	void mousePressEvent(QMouseEvent *event);
+	void mouseMoveEvent(QMouseEvent *event);
+	void keyPressEvent(QKeyEvent *event);
+	GLuint texture[1];
 };
