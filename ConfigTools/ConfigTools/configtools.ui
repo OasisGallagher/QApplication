@@ -59,10 +59,10 @@
        <widget class="QLineEdit" name="picturePath"/>
       </item>
       <item row="2" column="1">
-       <widget class="QComboBox" name="comboBox"/>
+       <widget class="QComboBox" name="categories"/>
       </item>
       <item row="2" column="0">
-       <widget class="QPushButton" name="managerType">
+       <widget class="QPushButton" name="managerCategory">
         <property name="text">
          <string>影片类型...</string>
         </property>
@@ -131,7 +131,11 @@
     </layout>
    </item>
    <item>
-    <widget class="QListView" name="itemList"/>
+    <widget class="QTreeView" name="itemList">
+     <property name="editTriggers">
+      <set>QAbstractItemView::NoEditTriggers</set>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>

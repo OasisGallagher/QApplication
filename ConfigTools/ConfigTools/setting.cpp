@@ -2,15 +2,14 @@
 #include <QString>
 #include <QTextStream>
 #include <QMessageBox>
-#include <QtXml/QDomDocument>
 
 #include "setting.h"
+#include "defines.h"
 
-static const char* path = "data/setting.xml";
 #define tr(_Msg)	QObject::tr(_Msg)
 
 bool Setting::open() {
-	QFile file(path);
+	QFile file(SETTING_PATH);
 	if (!file.exists()) {
 		revert();
 	}
@@ -21,26 +20,82 @@ bool Setting::open() {
 	}
 
 	QDomDocument doc;
-	QString err;
-	int line = 0, column = 0;
-	if (!doc.setContent(&file, false, &err, &line, &column)) {
-		QMessageBox::warning(NULL, tr("InvalidSettingFormatTitle"), QString(tr("InvalidSettingFormatMessage")).arg(err).arg(line).arg(column), QMessageBox::Yes | QMessageBox::No);
+	if (!doc.setContent(&file, false, NULL, NULL, NULL) || !unserialize(&doc)) {
+		QMessageBox::StandardButton ans = QMessageBox::warning(
+			NULL, 
+			tr("InvalidSettingFormatTitle"), 
+			QString(tr("InvalidSettingFormatMessage")),
+			QMessageBox::Yes | QMessageBox::No
+		);
+
+		if (ans != QMessageBox::Yes) {
+			file.close();
+			return false;
+		}
+
+		revert();
+		unserialize(&doc);
+	}
+
+	file.close();
+
+	return true;
+}
+
+bool Setting::unserialize(QDomDocument* doc) {
+	QDomElement root = doc->documentElement().toElement();
+	if (root.isNull()) { return false; }
+
+	QDomNodeList categories = root.elementsByTagName(SETTING_CATEGORY);
+	QDomElement vp = root.firstChildElement(SETTING_VIDEO_POSTFIX).toElement();
+	QDomElement pp = root.firstChildElement(SETTING_PICTURE_POSTFIX).toElement();
+
+	if (vp.isNull() || pp.isNull()) {
 		return false;
 	}
+
+	categories_.clear();
+
+	for (int i = 0; i < categories.size(); ++i) {
+		categories_ << categories.at(i).firstChild().nodeValue();
+	}
+
+	videoPrefix_ = vp.firstChild().nodeValue();
+	picturePrefix_ = pp.firstChild().nodeValue();
+
+	return true;
 }
 
 void Setting::revert() {
-	prefix_ = "*.mp4 *.flv";
-	categories_.clear();
+	videoPrefix_ = "*.mp4 *.flv";
+	picturePrefix_ = "*.jpg *.jpeg *.png";
 
-	revertFromMemory();
+	//categories_.clear();
+	categories_ << "first" << "second";
+
+	serialize();
 }
 
-void Setting::revertFromMemory() {
-	QFile file(path);
-	Q_ASSERT(!file.exists());
+bool Setting::addCategory(const QString& category) {
+	if(!categories_.indexOf(category)) {
+		categories_ << category;
+		serialize();
+		return true;
+	}
 
-	file.open(QIODevice::WriteOnly);
+	return false;
+}
+
+void Setting::removeCategory(const QString& category) {
+	if (categories_.removeAll(category) != 0) {
+		serialize();
+	}
+}
+
+void Setting::serialize() {
+	QFile file(SETTING_PATH);
+
+	file.open(QIODevice::WriteOnly | QIODevice::Truncate);
 
 	QTextStream stream(&file);
 	QDomDocument doc;
@@ -48,21 +103,25 @@ void Setting::revertFromMemory() {
 	QDomProcessingInstruction instruction = doc.createProcessingInstruction("xml", "version = \'1.0\' encoding=\'UTF-8\'");
 	doc.appendChild(instruction);
 
-	QDomElement root = doc.createElement("setting");
+	QDomElement root = doc.createElement(SETTING_ROOT);
 	doc.appendChild(root);
 
-	QDomElement categoriesElement = doc.createElement("categories");
-	doc.appendChild(categoriesElement);
+	QDomElement categoriesElement = doc.createElement(SETTING_CATEGORIES);
+	root.appendChild(categoriesElement);
 
 	foreach(QString str, categories_) {
-		QDomElement e = doc.createElement("category");
+		QDomElement e = doc.createElement(SETTING_CATEGORY);
 		e.appendChild(doc.createTextNode(str));
 		categoriesElement.appendChild(e);
 	}
 
-	QDomElement videoPostfix = doc.createElement("videoPostfix");
-	doc.appendChild(videoPostfix);
-	videoPostfix.appendChild(doc.createTextNode(prefix_));
+	QDomElement vp = doc.createElement(SETTING_VIDEO_POSTFIX);
+	root.appendChild(vp);
+	vp.appendChild(doc.createTextNode(videoPrefix_));
+
+	QDomElement pp = doc.createElement(SETTING_PICTURE_POSTFIX);
+	root.appendChild(pp);
+	pp.appendChild(doc.createTextNode(picturePrefix_));
 
 	doc.save(stream, 4);
 
