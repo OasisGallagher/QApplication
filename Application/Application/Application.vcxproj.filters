@@ -99,10 +99,10 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\Language\en.ts">
+    <None Include="Resources\languages\en.ts">
       <Filter>Translation Files</Filter>
     </None>
-    <None Include="Resources\Language\zh.ts">
+    <None Include="Resources\languages\zh.ts">
       <Filter>Translation Files</Filter>
     </None>
   </ItemGroup>

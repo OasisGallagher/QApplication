@@ -134,9 +134,9 @@ void Application::initWindowWidgets() {
 
 	//table->setItemDelegate(new NoFocusDelegate());
 	table->setMouseTracking(true);
-	table->setStyleSheet("selection-background-color:lightblue;");
+	table->setStyleSheet("selection-background-color:lightblue;border-width: 1px; border-style: solid;border-color: lightgray;");
 
-	hHeader->setStyleSheet("QHeaderView::section{background:lightgray;}");
+	hHeader->setStyleSheet("font-weight:bold;");
 }
 
 void Application::onClickOpenFile() {

@@ -1,6 +1,7 @@
 <RCC>
   <qresource prefix="/qm">
     <file alias="zh">Resources/languages/zh.qm</file>
+	<file alias="en">Resources/languages/en.qm</file>
   </qresource>
   <qresource prefix="/images">
     <file alias="delete">Resources/images/delete_2.png</file>

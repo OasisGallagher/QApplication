@@ -18,6 +18,6 @@ UI_DIR += ./GeneratedFiles
 RCC_DIR += ./GeneratedFiles
 include(Application.pri)
 
-TRANSLATIONS += Resource/cn.ts \
-			 Resource/en.ts
+TRANSLATIONS += Resources/languages/zh.ts \
+	Resources/languages/en.ts
 
