@@ -34,7 +34,10 @@ Shader::~Shader() {
 bool Shader::Load(const std::string& path) {
 	ShaderXLoader loader;
 	std::string sources[ShaderTypeCount];
-	loader.Load(path, sources);
+	if (!loader.Load(path, sources)) {
+		return false;
+	}
+
 	for (int i = 0; i < ShaderTypeCount; ++i) {
 		if (!sources[i].empty() && !LoadShader((ShaderType)i, sources[i].c_str())) {
 			return false;

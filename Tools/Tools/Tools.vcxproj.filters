@@ -48,9 +48,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
-      <Filter>Sources</Filter>
-    </ClCompile>
     <ClCompile Include="Tools.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
@@ -81,34 +78,7 @@
     <ClCompile Include="GeneratedFiles\Release\moc_GLWidget.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
-    <ClCompile Include="engine\src\camera.cpp">
-      <Filter>Sources</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\src\loader.cpp">
-      <Filter>Sources</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\src\mesh.cpp">
-      <Filter>Sources</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\src\render_target.cpp">
-      <Filter>Sources</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\src\shader.cpp">
-      <Filter>Sources</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\src\texture.cpp">
-      <Filter>Sources</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\src\debug.cpp">
-      <Filter>Sources</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\src\mathf.cpp">
-      <Filter>Sources</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\src\utilities.cpp">
-      <Filter>Sources</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\src\skybox.cpp">
+    <ClCompile Include="main.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
   </ItemGroup>
@@ -134,48 +104,6 @@
       <Filter>Generated Files</Filter>
     </ClInclude>
     <ClInclude Include="Utility.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\include\camera.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\include\loader.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\include\mesh.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\include\render_state.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\include\render_target.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\include\shader.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\include\texture.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\include\debug.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\include\defs.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\include\mathf.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\include\ptr_table.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\include\reference_countable.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\include\utilities.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\include\skybox.h">
       <Filter>Headers</Filter>
     </ClInclude>
   </ItemGroup>
