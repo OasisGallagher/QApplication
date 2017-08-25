@@ -1,5 +1,7 @@
 #pragma once
 
+#define MESSAGE_BUTTON_YES_NO (QMessageBox::Yes | QMessageBox::No)
+
 #define SETTING_PATH ("data/setting.xml")
 #define SETTING_ROOT ("setting")
 #define SETTING_CATEGORIES ("categories")
@@ -10,3 +12,4 @@
 #define OUTPUT_PATH ("data/output.json")
 #define OUTPUT_VIDEO ("video")
 #define OUTPUT_PICTURE ("picture")
+#define OUTPUT_CATEGORY ("category")

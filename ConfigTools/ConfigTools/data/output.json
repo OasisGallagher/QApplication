@@ -1,10 +1,7 @@
 [
     {
-        "picture": "E:/GitHubQApplication/ConfigTools/ConfigTools/data/remove_me.flv",
-        "video": "E:/GitHubQApplication/ConfigTools/ConfigTools/data/remove_me.jpg"
-    },
-	{
-        "picture": "E:/GitHubQApplication/ConfigTools/ConfigTools/data/remove_me2.flv",
-        "video": "E:/GitHubQApplication/ConfigTools/ConfigTools/data/remove_me2.jpg"
+        "category": "GameVideos",
+        "picture": "C:/Users/liam.wang/Desktop/1.jpg",
+        "video": "C:/Users/liam.wang/Desktop/1.mp4"
     }
 ]

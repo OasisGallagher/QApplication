@@ -12,18 +12,29 @@ class ConfigTools : public QDialog {
 
 public:
 	ConfigTools(QWidget *parent = Q_NULLPTR);
+	~ConfigTools();
 
 private slots:
-	void onSave();
-	void onAddVideo();
-	void onAddPicture();
+	void onAdd();
+	void onRemove();
+
+	void onBrowseVideo();
+	void onEditCategory();
+	void onBrowsePicture();
 
 	void onVideoPathChanged(const QString& path);
 	void onPicturePathChanged(const QString& path);
-private:
-	Output output_;
-	Setting setting_;
-	Ui::ConfigTools ui;
 
-	QStandardItemModel* model_;
+	void onListItemSelectionChanged();
+	void onListItemDoubleClicked(int row, int column);
+	
+	void reloadUIContent();
+	void reloadComboBox();
+
+private:
+	void appendRow(const OutputItem& item);
+
+private:
+	bool saved_;
+	Ui::ConfigTools ui;
 };

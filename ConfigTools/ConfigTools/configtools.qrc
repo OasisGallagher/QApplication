@@ -1,4 +1,6 @@
 <RCC>
-    <qresource prefix="ConfigTools">
+    <qresource prefix="/ConfigTools"/>
+    <qresource prefix="/lang">
+        <file alias="zh">Resources/lang/zh.ts</file>
     </qresource>
 </RCC>

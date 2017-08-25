@@ -8,14 +8,24 @@
 
 #define tr(_Msg)	QObject::tr(_Msg)
 
-bool Setting::open() {
+Setting* Setting::ptr_ = NULL;
+
+Setting* Setting::get() {
+	if (ptr_ == NULL) {
+		ptr_ = new Setting;
+	}
+
+	return ptr_;
+}
+
+bool Setting::read() {
 	QFile file(SETTING_PATH);
 	if (!file.exists()) {
 		revert();
 	}
 
 	if (!file.open(QIODevice::ReadOnly)) {
-		QMessageBox::warning(NULL, tr("FailedToOpenSettingTitle"), tr("FailedToOpenSettingMessage"));
+		QMessageBox::warning(NULL, tr("WarningTitle"), tr("FailedToOpenSettingMessage"));
 		return false;
 	}
 
@@ -23,9 +33,9 @@ bool Setting::open() {
 	if (!doc.setContent(&file, false, NULL, NULL, NULL) || !unserialize(&doc)) {
 		QMessageBox::StandardButton ans = QMessageBox::warning(
 			NULL, 
-			tr("InvalidSettingFormatTitle"), 
+			tr("WarningTitle"), 
 			QString(tr("InvalidSettingFormatMessage")),
-			QMessageBox::Yes | QMessageBox::No
+			MESSAGE_BUTTON_YES_NO
 		);
 
 		if (ans != QMessageBox::Yes) {
@@ -77,19 +87,47 @@ void Setting::revert() {
 }
 
 bool Setting::addCategory(const QString& category) {
-	if(!categories_.indexOf(category)) {
+	if(!categories_.contains(category)) {
 		categories_ << category;
 		serialize();
+		emit categoryAdded();
 		return true;
 	}
 
+	QMessageBox::warning(NULL, tr("Warning"), tr("DuplicateCategoryMessage"), QMessageBox::Ok);
 	return false;
 }
 
-void Setting::removeCategory(const QString& category) {
-	if (categories_.removeAll(category) != 0) {
-		serialize();
+void Setting::removeCategories(const QStringList& categories) {
+	foreach(QString item, categories) {
+		categories_.removeAll(item);
 	}
+
+	serialize();
+	categoriesRemoved(categories);
+}
+
+bool Setting::replaceCategory(const QString& from, const QString& to) {
+	if (categories_.contains(to)) {
+		QMessageBox::warning(NULL, tr("Warning"), tr("DuplicateCategoryMessage"), QMessageBox::Ok);
+		return false;
+	}
+
+	bool modified = false;
+	for (int i = 0; i < categories_.size(); ++i) {
+		if (categories_[i] == from) {
+			categories_[i] = to;
+			modified = true;
+			break;
+		}
+	}
+
+	if (modified) {
+		serialize();
+		emit categoryModified(from, to);
+	}
+
+	return true;
 }
 
 void Setting::serialize() {
