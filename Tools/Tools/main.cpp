@@ -1,9 +1,9 @@
-#include "Tools.h"
-
+#include <QDebug>
 #include <QTextCodec>
 #include <QTranslator>
-#include <QtOpenGL/QGLFormat>
 #include <QtWidgets/QApplication>
+
+#include "Tools.h"
 
 int main(int argc, char *argv[]) {
 	QApplication a(argc, argv);
