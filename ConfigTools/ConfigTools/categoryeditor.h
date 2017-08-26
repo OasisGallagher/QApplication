@@ -1,5 +1,4 @@
-#ifndef CATEGORYEDITOR_H
-#define CATEGORYEDITOR_H
+#pragma once
 
 #include <QDialog>
 
@@ -16,18 +15,20 @@ public:
 	explicit CategoryEditor(QWidget *parent = 0);
 	~CategoryEditor();
 
+private slots:
+	void onItemChanged(QListWidgetItem* item);
+	void onItemListCustomContextMenuRequested();
+	void onAdd();
+	void onRemove();
+	void onModify();
+
 protected:
 	virtual void showEvent(QShowEvent* e);
 
-private slots:
-	void onItemChanged(QListWidgetItem* item);
-	void onItemListCustomContextMenuRequested(const QPoint& pos);
-	void onAddItem();
-	void onRemoveItems();
-	void onModifyItem();
+private:
+	QString newCategoryName();
 
 private:
 	Ui::CategoryEditor *ui;
 };
 
-#endif // CATEGORYEDITOR_H

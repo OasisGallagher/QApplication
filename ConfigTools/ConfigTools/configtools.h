@@ -4,8 +4,10 @@
 #include <QStandardItemModel>
 
 #include "ui_configtools.h"
-#include "output.h"
-#include "setting.h"
+
+struct VideoItem;
+class VideoEditor;
+class CategoryEditor;
 
 class ConfigTools : public QDialog {
 	Q_OBJECT
@@ -14,27 +16,26 @@ public:
 	ConfigTools(QWidget *parent = Q_NULLPTR);
 	~ConfigTools();
 
+protected:
+	virtual void keyReleaseEvent(QKeyEvent* e);
+
 private slots:
 	void onAdd();
+	void onModify();
 	void onRemove();
-
-	void onBrowseVideo();
 	void onEditCategory();
-	void onBrowsePicture();
 
-	void onVideoPathChanged(const QString& path);
-	void onPicturePathChanged(const QString& path);
-
-	void onListItemSelectionChanged();
-	void onListItemDoubleClicked(int row, int column);
+	void onTableCustomContextMenuRequested();
+	void onItemDoubleClicked(int row, int column);
 	
 	void reloadUIContent();
-	void reloadComboBox();
+	
+private:
+	void appendRow(const VideoItem& item);
 
 private:
-	void appendRow(const OutputItem& item);
+	VideoEditor* videoEditor_;
+	CategoryEditor* categoryEditor_;
 
-private:
-	bool saved_;
 	Ui::ConfigTools ui;
 };

@@ -11,9 +11,10 @@ public:
 
 	bool read();
 
-	const QString& videoPrefix() { return videoPrefix_; }
-	const QString& picturePrefix() { return picturePrefix_; }
-	const QStringList& videoCategories() { return categories_; }
+	const QString& videoPrefix() const { return videoPrefix_; }
+	const QString& picturePrefix() const { return picturePrefix_; }
+	const QString categoryAt(int i) const { return categories_[i]; }
+	const QStringList& categories() const { return categories_; }
 
 	bool addCategory(const QString& category);
 	void removeCategories(const QStringList& categories);

@@ -1,7 +1,12 @@
 [
     {
-        "category": "GameVideos",
-        "picture": "C:/Users/liam.wang/Desktop/1.jpg",
-        "video": "C:/Users/liam.wang/Desktop/1.mp4"
+        "category": "测试用例",
+        "picture": "pictures/remove_me.jpg",
+        "video": "videos/remove_me.flv"
+    },
+    {
+        "category": "测试用例",
+        "picture": "pictures/remove_me2.jpg",
+        "video": "videos/remove_me2.flv"
     }
 ]

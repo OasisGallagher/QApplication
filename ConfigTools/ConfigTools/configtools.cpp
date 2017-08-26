@@ -1,18 +1,22 @@
 #include <QList>
-#include <QDebug>
+#include <QMenu>
 #include <QListView>
+#include <QKeyEvent>
 #include <QMessageBox>
 #include <QToolButton>
 #include <QFileDialog>
 #include <QFileIconProvider>
 #include <QtMultimedia/QMediaPlayer>
 
+#include "VideosConfig.h"
+#include "setting.h"
 #include "defines.h"
 #include "configtools.h"
+#include "videoeditor.h"
 #include "categoryeditor.h"
 
 ConfigTools::ConfigTools(QWidget *parent)
-	: QDialog(parent), saved_(true) {
+	: QDialog(parent) {
 	ui.setupUi(this);
 	Qt::WindowFlags flags = windowFlags();
 	flags |= Qt::WindowMinimizeButtonHint;
@@ -20,9 +24,8 @@ ConfigTools::ConfigTools(QWidget *parent)
 	flags |= Qt::MSWindowsFixedSizeDialogHint;
 	setWindowFlags(flags);
 
-	QStringList headers;
-	headers << tr("FileName") << tr("PictureName") << tr("Category");
-	ui.itemList->setHorizontalHeaderLabels(headers);
+	videoEditor_ = new VideoEditor(this);
+	categoryEditor_ = new CategoryEditor(this);
 
 	ui.itemList->horizontalHeader()->setSectionsClickable(false);
 	ui.itemList->horizontalHeader()->setStyleSheet("font-weight:bold;");
@@ -31,28 +34,26 @@ ConfigTools::ConfigTools(QWidget *parent)
 	ui.itemList->setSelectionBehavior(QAbstractItemView::SelectRows);
 	ui.itemList->setSelectionMode(QAbstractItemView::SingleSelection);
 	ui.itemList->setColumnCount(3);
-	
-	connect(Setting::get(), SIGNAL(categoryAdded()), this, SLOT(reloadComboBox()));
-	connect(Output::get(), SIGNAL(outputModified()), this, SLOT(reloadUIContent()));
 
-	ui.modify->setEnabled(false);
+	QStringList headers;
+	headers << tr("FileName") << tr("PictureName") << tr("Category");
+	ui.itemList->setHorizontalHeaderLabels(headers);
 
-	connect(ui.selectVideo, SIGNAL(clicked()), this, SLOT(onBrowseVideo()));
-	connect(ui.selectPicture, SIGNAL(clicked()), this, SLOT(onBrowsePicture()));
+	connect(VideosConfig::get(), SIGNAL(outputModified()), this, SLOT(reloadUIContent()));
+	connect(ui.editCategory, SIGNAL(clicked()), this, SLOT(onEditCategory()));
 
-	connect(ui.managerCategory, SIGNAL(clicked()), this, SLOT(onEditCategory()));
+	ui.add->setText(tr("Add%1").arg("..."));
+	ui.modify->setText(tr("Modify%1").arg("..."));
 
 	connect(ui.add, SIGNAL(clicked()), this, SLOT(onAdd()));
+	connect(ui.modify, SIGNAL(clicked()), this, SLOT(onModify()));
 	connect(ui.remove, SIGNAL(clicked()), this, SLOT(onRemove()));
 
-	connect(ui.videoPath, SIGNAL(textChanged(const QString&)), this, SLOT(onVideoPathChanged(const QString&)));
-	connect(ui.picturePath, SIGNAL(textChanged(const QString&)), this, SLOT(onPicturePathChanged(const QString&)));
-
-	connect(ui.itemList, SIGNAL(cellDoubleClicked(int, int)), this, SLOT(onListItemDoubleClicked(int, int)));
-	connect(ui.itemList, SIGNAL(currentItemChanged(QTableWidgetItem*, QTableWidgetItem*)), this, SLOT(onListItemSelectionChanged()));
+	connect(ui.itemList, SIGNAL(cellDoubleClicked(int, int)), this, SLOT(onItemDoubleClicked(int, int)));
+	connect(ui.itemList, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(onTableCustomContextMenuRequested()));
 
 	Setting::get()->read();
-	Output::get()->read();
+	VideosConfig::get()->read();
 
 	reloadUIContent();
 }
@@ -60,40 +61,31 @@ ConfigTools::ConfigTools(QWidget *parent)
 ConfigTools::~ConfigTools() {
 }
 
-void ConfigTools::reloadComboBox() {
-	ui.categories->addItems(Setting::get()->videoCategories());
-	ui.categories->setCurrentIndex(-1);
+void ConfigTools::keyReleaseEvent(QKeyEvent* e) {
+	if (e->key() == Qt::Key_Delete) {
+		onRemove();
+	}
 }
 
 void ConfigTools::reloadUIContent() {
-	ui.videoPath->clear();
-	ui.picturePath->clear();
-
-	ui.categories->clear();
-
-	reloadComboBox();
-
 	ui.itemList->clearContents();
 	ui.itemList->setRowCount(0);
 
-	auto cont = Output::get()->items();
+	auto cont = VideosConfig::get()->items();
 	for (int i = 0; i < cont.size(); ++i) {
 		appendRow(cont[i]);
 	}
-
-	ui.itemList->horizontalHeader()->resizeSections(QHeaderView::ResizeToContents);
-	ui.itemList->horizontalHeader()->setStretchLastSection(true);
 }
 
-void ConfigTools::appendRow(const OutputItem& item) {
+void ConfigTools::appendRow(const VideoItem& item) {
 	int p = ui.itemList->rowCount();
 	ui.itemList->insertRow(p);
 	ui.itemList->setRowHeight(p, 22);
 
 	QFileInfo vi(item.video);
 	QFileInfo pi(item.picture);
-	QTableWidgetItem* item0 = new QTableWidgetItem(vi.fileName());
-	QTableWidgetItem* item1 = new QTableWidgetItem(pi.fileName());
+	QTableWidgetItem* item0 = new QTableWidgetItem(vi.filePath());
+	QTableWidgetItem* item1 = new QTableWidgetItem(pi.filePath());
 	QTableWidgetItem* item2 = new QTableWidgetItem(item.category);
 
 	ui.itemList->setItem(p, 0, item0);
@@ -101,27 +93,53 @@ void ConfigTools::appendRow(const OutputItem& item) {
 	ui.itemList->setItem(p, 2, item2);
 }
 
-void ConfigTools::onListItemSelectionChanged() {
-	qDebug() << ui.itemList->selectedItems().size();
+void ConfigTools::onTableCustomContextMenuRequested() {
+	QList<QTableWidgetItem*> list = ui.itemList->selectedItems();
+
+	QMenu menu;
+	QAction* add = new QAction(tr("Add"), &menu);
+	QAction* remove = new QAction(tr("Remove"), &menu);
+	QAction* modify = new QAction(tr("Modify"), &menu);
+
+	connect(add, SIGNAL(triggered()), this, SLOT(onAdd()));
+	connect(modify, SIGNAL(triggered()), this, SLOT(onModify()));
+	connect(remove, SIGNAL(triggered()), this, SLOT(onRemove()));
+
+	if (list.isEmpty()) {
+		remove->setEnabled(false);
+		modify->setEnabled(false);
+	}
+
+	menu.addAction(add);
+	menu.addAction(remove);
+	menu.addAction(modify);
+
+	menu.exec(QCursor::pos());
 }
 
-void ConfigTools::onListItemDoubleClicked(int row, int column) {
-	if (!saved_) {
-		auto ans = QMessageBox::information(this, tr("SavePromptTitle"), tr("SavePromptMessage"), MESSAGE_BUTTON_YES_NO | QMessageBox::Cancel);
-		if (ans == QMessageBox::Cancel) {
-			return;
-		}
+void ConfigTools::onItemDoubleClicked(int row, int column) {
+	onModify();
+}
 
-		if (ans == QMessageBox::Yes) {
-			onAdd();
-		}
+void ConfigTools::onAdd() {
+	videoEditor_->exec(-1);
+	if (videoEditor_->result() == QDialog::Accepted) {
+		reloadUIContent();
 	}
-	
-	const OutputItem& item = Output::get()->items()[row];
-	ui.videoPath->setText(item.video);
-	ui.picturePath->setText(item.picture);
-	int index = Setting::get()->videoCategories().indexOf(item.category);
-	ui.categories->setCurrentIndex(qMax(index, 0));
+}
+
+void ConfigTools::onModify() {
+	QList<QTableWidgetItem*> items = ui.itemList->selectedItems();
+	if (items.empty()) {
+		QMessageBox::warning(this, tr("Warning"), tr("EmptySelectionMessage"), QMessageBox::Ok);
+		return;
+	}
+
+	QTableWidgetItem* item = items.front();
+	videoEditor_->exec(item->row());
+	if (videoEditor_->result() == QDialog::Accepted) {
+		reloadUIContent();
+	}
 }
 
 void ConfigTools::onRemove() {
@@ -131,77 +149,17 @@ void ConfigTools::onRemove() {
 		return;
 	}
 
-	auto ans = QMessageBox::warning(this, tr("WarningTitle"), tr("RemoveItemPrompt"), MESSAGE_BUTTON_YES_NO);
+	auto ans = QMessageBox::warning(this, tr("WarningTitle"), tr("RemoveItemPrompt").arg(items.size()), MESSAGE_BUTTON_YES_NO);
 	if (ans == QMessageBox::No) {
 		return;
 	}
 
 	int row = items.front()->row();
-	
+
 	ui.itemList->removeRow(row);
-	Output::get()->remove(row);
-}
-
-void ConfigTools::onAdd() {
-	QString videoPath = ui.videoPath->text();
-	if (videoPath.isEmpty() || !QFile(videoPath).exists()) {
-		QMessageBox::warning(this, tr("WarningTitle"), tr("InvalidVideoPathMessage"), QMessageBox::Ok);
-		return;
-	}
-
-	QString picturePath = ui.picturePath->text();
-	if (picturePath.isEmpty() || !QFile(picturePath).exists()) {
-		QMessageBox::warning(this, tr("WarningTitle"), tr("InvalidPicturePathMessage"), QMessageBox::Ok);
-		return;
-	}
-
-	int index = ui.categories->currentIndex();
-	if (index < 0) {
-		QMessageBox::warning(this, tr("WarningTitle"), tr("InvalidCategorySelectedMessage"), QMessageBox::Ok);
-		return;
-	}
-
-	QString category;
-	QStringList list = Setting::get()->videoCategories();
-	if (index >= 0 && index < list.size()) {
-		category = list[index];
-	}
-
-	OutputItem item = { videoPath.replace('\\', '/'), picturePath.replace('\\', '/'), category };
-	if (Output::get()->add(item)) {
-		appendRow(item);
-		ui.videoPath->clear();
-		ui.picturePath->clear();
-		ui.categories->setCurrentIndex(0);
-	}
-}
-
-void ConfigTools::onBrowseVideo() {
-	QString file = QFileDialog::getOpenFileName(this, tr("SelectVideo"), "", tr("Videos") + " (" + Setting::get()->videoPrefix() + ")");
-	if (file.isEmpty()) { return; }
-
-	ui.videoPath->setText(file);
+	VideosConfig::get()->remove(row);
 }
 
 void ConfigTools::onEditCategory() {
-	CategoryEditor* editor = new CategoryEditor(this);
-	editor->exec();
-}
-
-void ConfigTools::onBrowsePicture() {
-	QString file = QFileDialog::getOpenFileName(this, tr("SelectVideo"), "", tr("Videos") + " (" + Setting::get()->picturePrefix() + ")");
-	if (file.isEmpty()) { return; }
-	ui.picturePath->setText(file);
-}
-
-void ConfigTools::onVideoPathChanged(const QString& path) {
-	QFile file(path);
-	QString ff = "font-family: Microsoft Yahei; font-size:13px;";
-	ui.videoPath->setStyleSheet(ff + (path.isEmpty() || file.exists() ? "color:black;" : "color:red;"));
-}
-
-void ConfigTools::onPicturePathChanged(const QString& path) {
-	QFile file(path);
-	QString ff = "font-family: Microsoft Yahei; font-size:13px;";
-	ui.picturePath->setStyleSheet(ff + (path.isEmpty() || file.exists() ? "color:black;" : "color:red;"));
+	categoryEditor_->exec();
 }

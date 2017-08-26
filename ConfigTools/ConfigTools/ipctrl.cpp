@@ -1,5 +1,11 @@
-#include "ipctrl.h"
+#include <QLineEdit>
+#include <QIntValidator>
+#include <QHBoxLayout>
+#include <QFont>
+#include <QLabel>
+#include <QKeyEvent>
 
+#include "ipctrl.h"
 
 IPCtrl::IPCtrl(QWidget *parent) : QFrame(parent) {
 	//setFrameShape(QFrame::StyledPanel);
@@ -46,6 +52,25 @@ IPCtrl::IPCtrl(QWidget *parent) : QFrame(parent) {
 		Qt::QueuedConnection);
 }
 
+QString IPCtrl::text() const {
+	QString ans;
+	for (int i = 0; i < QTUTL_IP_SIZE; ++i) {
+		QString field = m_pLineEdit[i]->text();
+		if (field.isEmpty()) {
+			ans.clear();
+			break;
+		}
+
+		if (i != 0) {
+			ans += '.';
+		}
+
+		ans += field;
+	}
+
+	return ans;
+}
+
 void IPCtrl::slotTextChanged(QLineEdit* pEdit) {
 	for (unsigned int i = 0; i != QTUTL_IP_SIZE; ++i) {
 		if (pEdit == m_pLineEdit[i]) {
@@ -73,14 +98,14 @@ bool IPCtrl::eventFilter(QObject *obj, QEvent *event) {
 					case Qt::Key_Left:
 						if (pEdit->cursorPosition() == 0) {
 							// user wants to move to previous item
-							MovePrevLineEdit(i);
+							moveToPrevField(i);
 						}
 						break;
 
 					case Qt::Key_Right:
 						if (pEdit->text().isEmpty() || (pEdit->text().size() == pEdit->cursorPosition())) {
 							// user wants to move to next item
-							MoveNextLineEdit(i);
+							moveToNextField(i);
 						}
 						break;
 
@@ -88,7 +113,7 @@ bool IPCtrl::eventFilter(QObject *obj, QEvent *event) {
 						if (pEdit->text().isEmpty() || pEdit->text() == "0") {
 							pEdit->setText("0");
 							// user wants to move to next item
-							MoveNextLineEdit(i);
+							moveToNextField(i);
 						}
 						emit signalTextChanged(pEdit);
 						break;
@@ -96,13 +121,13 @@ bool IPCtrl::eventFilter(QObject *obj, QEvent *event) {
 					case Qt::Key_Backspace:
 						if (pEdit->text().isEmpty() || pEdit->cursorPosition() == 0) {
 							// user wants to move to previous item
-							MovePrevLineEdit(i);
+							moveToPrevField(i);
 						}
 						break;
 
 					case Qt::Key_Comma:
 					case Qt::Key_Period:
-						MoveNextLineEdit(i);
+						moveToNextField(i);
 						break;
 
 					default:
@@ -118,7 +143,7 @@ bool IPCtrl::eventFilter(QObject *obj, QEvent *event) {
 	return bRes;
 }
 
-void IPCtrl::MoveNextLineEdit(int i) {
+void IPCtrl::moveToNextField(int i) {
 	if (i + 1 != QTUTL_IP_SIZE) {
 		m_pLineEdit[i + 1]->setFocus();
 		m_pLineEdit[i + 1]->setCursorPosition(0);
@@ -126,7 +151,7 @@ void IPCtrl::MoveNextLineEdit(int i) {
 	}
 }
 
-void IPCtrl::MovePrevLineEdit(int i) {
+void IPCtrl::moveToPrevField(int i) {
 	if (i != 0) {
 		m_pLineEdit[i - 1]->setFocus();
 		m_pLineEdit[i - 1]->setCursorPosition(m_pLineEdit[i - 1]->text().size());

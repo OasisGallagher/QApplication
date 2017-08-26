@@ -63,9 +63,6 @@
     <ClCompile Include="setting.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="output.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ipctrl.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -90,11 +87,23 @@
     <ClCompile Include="GeneratedFiles\Release\moc_setting.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_output.cpp">
+    <ClCompile Include="videoeditor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_videoeditor.cpp">
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_output.cpp">
+    <ClCompile Include="GeneratedFiles\Release\moc_videoeditor.cpp">
       <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_videosconfig.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_videosconfig.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="videosconfig.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -116,10 +125,16 @@
     <CustomBuild Include="categoryeditor.ui">
       <Filter>Form Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="output.h">
+    <CustomBuild Include="setting.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="setting.h">
+    <CustomBuild Include="videoeditor.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="videoeditor.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="videosconfig.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
   </ItemGroup>
@@ -136,9 +151,9 @@
     <ClInclude Include="GeneratedFiles\ui_categoryeditor.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="ConfigTools.rc" />
+    <ClInclude Include="GeneratedFiles\ui_videoeditor.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\lang\zh.ts">

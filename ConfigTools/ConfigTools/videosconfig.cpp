@@ -6,28 +6,28 @@
 #include <QMessageBox>
 #include <QJsonDocument>
 
-#include "output.h"
+#include "VideosConfig.h"
 #include "setting.h"
 #include "defines.h"
 
 #define tr(_Msg)	QObject::tr(_Msg)
 
-Output* Output::ptr_ = NULL;
+VideosConfig* VideosConfig::ptr_ = NULL;
 
-Output* Output::get() {
+VideosConfig* VideosConfig::get() {
 	if (ptr_ == NULL) {
-		ptr_ = new Output;
+		ptr_ = new VideosConfig;
 	}
 
 	return ptr_;
 }
 
-Output::Output() {
+VideosConfig::VideosConfig() {
 	connect(Setting::get(), SIGNAL(categoriesRemoved(const QStringList&)), this, SLOT(onCategoriesRemoved(const QStringList&)));
 	connect(Setting::get(), SIGNAL(categoryModified(const QString&, const QString&)), this, SLOT(onCategoryModified(const QString&, const QString&)));
 }
 
-bool Output::read() {
+bool VideosConfig::read() {
 	QFile file(OUTPUT_PATH);
 	if (!file.open(QIODevice::ReadOnly)) {
 		return false;
@@ -50,14 +50,14 @@ bool Output::read() {
 	QJsonArray ja = jd.array();
 	for (int i = 0; i < ja.size(); ++i) {
 		QJsonObject jo = ja[i].toObject();
-		OutputItem item{ jo[OUTPUT_VIDEO].toString(), jo[OUTPUT_PICTURE].toString(), jo[OUTPUT_CATEGORY].toString() };
+		VideoItem item{ jo[OUTPUT_VIDEO].toString(), jo[OUTPUT_PICTURE].toString(), jo[OUTPUT_CATEGORY].toString() };
 		cont_.append(item);
 	}
 
 	return true;
 }
 
-int Output::countOfCategoriesUsed(const QStringList& categories) {
+int VideosConfig::countOfCategoriesUsed(const QStringList& categories) {
 	int ans = 0;
 	for (int i = 0; i < cont_.size(); ++i) {
 		if (categories.contains(cont_[i].category)) {
@@ -68,7 +68,7 @@ int Output::countOfCategoriesUsed(const QStringList& categories) {
 	return ans;
 }
 
-void Output::onCategoriesRemoved(const QStringList& categories) {
+void VideosConfig::onCategoriesRemoved(const QStringList& categories) {
 	bool modified = true;
 
 	for (int i = cont_.size() - 1; i >= 0 ; --i) {
@@ -84,7 +84,7 @@ void Output::onCategoriesRemoved(const QStringList& categories) {
 	}
 }
 
-void Output::onCategoryModified(const QString& from, const QString& to) {
+void VideosConfig::onCategoryModified(const QString& from, const QString& to) {
 	bool modifed = false;
 	for (int i = 0; i < cont_.size(); ++i) {
 		if (cont_[i].category == from) {
@@ -99,7 +99,7 @@ void Output::onCategoryModified(const QString& from, const QString& to) {
 	}
 }
 
-void Output::flush() {
+void VideosConfig::flush() {
 	/*QString OUTPUT_PATH = QFileDialog::getSaveFileName(NULL, tr("SaveOutputTitle"), DEFAULT_FILE, "*.json");
 	if (OUTPUT_PATH.isEmpty()) {
 		return;
@@ -111,40 +111,57 @@ void Output::flush() {
 	file.close();
 }
 
-bool Output::add(const OutputItem& item) {
-	int i = 0;
-	for (; i < cont_.size(); ++i) {
-		if (cont_[i].video == item.video) {
-			QMessageBox::StandardButton ans = QMessageBox::information(NULL, tr("DuplicateItemTitle"),
-				tr("DuplicateItemMessage"), MESSAGE_BUTTON_YES_NO | QMessageBox::Cancel);
+bool VideosConfig::add(const VideoItem& item) {
+	int i = indexOf(item.video);
 
-			if (ans == QMessageBox::Cancel) {
-				return false;
-			}
+	if (i >= 0) {
+		auto ans = QMessageBox::warning(NULL, tr("Warning"), tr("DuplicateItemOverrideMessage"), MESSAGE_BUTTON_YES_NO);
 
-			if (ans == QMessageBox::Yes) {
-				cont_[i] = item;
-			}
+		if (ans == QMessageBox::No) {
+			return false;
+		}
 
-			break;
+		if (ans == QMessageBox::Yes) {
+			cont_[i] = item;
 		}
 	}
-
-	if (i >= cont_.size()) {
+	else {
 		cont_.append(item);
 	}
 
 	flush();
+	emit outputModified();
 
 	return true;
 }
 
-void Output::remove(int i) {
+void VideosConfig::remove(int i) {
 	cont_.remove(i);
 	flush();
+	emit outputModified();
 }
 
-QByteArray Output::format() {
+bool VideosConfig::modify(int i, const VideoItem& item) {
+	// modify information.
+	if (cont_[i].video == item.video) {
+		cont_[i] = item;
+	}
+	else {
+		int p = indexOf(item.video);
+		if (p >= 0) {
+			QMessageBox::information(NULL, tr("DuplicateItemTitle"), tr("DuplicateItemMessage"), QMessageBox::Yes);
+			return false;
+		}
+	}
+
+	cont_[i] = item;
+	flush();
+	emit outputModified();
+
+	return true;
+}
+
+QByteArray VideosConfig::format() {
 	QJsonArray ja;
 
 	for (int i = 0; i < cont_.size(); ++i) {
@@ -160,4 +177,14 @@ QByteArray Output::format() {
 	jd.setArray(ja);
 
 	return jd.toJson();
+}
+
+int VideosConfig::indexOf(const QString& video) {
+	for (int i = 0; i < cont_.size(); ++i) {
+		if (cont_[i].video == video) {
+			return i;
+		}
+	}
+
+	return -1;
 }

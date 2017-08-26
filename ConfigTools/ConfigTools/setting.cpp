@@ -108,6 +108,8 @@ void Setting::removeCategories(const QStringList& categories) {
 }
 
 bool Setting::replaceCategory(const QString& from, const QString& to) {
+	if (from == to) { return true; }
+
 	if (categories_.contains(to)) {
 		QMessageBox::warning(NULL, tr("Warning"), tr("DuplicateCategoryMessage"), QMessageBox::Ok);
 		return false;

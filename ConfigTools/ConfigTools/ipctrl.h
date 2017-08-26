@@ -1,12 +1,6 @@
 #pragma once
 #include <QFrame>
-#include <QLineEdit>
-#include <QIntValidator>
-#include "stdint.h"
-#include <QHBoxLayout>
-#include <QFont>
-#include <QLabel>
-#include <QKeyEvent>
+class QLineEdit;
 
 class IPCtrl : public QFrame {
 	Q_OBJECT
@@ -15,9 +9,13 @@ public:
 	IPCtrl(QWidget *parent = 0);
 	~IPCtrl() {}
 
+public:
+	QString text() const;
+
+protected:
 	virtual bool eventFilter(QObject *obj, QEvent *event);
 
-	public slots:
+public slots:
 	void slotTextChanged(QLineEdit* pEdit);
 
 signals:
@@ -30,6 +28,6 @@ private:
 	};
 
 	QLineEdit *(m_pLineEdit[QTUTL_IP_SIZE]);
-	void MoveNextLineEdit(int i);
-	void MovePrevLineEdit(int i);
+	void moveToNextField(int i);
+	void moveToPrevField(int i);
 };

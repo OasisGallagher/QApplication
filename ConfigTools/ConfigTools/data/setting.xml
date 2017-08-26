@@ -1,7 +1,8 @@
 <?xml version = '1.0' encoding='UTF-8'?>
 <setting>
     <categories>
-        <category>TradeVideos___2</category>
+        <category>GameVideo</category>
+        <category>测试用例</category>
     </categories>
     <videoPostfix>*.mp4 *.flv</videoPostfix>
     <picturePostfix>*.jpg *.jpeg *.png</picturePostfix>

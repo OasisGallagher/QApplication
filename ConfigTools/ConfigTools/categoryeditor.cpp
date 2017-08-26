@@ -3,7 +3,7 @@
 #include <QMessageBox>
 
 #include "defines.h"
-#include "output.h"
+#include "VideosConfig.h"
 #include "setting.h"
 #include "categoryeditor.h"
 #include "ui_categoryeditor.h"
@@ -14,53 +14,79 @@ CategoryEditor::CategoryEditor(QWidget *parent) :
 	ui->setupUi(this);	
 
 	connect(ui->itemList, SIGNAL(itemChanged(QListWidgetItem*)), this, SLOT(onItemChanged(QListWidgetItem*)));
-	connect(ui->itemList, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(onItemListCustomContextMenuRequested(const QPoint&)));
+	connect(ui->itemList, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(onItemListCustomContextMenuRequested()));
+
+	connect(ui->add, SIGNAL(clicked()), this, SLOT(onAdd()));
+	connect(ui->modify, SIGNAL(clicked()), this, SLOT(onModify()));
+	connect(ui->remove, SIGNAL(clicked()), this, SLOT(onRemove()));
 }
 
 CategoryEditor::~CategoryEditor() {
 	delete ui;
 }
 
-void CategoryEditor::onItemListCustomContextMenuRequested(const QPoint&) {
+void CategoryEditor::onItemListCustomContextMenuRequested() {
 	QList<QListWidgetItem*> list = ui->itemList->selectedItems();
 
-	QMenu* menu = new QMenu(this);
-	QAction* add = new QAction(tr("Add"), menu);
-	QAction* remove = new QAction(tr("Remove"), menu);
-	QAction* modify = new QAction(tr("Modify"), menu);
+	QMenu menu;
+	QAction* add = new QAction(tr("Add"), &menu);
+	QAction* remove = new QAction(tr("Remove"), &menu);
+	QAction* modify = new QAction(tr("Modify"), &menu);
 
-	connect(add, SIGNAL(triggered()), this, SLOT(onAddItem()));
-	connect(modify, SIGNAL(triggered()), this, SLOT(onModifyItem()));
-	connect(remove, SIGNAL(triggered()), this, SLOT(onRemoveItems()));
+	connect(add, SIGNAL(triggered()), this, SLOT(onAdd()));
+	connect(modify, SIGNAL(triggered()), this, SLOT(onModify()));
+	connect(remove, SIGNAL(triggered()), this, SLOT(onRemove()));
 
 	if (list.isEmpty()) {
 		remove->setEnabled(false);
 		modify->setEnabled(false);
 	}
 
-	menu->addAction(add);
-	menu->addAction(remove);
-	menu->addAction(modify);
-	
-	menu->exec(QCursor::pos());
+	menu.addAction(add);
+	menu.addAction(remove);
+	menu.addAction(modify);
+
+	menu.exec(QCursor::pos());
 }
 
-void CategoryEditor::onAddItem() {
-	QListWidgetItem* item = new QListWidgetItem("");
-	item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsSelectable);
+void CategoryEditor::onAdd() {
+	QString name = newCategoryName();
+	QListWidgetItem* item = new QListWidgetItem(name);
+	item->setData(Qt::UserRole, name);
+	Setting::get()->addCategory(item->text());
 
+	item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsSelectable);
 	ui->itemList->addItem(item);
 	ui->itemList->editItem(item);
+	ui->itemList->clearSelection();
+	item->setSelected(true);
 }
 
-void CategoryEditor::onRemoveItems() {
+QString CategoryEditor::newCategoryName() {
+	auto items = Setting::get()->categories();
+	QString ans = tr("NewCategory");
+	for (int i = 1; items.contains(ans); ++i) {
+		ans = QString(tr("NewCategory") + "%1").arg(i);
+	}
+
+	return ans;
+}
+
+void CategoryEditor::onRemove() {
 	QStringList list;
-	foreach(QListWidgetItem* item, ui->itemList->selectedItems()) {
+	QList<QListWidgetItem*> selected = ui->itemList->selectedItems();
+	foreach(QListWidgetItem* item, selected) {
 		list << item->text();
 	}
 
-	if (Output::get()->countOfCategoriesUsed(list) > 0) {
+	if (VideosConfig::get()->countOfCategoriesUsed(list) > 0) {
 		auto ans = QMessageBox::warning(this, tr("Warning"), "RemoveCategoryDependencyMessage", MESSAGE_BUTTON_YES_NO);
+		if (ans == QMessageBox::No) {
+			return;
+		}
+	}
+	else {
+		auto ans = QMessageBox::warning(this, tr("WarningTitle"), tr("RemoveItemPrompt").arg(selected.size()), MESSAGE_BUTTON_YES_NO);
 		if (ans == QMessageBox::No) {
 			return;
 		}
@@ -78,16 +104,23 @@ void CategoryEditor::onRemoveItems() {
 	Setting::get()->removeCategories(list);
 }
 
-void CategoryEditor::onModifyItem() {
-	ui->itemList->editItem(ui->itemList->selectedItems().front());
+void CategoryEditor::onModify() {
+	QList<QListWidgetItem*> items = ui->itemList->selectedItems();
+	if (items.isEmpty()) {
+		QMessageBox::warning(this, tr("Warning"), tr("EmptySelectionMessage"), QMessageBox::Ok);
+		return;
+	}
+
+	ui->itemList->editItem(items.front());
 }
 
 void CategoryEditor::showEvent(QShowEvent* e) {
-	const QStringList& categories = Setting::get()->videoCategories();
+	const QStringList& categories = Setting::get()->categories();
 	ui->itemList->clear();
 
 	foreach(QString str, categories) {
 		QListWidgetItem* item = new QListWidgetItem(str);
+		item->setData(Qt::UserRole, str);
 		item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsSelectable);
 		ui->itemList->addItem(item);
 	}
@@ -95,18 +128,26 @@ void CategoryEditor::showEvent(QShowEvent* e) {
 
 void CategoryEditor::onItemChanged(QListWidgetItem* item) {
 	int row = ui->itemList->row(item);
-	QStringList list = Setting::get()->videoCategories();
-	if (row >= list.size()) {
-		if (item->text().isEmpty()) {
-			QMessageBox::warning(this, tr("Warning"), tr("EmptyCategoryMessage"), QMessageBox::Ok);
-			ui->itemList->editItem(item);
-		}
-		else {
-			Setting::get()->addCategory(item->text());
-		}
+	QStringList list = Setting::get()->categories();
+	bool done = false;
+
+	if (item->text().isEmpty()) {
+		QMessageBox::warning(this, tr("Warning"), tr("EmptyCategoryMessage"), QMessageBox::Ok);
+	}
+	else if (row >= list.size()) {
+		done = Setting::get()->addCategory(item->text());
 	}
 	else {
-		QString old = Setting::get()->videoCategories()[row];
-		Setting::get()->replaceCategory(old, item->text());
+		QString old = Setting::get()->categoryAt(row);
+		done = Setting::get()->replaceCategory(old, item->text());
+	}
+
+	if (done) {
+		item->setData(Qt::UserRole, item->text());
+	}
+	else {
+		item->setText(item->data(Qt::UserRole).toString());
+		ui->itemList->clearSelection();
+		item->setSelected(true);
 	}
 }
