@@ -689,7 +689,7 @@ Shader::UniformBlock::~UniformBlock() {
 
 bool ShaderXLoader::Load(const std::string& path, std::string* answer) {
 	std::vector<std::string> lines;
-	if (!TextLoader::Load(path, lines)) {
+	if (!TextLoader::Load("resources/" + path, lines)) {
 		return false;
 	}
 

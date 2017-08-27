@@ -1,5 +1,7 @@
 #include <QDebug>
+#include <QApplication>
 #include <QtGui/QMouseEvent>
+#include <QtGui/QWheelEvent>
 #include <gl/glew.h>
 
 #include "mesh.h"
@@ -22,19 +24,11 @@ static void OnEngineLogReceived(LogLevel level, const std::string& message) {
 		qWarning() << message.c_str();
 		break;
 	case LogLevelError:
-		qCritical() << message.c_str();
-		break;
 	case LogLevelFatal:
 		qFatal(message.c_str());
 		break;
 	}
 }
-
-const GLfloat triangle_data[] = {
-	-1.0f, -1.0f, 0.0f,
-	1.0f, -1.0f, 0.0f,
-	0.0f, 1.0f, 0.0f,
-};
 
 Shader* reflect_, *refract_;
 SkyBox* skyBox_;
@@ -42,7 +36,8 @@ GLuint vao_, vbo_;
 Camera* camera_;
 Mesh* mesh_;
 
-GLWidget::GLWidget(QWidget *parent) : QGLWidget(parent) {
+GLWidget::GLWidget(QWidget *parent) 
+	: QGLWidget(parent), mpressed_(false), lpressed(false) {
 	setMouseTracking(true);
 }
 
@@ -131,12 +126,52 @@ void GLWidget::paintGL() {
 	RenderReflect();
 	RenderRefract();
 	skyBox_->Render();
+
+	QMetaObject::invokeMethod(this, "updateGL", Qt::QueuedConnection);
+}
+
+void GLWidget::wheelEvent(QWheelEvent* event) {
+	camera_->Zoom(-0.1f * event->delta());
 }
 
 void GLWidget::mousePressEvent(QMouseEvent *event) {
+	if (event->button() == Qt::MiddleButton) {
+		mpos_ = event->pos();
+		mpressed_ = true;
+	}
+	if (event->button() == Qt::LeftButton) {
+		lpos_ = event->pos();
+		lpressed = true;
+	}
 
+	QGLWidget::mousePressEvent(event);
 }
+
+void GLWidget::mouseReleaseEvent(QMouseEvent* event) {
+	if (event->button() == Qt::MiddleButton) {
+		mpressed_ = false;
+	}
+	else if (event->button() == Qt::LeftButton) {
+		lpressed = false;
+	}
+
+	QGLWidget::mouseReleaseEvent(event);
+}
+
 void GLWidget::mouseMoveEvent(QMouseEvent *event) {
+	if (mpressed_) {
+		QPoint delta = event->pos() - mpos_;
+		mpos_ = event->pos();
+		camera_->Move(0.1f * glm::vec2(delta.x(), delta.y()));
+	}
+
+	if (lpressed) {
+		QPoint delta = event->pos() - lpos_;
+		lpos_ = event->pos();
+		camera_->Rotate(-0.1f * glm::vec2(delta.x(), delta.y()));
+	}
+
+	QGLWidget::mouseMoveEvent(event);
 }
 
 void GLWidget::keyPressEvent(QKeyEvent* event) {

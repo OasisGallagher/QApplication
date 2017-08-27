@@ -32,6 +32,7 @@ void Camera::Reset(const glm::vec3& eye, const glm::vec3& center) {
 }
 
 void Camera::Zoom(float delta) {
+	if (delta == 0) { return; }
 	glm::vec3 fwd(
 		sinf(theta_) * cosf(phi_),
 		cosf(theta_),

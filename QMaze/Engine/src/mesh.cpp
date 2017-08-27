@@ -56,11 +56,12 @@ bool Mesh::Load(const std::string& path) {
 
 	Assimp::Importer importer;
 	unsigned flags = aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_CalcTangentSpace;
-	const aiScene* scene = importer.ReadFile(path.c_str(), flags);
+	std::string fpath = "resources/" + path;
+	const aiScene* scene = importer.ReadFile(fpath.c_str(), flags);
 
-	Assert(scene != nullptr, "failed to read file " + path + ": " + importer.GetErrorString());
+	Assert(scene != nullptr, "failed to read file " + fpath + ": " + importer.GetErrorString());
 
-	bool result = InitFromScene(scene, path);
+	bool result = InitFromScene(scene, fpath);
 
 	glBindVertexArray(0);
 
