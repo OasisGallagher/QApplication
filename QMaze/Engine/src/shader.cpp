@@ -2,7 +2,7 @@
 #include "loader.h"
 #include "shader.h"
 #include "utilities.h"
-#include "render_state.h"
+#include "renderstate.h"
 
 struct ShaderDescription {
 	GLenum glShaderType;

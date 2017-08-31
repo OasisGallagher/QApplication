@@ -1,5 +1,4 @@
 #include <glm/glm.hpp>
-#include <glm/gtx/quaternion.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "mesh.h"
@@ -9,9 +8,9 @@
 #include "loader.h"
 #include "texture.h"
 #include "utilities.h"
-#include "render_state.h"
+#include "renderstate.h"
 
-SkyBox::SkyBox(Camera* camera, std::string* textures) {
+Skybox::Skybox(Camera* camera, std::string* textures) {
 	camera_ = camera;
 	shader_ = new Shader;
 	shader_->Load("shaders/skybox.glsl");
@@ -24,13 +23,13 @@ SkyBox::SkyBox(Camera* camera, std::string* textures) {
 	mesh_->Load("models/sphere.obj");
 }
 
-SkyBox::~SkyBox() {
+Skybox::~Skybox() {
 	delete mesh_;
 	delete shader_;
 	delete texture_;
 }
 
-void SkyBox::Render() {
+void Skybox::Render() {
 	shader_->Bind();
 	
 	RenderState::PushCullFaceEnabled(GL_TRUE);
@@ -59,10 +58,10 @@ void SkyBox::Render() {
 	texture_->Unbind();
 }
 
-Texture3D* SkyBox::GetTexture() {
+Texture3D* Skybox::GetTexture() {
 	return texture_;
 }
 
-void SkyBox::Rotate(const glm::mat4& rotation) {
+void Skybox::Rotate(const glm::mat4& rotation) {
 	rotation_ = rotation;
 }

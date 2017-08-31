@@ -131,7 +131,7 @@ void GLWidget::paintGL() {
 }
 
 void GLWidget::wheelEvent(QWheelEvent* event) {
-	camera_->Zoom(-0.1f * event->delta());
+	camera_->Zoom(-0.1f * 0.05f* event->delta());
 }
 
 void GLWidget::mousePressEvent(QMouseEvent *event) {
@@ -162,13 +162,13 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event) {
 	if (mpressed_) {
 		QPoint delta = event->pos() - mpos_;
 		mpos_ = event->pos();
-		camera_->Move(0.1f * glm::vec2(delta.x(), delta.y()));
+		camera_->Move(0.1f * 0.05f * glm::vec2(delta.x(), delta.y()));
 	}
 
 	if (lpressed) {
 		QPoint delta = event->pos() - lpos_;
 		lpos_ = event->pos();
-		camera_->Rotate(-0.1f * glm::vec2(delta.x(), delta.y()));
+		camera_->Rotate(-0.1f * 0.005f * glm::vec2(delta.x(), delta.y()));
 	}
 
 	QGLWidget::mouseMoveEvent(event);

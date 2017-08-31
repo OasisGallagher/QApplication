@@ -20,9 +20,6 @@ enum LogLevel {
 typedef void(*fnLogCallback)(LogLevel type, const std::string& message);
 
 namespace Globals {
-	static const int kWindowWidth =  1024;
-	static const int kWindowHeight = 768;
-
 	static const float kFieldOfView = 3.141592f / 3.f;
 	
 	static const float kNearPlane = 1.f;

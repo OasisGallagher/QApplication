@@ -2,6 +2,7 @@
 #include <string>
 #include <gl/glew.h>
 
+#include "object.h"
 #include "loader.h"
 
 class Mesh;
@@ -10,10 +11,10 @@ class Camera;
 struct ModelInfo;
 class Texture3D;
 
-class ENGINE_EXPORT SkyBox {
+class ENGINE_EXPORT Skybox : public Object {
 public:
-	SkyBox(Camera* camera, std::string* textures);
-	~SkyBox();
+	Skybox(Camera* camera, std::string* textures);
+	~Skybox();
 
 public:
 	void Render();

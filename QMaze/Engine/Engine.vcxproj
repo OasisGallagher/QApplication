@@ -159,10 +159,12 @@ copy $(TargetDir)$(TargetName).dll $(SolutionDir)$(SolutionName)\bin</Command>
     <ClInclude Include="include\environment.h" />
     <ClInclude Include="include\loader.h" />
     <ClInclude Include="include\mesh.h" />
+    <ClInclude Include="include\object.h" />
     <ClInclude Include="include\ptr_table.h" />
-    <ClInclude Include="include\reference_countable.h" />
-    <ClInclude Include="include\render_state.h" />
-    <ClInclude Include="include\render_target.h" />
+    <ClInclude Include="include\referencecountable.h" />
+    <ClInclude Include="include\renderstate.h" />
+    <ClInclude Include="include\rendertarget.h" />
+    <ClInclude Include="include\scene.h" />
     <ClInclude Include="include\shader.h" />
     <ClInclude Include="include\skybox.h" />
     <ClInclude Include="include\texture.h" />
@@ -174,7 +176,8 @@ copy $(TargetDir)$(TargetName).dll $(SolutionDir)$(SolutionName)\bin</Command>
     <ClCompile Include="src\environment.cpp" />
     <ClCompile Include="src\loader.cpp" />
     <ClCompile Include="src\mesh.cpp" />
-    <ClCompile Include="src\render_target.cpp" />
+    <ClCompile Include="src\object.cpp" />
+    <ClCompile Include="src\rendertarget.cpp" />
     <ClCompile Include="src\shader.cpp" />
     <ClCompile Include="src\skybox.cpp" />
     <ClCompile Include="src\texture.cpp" />

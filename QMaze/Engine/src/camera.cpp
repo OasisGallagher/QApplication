@@ -1,5 +1,4 @@
 #include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/quaternion.hpp>
 
 #include "defs.h"
 #include "debug.h"
@@ -7,12 +6,13 @@
 #include "utilities.h"
 
 Camera::Camera() {
-	float aspect = (float)Globals::kWindowWidth / Globals::kWindowHeight;
-	proj_ = glm::perspective(Globals::kFieldOfView, aspect, Globals::kNearPlane, Globals::kFarPlane);
+	aspect_ = 1.3f;
+	near_ = 1.f;
+	far_ = 100.f;
+	fieldOfView_ = 3.141592f / 3.f;
 
-	zspeed_ = 0.05f;
-	mspeed_ = 0.05f;
-	rspeed_ = 0.005f;
+	proj_ = glm::perspective(fieldOfView_, aspect_, near_, far_);
+
 	phi_ = glm::radians(-90.f);
 	theta_ = glm::radians(90.f);
 }
@@ -20,7 +20,7 @@ Camera::Camera() {
 Camera::~Camera() {
 }
 
-void Camera::Reset(const glm::vec3& eye, const glm::vec3& center) {
+void Camera::LookAt(const glm::vec3& eye, const glm::vec3& center) {
 	pos_ = eye;
 
 	center_ = center;
@@ -39,12 +39,12 @@ void Camera::Zoom(float delta) {
 		sinf(theta_) *sin(phi_)
 		);
 	
-	pos_ += fwd * delta * zspeed_;
+	pos_ += fwd * delta;
 }
 
 void Camera::Rotate(const glm::vec2& delta) {
-	phi_ += rspeed_ * delta.x;
-	theta_ += rspeed_ * delta.y;
+	phi_ += delta.x;
+	theta_ += delta.y;
 }
 
 void Camera::Move(const glm::vec2& delta) {
@@ -52,18 +52,18 @@ void Camera::Move(const glm::vec2& delta) {
 		sinf(theta_) * cosf(phi_),
 		cosf(theta_),
 		sinf(theta_) *sin(phi_)
-		);
+	);
 
 	glm::vec3 right(
 		cosf(glm::radians(90.f) + phi_),
 		0,
 		sinf(glm::radians(90.f) + phi_)
-		);
+	);
 
 	glm::vec3 up = glm::cross(right, fwd);
 
-	pos_ += right * delta.x * mspeed_;
-	pos_ += up * delta.y * mspeed_;
+	pos_ += right * delta.x;
+	pos_ += up * delta.y;
 }
 
 const glm::vec3& Camera::GetPosition() {

@@ -1,6 +1,6 @@
 #include "debug.h"
-#include "render_state.h"
-#include "render_target.h"
+#include "renderstate.h"
+#include "rendertarget.h"
 
 RenderTarget::RenderTarget() {
 }
