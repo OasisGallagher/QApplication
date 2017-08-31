@@ -1,6 +1,12 @@
 <RCC>
-  <qresource prefix="/ConfigTools"/>
-  <qresource prefix="/lang">
-    <file alias="zh">Resources/lang/zh.qm</file>
-  </qresource>
+    <qresource prefix="/ConfigTools"/>
+    <qresource prefix="/languages">
+        <file alias="zh">resources/languages/zh.qm</file>
+    </qresource>
+    <qresource prefix="/images">
+        <file alias="setting">resources/images/setting.png</file>
+        <file alias="client">resources/images/client.png</file>
+        <file alias="udisk">resources/images/udisk.png</file>
+        <file alias="video">resources/images/video.png</file>
+    </qresource>
 </RCC>
