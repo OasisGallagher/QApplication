@@ -59,7 +59,7 @@ bool Mesh::Load(const std::string& path) {
 	std::string fpath = "resources/" + path;
 	const aiScene* scene = importer.ReadFile(fpath.c_str(), flags);
 
-	Assert(scene != nullptr, "failed to read file " + fpath + ": " + importer.GetErrorString());
+	AssertX(scene != nullptr, "failed to read file " + fpath + ": " + importer.GetErrorString());
 
 	bool result = InitFromScene(scene, fpath);
 
@@ -135,7 +135,7 @@ void Mesh::InitMesh(const aiMesh* mesh, MeshData& data) {
 
 	for (unsigned i = 0; i < mesh->mNumFaces; ++i) {
 		const aiFace& face = mesh->mFaces[i];
-		Assert(face.mNumIndices == 3, "invalid index count");
+		AssertX(face.mNumIndices == 3, "invalid index count");
 		data.indices.push_back(face.mIndices[0]);
 		data.indices.push_back(face.mIndices[1]);
 		data.indices.push_back(face.mIndices[2]);
@@ -173,11 +173,11 @@ bool Mesh::InitMaterials(const aiScene* scene, const std::string& path) {
 void Mesh::Render(GLenum mode) {
 	glBindVertexArray(vao_);
 
-	Assert(mode == GL_TRIANGLES || mode == GL_PATCHES, "invalid mode");
+	AssertX(mode == GL_TRIANGLES || mode == GL_PATCHES, "invalid mode");
 
 	for (unsigned i = 0; i < entries_.size(); ++i) {
 		unsigned materilIndex = entries_[i].materialIndex;
-		Assert(materilIndex < textures_.size(), "invalid materialIndex");
+		AssertX(materilIndex < textures_.size(), "invalid materialIndex");
 
 		if (textures_[materilIndex] != nullptr) {
 			textures_[materilIndex]->Bind(Globals::ColorTexture);

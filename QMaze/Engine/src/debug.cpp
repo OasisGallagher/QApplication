@@ -50,6 +50,17 @@ std::string Debug::Now() {
 	return Utility::Format("%02d:%02d:%02d", ptr->tm_hour, ptr->tm_min, ptr->tm_sec);
 }
 
+void Debug::Break(const std::string& expression, const char* file, int line) {
+	std::ostringstream oss;
+	oss << expression << "\n";
+	oss << "at " << file << ":" << line;
+	if (fnptr_ != nullptr) { fnptr_(LogLevelFatal, oss.str()); }
+	//qFatal(oss.str().c_str());
+	//Debug::LogError(oss.str());
+
+	//OS::Break(oss.str().c_str());
+}
+
 void Debug::Break(const std::string& expression, const std::string& message, const char* file, int line) {
 	std::ostringstream oss;
 	oss << expression + ":\n" + message << "\n";

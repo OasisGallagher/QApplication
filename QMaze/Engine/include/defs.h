@@ -10,6 +10,12 @@
 #define ENGINE_EXPORT __declspec(dllimport)
 #endif
 
+enum ObjectType {
+	ObjectSkybox,
+	ObjectShader,
+	ObjectTypeCount,
+};
+
 enum LogLevel {
 	LogLevelDebug,
 	LogLevelWarning,

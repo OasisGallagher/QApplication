@@ -16,7 +16,7 @@ public:
 
 	void SetColorType(ClearType type);
 	void SetClearColor(const glm::vec3& color);
-	void SetClearSkybox(const Skybox);
+	//void SetClearSkybox(const Skybox);
 
 public:
 	void SetRenderTarget(RenderTarget* target);

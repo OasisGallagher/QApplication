@@ -4,7 +4,8 @@
 #include <gl/glew.h>
 
 #include "defs.h"
-#include "ptr_table.h"
+#include "object.h"
+#include "ptrtable.h"
 
 enum ShaderType {
 	ShaderTypeVertex,
@@ -15,7 +16,7 @@ enum ShaderType {
 	ShaderTypeCount,
 };
 
-class ENGINE_EXPORT Shader {
+class ENGINE_EXPORT Shader : public Object {
 private:
 	struct Uniform {
 		GLenum type;

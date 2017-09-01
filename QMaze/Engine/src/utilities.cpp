@@ -9,7 +9,7 @@
 static char formatBuffer[FORMAT_BUFFER_LENGTH];
 
 std::string Utility::Heading(const std::string& text) {
-	Assert(HEADING_LENGTH >= (int)text.length(), "invalid parameter");
+	AssertX(HEADING_LENGTH >= (int)text.length(), "invalid parameter");
 	int left = (int)(HEADING_LENGTH - text.length()) / 2;
 	std::string ans(HEADING_LENGTH, '=');
 	for (int i = 0; i < (int)text.length(); ++i) {
@@ -53,7 +53,7 @@ std::string Utility::GetDirectoryPath(const std::string& path) {
 int Utility::ParseInteger(const std::string& text) {
 	int answer = INT_MIN;
 	bool status = ParseInteger(text, &answer);
-	Assert(status, "invalid integer :" + text);
+	AssertX(status, "invalid integer :" + text);
 	return answer;
 }
 
@@ -92,7 +92,7 @@ std::string Utility::Format(const char* format, ...) {
 	int n = vsnprintf(formatBuffer, FORMAT_BUFFER_LENGTH, format, ap);
 	va_end(ap);
 
-	Assert(n >= 0 && n < FORMAT_BUFFER_LENGTH, "format error");
+	AssertX(n >= 0 && n < FORMAT_BUFFER_LENGTH, "format error");
 
 	return formatBuffer;
 }

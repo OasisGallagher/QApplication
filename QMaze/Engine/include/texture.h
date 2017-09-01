@@ -4,6 +4,15 @@
 
 #include "defs.h"
 
+class ENGINE_EXPORT Texture {
+public:
+	virtual void Bind(GLenum target);
+	virtual void Unbind();
+
+protected:
+	GLuint texture_;
+};
+
 class ENGINE_EXPORT Texture2D {
 public:
 	Texture2D();
@@ -36,25 +45,6 @@ public:
 private:
 	void Destroy();
 	GLuint CreateCubeTexture(const std::string* textures);
-
-private:
-	GLuint texture_;
-};
-
-class ENGINE_EXPORT RandomTexture {
-public:
-	RandomTexture();
-	~RandomTexture();
-
-public:
-	bool Load(unsigned size);
-
-	void Bind(GLenum target);
-	void Unbind();
-
-private:
-	GLuint LoadRandomTexture(unsigned size);
-	void Destroy();
 
 private:
 	GLuint texture_;

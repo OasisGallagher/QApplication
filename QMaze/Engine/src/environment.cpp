@@ -47,7 +47,7 @@ void Environment::DebugOutputCallback(GLenum source, GLenum type, GLuint id, GLe
 
 	text += message;
 
-	Assert(severity != GL_DEBUG_SEVERITY_HIGH_ARB, text);
+	AssertX(severity != GL_DEBUG_SEVERITY_HIGH_ARB, text);
 
 	if (severity == GL_DEBUG_SEVERITY_HIGH_ARB) {
 		Debug::LogError(text);

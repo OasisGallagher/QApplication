@@ -21,7 +21,7 @@ static const ShaderDescription descriptions[] = {
 static const char* SHADER = "shader";
 static const char* INCLUDE = "include";
 
-Shader::Shader() {
+Shader::Shader() : Object(ObjectShader) {
 	program_ = glCreateProgram();
 	std::fill(shaderObjs_, shaderObjs_ + ShaderTypeCount, 0);
 }
@@ -59,7 +59,7 @@ bool Shader::Load(ShaderType shaderType, const std::string& path) {
 bool Shader::Link() {
 	for (int i = 0; i < ShaderTypeCount; ++i) {
 		if (i == ShaderTypeVertex || i == ShaderTypeFragment) {
-			Assert(shaderObjs_[i], Utility::Format("invalid %s.", descriptions[i].name));
+			AssertX(shaderObjs_[i], Utility::Format("invalid %s.", descriptions[i].name));
 		}
 	}
 
@@ -262,24 +262,24 @@ bool Shader::LoadShader(ShaderType shaderType, const char* source) {
 		return true;
 	}
 
-	Assert(false, descriptions[shaderType].name + std::string(" ") + message);
+	AssertX(false, descriptions[shaderType].name + std::string(" ") + message);
 	return false;
 }
 
 void Shader::SetUniform(const std::string& name, int value) {
-	Assert(uniforms_.contains(name), "invalid uniform " + name + ".");
+	AssertX(uniforms_.contains(name), "invalid uniform " + name + ".");
 	Uniform* u = uniforms_[name];
 	glProgramUniform1i(program_, u->location, value);
 }
 
 void Shader::SetUniform(const std::string& name, float value) {
-	Assert(uniforms_.contains(name), "invalid uniform " + name + ".");
+	AssertX(uniforms_.contains(name), "invalid uniform " + name + ".");
 	Uniform* u = uniforms_[name];
 	glProgramUniform1f(program_, u->location, value);
 }
 
 void Shader::SetUniform(const std::string& name, const void* value) {
-	Assert(uniforms_.contains(name), "invalid uniform " + name + ".");
+	AssertX(uniforms_.contains(name), "invalid uniform " + name + ".");
 	Uniform* u = uniforms_[name];
 	switch (u->type) {
 
@@ -440,7 +440,7 @@ void Shader::SetUniform(const std::string& name, const void* value) {
 }
 
 void Shader::SetBlock(const std::string& name, const void* value) {
-	Assert(blocks_.contains(name), "invalid block name " + name + ".");
+	AssertX(blocks_.contains(name), "invalid block name " + name + ".");
 	UniformBlock* block = blocks_[name];
 	glBindBuffer(GL_UNIFORM_BUFFER, block->buffer);
 	glBufferSubData(GL_UNIFORM_BUFFER, 0, block->size, value);
@@ -448,7 +448,7 @@ void Shader::SetBlock(const std::string& name, const void* value) {
 }
 
 void Shader::SetBlockUniform(const std::string& blockName, const std::string& uniformName, const void* value) {
-	Assert(blocks_.contains(blockName), "invalid block name " + blockName + ".");
+	AssertX(blocks_.contains(blockName), "invalid block name " + blockName + ".");
 	UniformBlock* block = blocks_[blockName];
 
 	std::string composedUniformName = blockName + "." + uniformName;
@@ -461,7 +461,7 @@ void Shader::SetBlockUniform(const std::string& blockName, const std::string& un
 		finalUniformName = composedUniformName;
 	}
 
-	Assert(!finalUniformName.empty(), "invalid uniform name " + uniformName + ".");
+	AssertX(!finalUniformName.empty(), "invalid uniform name " + uniformName + ".");
 	Uniform* uniform = block->uniforms[finalUniformName];
 	glBindBuffer(GL_UNIFORM_BUFFER, block->buffer);
 	glBufferSubData(GL_UNIFORM_BUFFER, uniform->offset, uniform->size, value);
@@ -469,9 +469,9 @@ void Shader::SetBlockUniform(const std::string& blockName, const std::string& un
 }
 
 void Shader::SetBlockUniformArrayElement(const std::string& blockName, const std::string& uniformName, GLint index, const void* value) {
-	Assert(blocks_.contains(blockName), "invalid block name " + blockName + ".");
+	AssertX(blocks_.contains(blockName), "invalid block name " + blockName + ".");
 	UniformBlock* block = blocks_[blockName];
-	Assert(block->uniforms.contains(uniformName), "invalid uniform name " + uniformName + ".");
+	AssertX(block->uniforms.contains(uniformName), "invalid uniform name " + uniformName + ".");
 	Uniform* uniform = block->uniforms[uniformName];
 
 	glBindBuffer(GL_UNIFORM_BUFFER, block->buffer);
@@ -709,7 +709,7 @@ void ShaderXLoader::Clear() {
 bool ShaderXLoader::ParseShaderSource(std::vector<std::string>& lines) {
 	ReadShaderSource(lines);
 
-	Assert(type_ != ShaderTypeCount, "invalid shader file");
+	AssertX(type_ != ShaderTypeCount, "invalid shader file");
 	answer_[type_] = globals_ + source_;
 
 	return true;
@@ -717,7 +717,7 @@ bool ShaderXLoader::ParseShaderSource(std::vector<std::string>& lines) {
 
 bool ShaderXLoader::Preprocess(const std::string& line) {
 	size_t pos = line.find(' ');
-	Assert(pos > 1, "unable to preprocess" + line);
+	AssertX(pos > 1, "unable to preprocess" + line);
 	std::string cmd = line.substr(1, pos - 1);
 	std::string parameter = Utility::Trim(line.substr(pos));
 
@@ -739,7 +739,7 @@ ShaderType ShaderXLoader::ParseShaderType(const std::string& tag) {
 		}
 	}
 
-	Assert(false, std::string("unkown shader tag ") + tag);
+	AssertX(false, std::string("unkown shader tag ") + tag);
 	return ShaderTypeCount;
 }
 

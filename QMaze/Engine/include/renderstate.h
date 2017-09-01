@@ -1,8 +1,8 @@
 #pragma once
 #include <gl/glew.h>
 
-#define PUSH_CAP(Cap, Enabled, Variable)	glGetBooleanv(Cap, &get().Variable); enableCap(Cap, !!Enabled);
-#define POP_CAP(Cap, Variable)	if (get().Variable) { glEnable(Cap); } else { glDisable(Cap); }
+#define PushCapability(Cap, Enabled, Variable)	glGetBooleanv(Cap, &get().Variable); enableCap(Cap, !!Enabled);
+#define PopCapability(Cap, Variable)	if (get().Variable) { glEnable(Cap); } else { glDisable(Cap); }
 
 class RenderState {
 public:
@@ -25,11 +25,11 @@ public:
 	}
 
 	static void PushCullFaceEnabled(GLboolean enabled) {
-		PUSH_CAP(GL_CULL_FACE, enabled, cull_face_enabled_);
+		PushCapability(GL_CULL_FACE, enabled, cull_face_enabled_);
 	}
 
 	static void PopCullFaceEnabled() {
-		POP_CAP(GL_CULL_FACE, cull_face_enabled_);
+		PopCapability(GL_CULL_FACE, cull_face_enabled_);
 	}
 
 	static void PushCullFaceFunc(GLenum mode) {
@@ -42,11 +42,11 @@ public:
 	}
 
 	static void PushDepthTestEnabled(GLboolean enabled) {
-		PUSH_CAP(GL_DEPTH_TEST, enabled, depth_test_enabled_);
+		PushCapability(GL_DEPTH_TEST, enabled, depth_test_enabled_);
 	}
 
 	static void PopDepthTestEnabled() {
-		POP_CAP(GL_DEPTH_TEST, depth_test_enabled_);
+		PopCapability(GL_DEPTH_TEST, depth_test_enabled_);
 	}
 
 	static void PushDepthTestFunc(GLenum mode) {
@@ -59,11 +59,11 @@ public:
 	}
 
 	static void PushBlendEnabled(GLboolean enabled) {
-		PUSH_CAP(GL_BLEND, enabled, blend_enabled_);
+		PushCapability(GL_BLEND, enabled, blend_enabled_);
 	}
 
 	static void PopBlendEnabled() {
-		POP_CAP(GL_BLEND, blend_enabled_);
+		PopCapability(GL_BLEND, blend_enabled_);
 	}
 
 	static void PushBlendAlphaFunc(GLenum sfactor, GLenum dfactor) {
@@ -120,3 +120,6 @@ private:
 	GLboolean cull_face_enabled_;
 	GLboolean depth_test_enabled_;
 };
+
+#undef PushCapability
+#undef PopCapability

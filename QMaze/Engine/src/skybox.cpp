@@ -10,7 +10,7 @@
 #include "utilities.h"
 #include "renderstate.h"
 
-Skybox::Skybox(Camera* camera, std::string* textures) {
+Skybox::Skybox(Camera* camera, std::string* textures) : Object(ObjectSkybox) {
 	camera_ = camera;
 	shader_ = new Shader;
 	shader_->Load("shaders/skybox.glsl");

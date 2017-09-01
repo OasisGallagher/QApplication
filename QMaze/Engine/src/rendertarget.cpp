@@ -76,7 +76,7 @@ void RenderTarget::Clear(GLbitfield buffers) {
 }
 
 void RenderTarget::AddDepthRenderBuffer() {
-	Assert(depth_ == 0, "depth texture or render buffer already exists");
+	AssertX(depth_ == 0, "depth texture or render buffer already exists");
 	RenderState::PushFramebuffer(fbo_);
 
 	glGenRenderbuffers(1, &depth_);
@@ -88,7 +88,7 @@ void RenderTarget::AddDepthRenderBuffer() {
 }
 
 void RenderTarget::AddDepthTexture(GLenum internalFormat, GLenum minFilter, GLenum magFilter, GLenum wrapS, GLenum wrapT) {
-	Assert(depth_ == 0, "depth texture or render buffer already exists");
+	AssertX(depth_ == 0, "depth texture or render buffer already exists");
 	RenderState::PushFramebuffer(fbo_);
 
 	glGenTextures(1, &depth_);
@@ -109,7 +109,7 @@ void RenderTarget::AddDepthTexture(GLenum internalFormat, GLenum minFilter, GLen
 }
 
 GLuint RenderTarget::GetRenderTexture(GLuint index) const {
-	Assert(index < index_, "index out of range");
+	AssertX(index < index_, "index out of range");
 	return textures_[index];
 }
 
@@ -122,7 +122,7 @@ GLuint RenderTarget::GetDepthTexture() const {
 }
 
 void RenderTarget::AddRenderTexture(GLenum internalFormat, GLenum minFilter, GLenum magFilter, GLenum wrapS, GLenum wrapT) {
-	Assert(index_ < max_textures_, "too many render textures");
+	AssertX(index_ < max_textures_, "too many render textures");
 
 	GLuint& texture = textures_[index_++];
 
