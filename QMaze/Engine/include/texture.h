@@ -13,7 +13,7 @@ protected:
 	GLuint texture_;
 };
 
-class ENGINE_EXPORT Texture2D {
+class ENGINE_EXPORT Texture2D : public Texture {
 public:
 	Texture2D();
 	~Texture2D();

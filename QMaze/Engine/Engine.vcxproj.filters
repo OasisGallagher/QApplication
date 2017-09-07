@@ -23,9 +23,6 @@
     <ClInclude Include="include\loader.h">
       <Filter>headers</Filter>
     </ClInclude>
-    <ClInclude Include="include\mesh.h">
-      <Filter>headers</Filter>
-    </ClInclude>
     <ClInclude Include="include\shader.h">
       <Filter>headers</Filter>
     </ClInclude>
@@ -47,9 +44,6 @@
     <ClInclude Include="include\object.h">
       <Filter>headers</Filter>
     </ClInclude>
-    <ClInclude Include="include\referencecountable.h">
-      <Filter>headers</Filter>
-    </ClInclude>
     <ClInclude Include="include\renderstate.h">
       <Filter>headers</Filter>
     </ClInclude>
@@ -65,6 +59,15 @@
     <ClInclude Include="include\world.h">
       <Filter>headers</Filter>
     </ClInclude>
+    <ClInclude Include="include\material.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\renderer.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\surface.h">
+      <Filter>headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\camera.cpp">
@@ -74,9 +77,6 @@
       <Filter>sources</Filter>
     </ClCompile>
     <ClCompile Include="src\loader.cpp">
-      <Filter>sources</Filter>
-    </ClCompile>
-    <ClCompile Include="src\mesh.cpp">
       <Filter>sources</Filter>
     </ClCompile>
     <ClCompile Include="src\shader.cpp">
@@ -101,6 +101,9 @@
       <Filter>sources</Filter>
     </ClCompile>
     <ClCompile Include="src\sprite.cpp">
+      <Filter>sources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\surface.cpp">
       <Filter>sources</Filter>
     </ClCompile>
   </ItemGroup>

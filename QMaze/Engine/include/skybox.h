@@ -5,7 +5,7 @@
 #include "object.h"
 #include "loader.h"
 
-class Mesh;
+class Surface;
 class Shader;
 class Camera;
 struct ModelInfo;
@@ -23,7 +23,7 @@ public:
 	void Rotate(const glm::mat4& rotation);
 
 private:
-	Mesh* mesh_;
+	Surface* mesh_;
 	Camera* camera_;
 	Shader* shader_;
 	Texture3D* texture_;

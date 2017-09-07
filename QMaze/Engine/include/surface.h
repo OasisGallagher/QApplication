@@ -7,7 +7,7 @@
 
 #include "defs.h"
 
-class Texture2D;
+class Material;
 
 struct aiMesh;
 struct aiScene;
@@ -15,10 +15,10 @@ struct aiNodeAnim;
 struct aiAnimation;
 struct aiNode;
 
-class ENGINE_EXPORT Mesh {
+class ENGINE_EXPORT Surface {
 public:
-	Mesh();
-	~Mesh();
+	Surface();
+	~Surface();
 
 public:
 	bool Load(const std::string& path);
@@ -33,21 +33,22 @@ private:
 		VBOCount,
 	};
 
-	struct MeshData {
+	struct Attribute {
 		std::vector<glm::vec3> positions;
 		std::vector<glm::vec3> normals;
 		std::vector<glm::vec2> uvs;
 		std::vector<unsigned> indices;
 	};
 
-	struct MeshEntry {
+	struct Mesh {
 		unsigned numIndices;
 		unsigned baseVertex;
 		unsigned baseIndex;
-		unsigned materialIndex;
+
+		Material* material;
 	};
 
-	void InitMesh(const aiMesh* mesh, MeshData& data);
+	void InitAttribute(const aiMesh* mesh, Attribute& attribute);
 	bool InitFromScene(const aiScene* scene, const std::string& path);
 	bool InitMaterials(const aiScene* scene, const std::string& path);
 
@@ -57,6 +58,6 @@ private:
 	GLuint vao_;
 	GLuint vbos_[VBOCount];
 
-	std::vector<MeshEntry> entries_;
-	std::vector<Texture2D*> textures_;
+	std::vector<Mesh> meshes_;
+	std::vector<Material*> materials_;
 };

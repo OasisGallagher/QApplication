@@ -2,6 +2,7 @@
 *.db
 *.opendb
 *.swp
+*.suo
 
 /ConfigTools/.vs/*
 /ConfigTools/Debug/*
@@ -14,6 +15,8 @@
 /QMaze/Debug/*
 /QMaze/x64/*
 /QMaze/QMaze/GeneratedFiles/*
-/QMaze/QMaze/x64
+/QMaze/QMaze/x64/*
 /QMaze/QMaze/Debug/*
+
+/QMaze/Engine/x64/*
 

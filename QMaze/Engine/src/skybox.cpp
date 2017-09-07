@@ -1,11 +1,11 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "mesh.h"
 #include "camera.h"
 #include "skybox.h"
 #include "shader.h"
 #include "loader.h"
+#include "surface.h"
 #include "texture.h"
 #include "utilities.h"
 #include "renderstate.h"
@@ -19,7 +19,7 @@ Skybox::Skybox(Camera* camera, std::string* textures) : Object(ObjectSkybox) {
 	texture_ = new Texture3D;
 	texture_->Load(textures);
 
-	mesh_ = new Mesh;
+	mesh_ = new Surface;
 	mesh_->Load("models/sphere.obj");
 }
 
