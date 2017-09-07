@@ -28,26 +28,21 @@ static void aiMaterixToGlm(glm::mat4& answer, const aiMatrix3x3& mat) {
 		);
 }
 
-Surface::Surface() {
+SurfacePrivate::SurfacePrivate() {
 	vao_ = 0;
 	memset(vbos_, 0, COUNT_OF(vbos_));
 }
 
-Surface::~Surface() {
+SurfacePrivate::~SurfacePrivate() {
 	Clear();
 }
 
-void Surface::Clear() {
-	for (unsigned i = 0; i < materials_.size(); ++i) {
-		delete materials_[i];
-	}
-
-	materials_.clear();
+void SurfacePrivate::Clear() {
 	glDeleteVertexArrays(1, &vao_);
 	glDeleteVertexArrays(COUNT_OF(vbos_), vbos_);
 }
 
-bool Surface::Load(const std::string& path) {
+bool SurfacePrivate::Load(const std::string& path) {
 	Clear();
 
 	glGenVertexArrays(1, &vao_);
@@ -69,10 +64,10 @@ bool Surface::Load(const std::string& path) {
 	return result;
 }
 
-bool Surface::InitFromScene(const aiScene* scene, const std::string& path) {
-	materials_.resize(scene->mNumMaterials);
+bool SurfacePrivate::InitFromScene(const aiScene* scene, const std::string& path) {
+	Material* materials = new Material[scene->mNumMaterials];
 
-	if (!InitMaterials(scene, path)) {
+	if (!InitMaterials(scene, path, materials)) {
 		return false;
 	}
 
@@ -83,13 +78,12 @@ bool Surface::InitFromScene(const aiScene* scene, const std::string& path) {
 
 	// Count the numer of vertices and indices.
 	for (unsigned i = 0; i < meshes_.size(); ++i) {
-		meshes_[i].material = nullptr;
 		meshes_[i].numIndices = scene->mMeshes[i]->mNumFaces * 3;
 		meshes_[i].baseVertex = numVertices;
 		meshes_[i].baseIndex = numIndices;
 
-		if (scene->mMeshes[i]->mMaterialIndex < materials_.size()) {
-			meshes_[i].material = materials_[scene->mMeshes[i]->mMaterialIndex];
+		if (scene->mMeshes[i]->mMaterialIndex < scene->mNumMaterials) {
+			meshes_[i].material = materials[scene->mMeshes[i]->mMaterialIndex];
 		}
 
 		numVertices += scene->mMeshes[i]->mNumVertices;
@@ -126,7 +120,7 @@ bool Surface::InitFromScene(const aiScene* scene, const std::string& path) {
 	return true;
 }
 
-void Surface::InitAttribute(const aiMesh* mesh, Attribute& attribute) {
+void SurfacePrivate::InitAttribute(const aiMesh* mesh, Attribute& attribute) {
 	const aiVector3D zero(0);
 	for (unsigned i = 0; i < mesh->mNumVertices; ++i) {
 		const aiVector3D* pos = &mesh->mVertices[i];
@@ -148,47 +142,48 @@ void Surface::InitAttribute(const aiMesh* mesh, Attribute& attribute) {
 	}
 }
 
-bool Surface::InitMaterials(const aiScene* scene, const std::string& path) {
+bool SurfacePrivate::InitMaterials(const aiScene* scene, const std::string& path, Material* materials) {
 	std::string dir = Utility::GetDirectoryPath(path);
 
 	bool success = true;
 	for (unsigned i = 0; i < scene->mNumMaterials; ++i) {
-		const aiMaterial* material = scene->mMaterials[i];
+		const aiMaterial* mat = scene->mMaterials[i];
 		
-		if (material->GetTextureCount(aiTextureType_DIFFUSE) > 0) {
+		if (mat->GetTextureCount(aiTextureType_DIFFUSE) > 0) {
 			aiString dpath;
-			if (material->GetTexture(aiTextureType_DIFFUSE, 0, &dpath) != AI_SUCCESS) {
+			if (mat->GetTexture(aiTextureType_DIFFUSE, 0, &dpath) != AI_SUCCESS) {
 				continue;
 			}
 
 			std::string fullPath = "textures/";
 			fullPath += dpath.data;
 			
-			Texture2D* texture = new Texture2D;
+			Texture2D texture = Texture2D::Create();
+			
 			if (!texture->Load(fullPath)) {
 				success = false;
-				delete texture;
 				continue;
 			}
 
-			materials_[i] = new Material;
-			materials_[i]->SetTexture(texture);
+			materials[i] = Material::Create();
+			materials[i]->SetDiffuseTexture(texture);
 		}
 	}
 
 	return success;
 }
 
-void Surface::Render(GLenum mode) {
+void SurfacePrivate::Render(GLenum mode) {
 	glBindVertexArray(vao_);
 
 	AssertX(mode == GL_TRIANGLES || mode == GL_PATCHES, "invalid mode");
 
 	for (unsigned i = 0; i < meshes_.size(); ++i) {
-		AssertX(materilIndex < textures_.size(), "invalid materialIndex");
-
-		if (textures_[materilIndex] != nullptr) {
-			textures_[materilIndex]->Bind(Globals::ColorTexture);
+		
+		Texture diffuse = meshes_[i].material->GetDiffuseTexture();
+		
+		if (diffuse) {
+			diffuse->Bind(Globals::ColorTexture);
 		}
 
 		glDrawElementsBaseVertex(mode, meshes_[i].numIndices, GL_UNSIGNED_INT,

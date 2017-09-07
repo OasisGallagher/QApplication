@@ -5,7 +5,7 @@
 #include "camera.h"
 #include "utilities.h"
 
-Camera::Camera() {
+CameraPrivate::CameraPrivate() {
 	aspect_ = 1.3f;
 	near_ = 1.f;
 	far_ = 100.f;
@@ -17,10 +17,10 @@ Camera::Camera() {
 	theta_ = glm::radians(90.f);
 }
 
-Camera::~Camera() {
+CameraPrivate::~CameraPrivate() {
 }
 
-void Camera::LookAt(const glm::vec3& eye, const glm::vec3& center) {
+void CameraPrivate::LookAt(const glm::vec3& eye, const glm::vec3& center) {
 	pos_ = eye;
 
 	center_ = center;
@@ -31,7 +31,7 @@ void Camera::LookAt(const glm::vec3& eye, const glm::vec3& center) {
 	phi_ = atanf(fwd.z / fwd.x);
 }
 
-void Camera::Zoom(float delta) {
+void CameraPrivate::Zoom(float delta) {
 	if (delta == 0) { return; }
 	glm::vec3 fwd(
 		sinf(theta_) * cosf(phi_),
@@ -42,12 +42,12 @@ void Camera::Zoom(float delta) {
 	pos_ += fwd * delta;
 }
 
-void Camera::Rotate(const glm::vec2& delta) {
+void CameraPrivate::Rotate(const glm::vec2& delta) {
 	phi_ += delta.x;
 	theta_ += delta.y;
 }
 
-void Camera::Move(const glm::vec2& delta) {
+void CameraPrivate::Move(const glm::vec2& delta) {
 	glm::vec3 fwd(
 		sinf(theta_) * cosf(phi_),
 		cosf(theta_),
@@ -66,15 +66,15 @@ void Camera::Move(const glm::vec2& delta) {
 	pos_ += up * delta.y;
 }
 
-const glm::vec3& Camera::GetPosition() {
+const glm::vec3& CameraPrivate::GetPosition() {
 	return pos_;
 }
 
-const glm::mat4& Camera::GetProjMatrix() {
+const glm::mat4& CameraPrivate::GetProjMatrix() {
 	return proj_;
 }
 
-const glm::mat4& Camera::GetViewMatrix() {
+const glm::mat4& CameraPrivate::GetViewMatrix() {
 	//return view_ = glm::lookAt(pos_, center_, glm::vec3(0, 1, 0));
 
 	glm::vec3 fwd(

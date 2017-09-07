@@ -6,8 +6,7 @@
 #include <glm/glm.hpp>
 
 #include "defs.h"
-
-class Material;
+#include "material.h"
 
 struct aiMesh;
 struct aiScene;
@@ -15,10 +14,10 @@ struct aiNodeAnim;
 struct aiAnimation;
 struct aiNode;
 
-class ENGINE_EXPORT Surface {
+class SurfacePrivate {
 public:
-	Surface();
-	~Surface();
+	SurfacePrivate();
+	~SurfacePrivate();
 
 public:
 	bool Load(const std::string& path);
@@ -45,12 +44,12 @@ private:
 		unsigned baseVertex;
 		unsigned baseIndex;
 
-		Material* material;
+		Material material;
 	};
 
 	void InitAttribute(const aiMesh* mesh, Attribute& attribute);
 	bool InitFromScene(const aiScene* scene, const std::string& path);
-	bool InitMaterials(const aiScene* scene, const std::string& path);
+	bool InitMaterials(const aiScene* scene, const std::string& path, Material* materials);
 
 	void Clear();
 
@@ -59,5 +58,8 @@ private:
 	GLuint vbos_[VBOCount];
 
 	std::vector<Mesh> meshes_;
-	std::vector<Material*> materials_;
+};
+
+class ENGINE_EXPORT Surface : public std::shared_ptr<SurfacePrivate> {
+
 };

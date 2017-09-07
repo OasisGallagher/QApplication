@@ -1,18 +1,21 @@
-#include <memory>
+#pragma once
 
-class Shader;
-class Texture;
+#include "defs.h"
+#include "texture.h"
 
-class Material {
+class MaterialPrivate {
 public:
-	Material();
-	~Material();
+	MaterialPrivate() {}
+	~MaterialPrivate() {}
 
 public:
-	void SetTexture(Texture* texture);
-	Texture* GetTexture();
+	void SetDiffuseTexture(Texture value) { diffuse_ = value; }
+	Texture GetDiffuseTexture() const { return diffuse_; }
 
 private:
-	Shader* shader_;
-	Texture* texture_;
+	Texture diffuse_;
+};
+
+class ENGINE_EXPORT Material : public Object {
+	IMPLEMENT_SMART_OBJECT(Material);
 };

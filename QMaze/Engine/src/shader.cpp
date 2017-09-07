@@ -21,17 +21,17 @@ static const ShaderDescription descriptions[] = {
 static const char* SHADER = "shader";
 static const char* INCLUDE = "include";
 
-Shader::Shader() : Object(ObjectShader) {
+ShaderPrivate::ShaderPrivate() : Object(ObjectShader) {
 	program_ = glCreateProgram();
 	std::fill(shaderObjs_, shaderObjs_ + ShaderTypeCount, 0);
 }
 
-Shader::~Shader() {
+ShaderPrivate::~ShaderPrivate() {
 	glDeleteProgram(program_);
 	ClearShaders();
 }
 
-bool Shader::Load(const std::string& path) {
+bool ShaderPrivate::Load(const std::string& path) {
 	ShaderXLoader loader;
 	std::string sources[ShaderTypeCount];
 	if (!loader.Load(path, sources)) {
@@ -47,7 +47,7 @@ bool Shader::Load(const std::string& path) {
 	return true;
 }
 
-bool Shader::Load(ShaderType shaderType, const std::string& path) {
+bool ShaderPrivate::Load(ShaderType shaderType, const std::string& path) {
 	std::string source;
 	if (!TextLoader::Load(path, source)) {
 		return false;
@@ -56,7 +56,7 @@ bool Shader::Load(ShaderType shaderType, const std::string& path) {
 	return LoadShader(shaderType, source.c_str());
 }
 
-bool Shader::Link() {
+bool ShaderPrivate::Link() {
 	for (int i = 0; i < ShaderTypeCount; ++i) {
 		if (i == ShaderTypeVertex || i == ShaderTypeFragment) {
 			AssertX(shaderObjs_[i], Utility::Format("invalid %s.", descriptions[i].name));
@@ -66,16 +66,16 @@ bool Shader::Link() {
 	return LinkShader();
 }
 
-bool Shader::Bind() {
+bool ShaderPrivate::Bind() {
 	RenderState::PushProgram(program_);
 	return true;
 }
 
-void Shader::Unbind() {
+void ShaderPrivate::Unbind() {
 	RenderState::PopProgram();
 }
 
-bool Shader::GetErrorMessage(GLuint shaderObj, std::string& answer) {
+bool ShaderPrivate::GetErrorMessage(GLuint shaderObj, std::string& answer) {
 	if (shaderObj == 0) {
 		answer = "invalid shader id";
 		return false;
@@ -94,12 +94,12 @@ bool Shader::GetErrorMessage(GLuint shaderObj, std::string& answer) {
 	return false;
 }
 
-GLuint Shader::GenerateBindingIndex() const {
+GLuint ShaderPrivate::GenerateBindingIndex() const {
 	static GLuint bindingIndex = 1;
 	return bindingIndex++;
 }
 
-void Shader::AddAllBlocks() {
+void ShaderPrivate::AddAllBlocks() {
 	blocks_.clear();
 
 	GLsizei nameWritten;
@@ -172,7 +172,7 @@ void Shader::AddAllBlocks() {
 	}
 }
 
-void Shader::AddAllUniforms() {
+void ShaderPrivate::AddAllUniforms() {
 	uniforms_.clear();
 
 	GLenum type;
@@ -209,7 +209,7 @@ void Shader::AddAllUniforms() {
 	delete[] name;
 }
 
-bool Shader::LinkShader() {
+bool ShaderPrivate::LinkShader() {
 	glLinkProgram(program_);
 	
 	GLint status = GL_FALSE;
@@ -236,7 +236,7 @@ bool Shader::LinkShader() {
 	return true;
 }
 
-void Shader::ClearShaders() {
+void ShaderPrivate::ClearShaders() {
 	for (int i = 0; i < ShaderTypeCount; ++i) {
 		if (shaderObjs_[i] != 0) {
 			glDeleteShader(shaderObjs_[i]);
@@ -245,7 +245,7 @@ void Shader::ClearShaders() {
 	}
 }
 
-bool Shader::LoadShader(ShaderType shaderType, const char* source) {
+bool ShaderPrivate::LoadShader(ShaderType shaderType, const char* source) {
 	GLuint shaderObj = glCreateShader(descriptions[shaderType].glShaderType);
 
 	glShaderSource(shaderObj, 1, &source, nullptr);
@@ -266,19 +266,19 @@ bool Shader::LoadShader(ShaderType shaderType, const char* source) {
 	return false;
 }
 
-void Shader::SetUniform(const std::string& name, int value) {
+void ShaderPrivate::SetUniform(const std::string& name, int value) {
 	AssertX(uniforms_.contains(name), "invalid uniform " + name + ".");
 	Uniform* u = uniforms_[name];
 	glProgramUniform1i(program_, u->location, value);
 }
 
-void Shader::SetUniform(const std::string& name, float value) {
+void ShaderPrivate::SetUniform(const std::string& name, float value) {
 	AssertX(uniforms_.contains(name), "invalid uniform " + name + ".");
 	Uniform* u = uniforms_[name];
 	glProgramUniform1f(program_, u->location, value);
 }
 
-void Shader::SetUniform(const std::string& name, const void* value) {
+void ShaderPrivate::SetUniform(const std::string& name, const void* value) {
 	AssertX(uniforms_.contains(name), "invalid uniform " + name + ".");
 	Uniform* u = uniforms_[name];
 	switch (u->type) {
@@ -439,7 +439,7 @@ void Shader::SetUniform(const std::string& name, const void* value) {
 	}
 }
 
-void Shader::SetBlock(const std::string& name, const void* value) {
+void ShaderPrivate::SetBlock(const std::string& name, const void* value) {
 	AssertX(blocks_.contains(name), "invalid block name " + name + ".");
 	UniformBlock* block = blocks_[name];
 	glBindBuffer(GL_UNIFORM_BUFFER, block->buffer);
@@ -447,7 +447,7 @@ void Shader::SetBlock(const std::string& name, const void* value) {
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
-void Shader::SetBlockUniform(const std::string& blockName, const std::string& uniformName, const void* value) {
+void ShaderPrivate::SetBlockUniform(const std::string& blockName, const std::string& uniformName, const void* value) {
 	AssertX(blocks_.contains(blockName), "invalid block name " + blockName + ".");
 	UniformBlock* block = blocks_[blockName];
 
@@ -468,7 +468,7 @@ void Shader::SetBlockUniform(const std::string& blockName, const std::string& un
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
-void Shader::SetBlockUniformArrayElement(const std::string& blockName, const std::string& uniformName, GLint index, const void* value) {
+void ShaderPrivate::SetBlockUniformArrayElement(const std::string& blockName, const std::string& uniformName, GLint index, const void* value) {
 	AssertX(blocks_.contains(blockName), "invalid block name " + blockName + ".");
 	UniformBlock* block = blocks_[blockName];
 	AssertX(block->uniforms.contains(uniformName), "invalid uniform name " + uniformName + ".");
@@ -479,7 +479,7 @@ void Shader::SetBlockUniformArrayElement(const std::string& blockName, const std
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
-GLuint Shader::GetUniformSize(GLint uniformType, GLint uniformSize, 
+GLuint ShaderPrivate::GetUniformSize(GLint uniformType, GLint uniformSize, 
 	GLint uniformOffset, GLint uniformMatrixStride, GLint uniformArrayStride) {
 	if (uniformArrayStride > 0) {
 		return uniformSize * uniformArrayStride;
@@ -520,7 +520,7 @@ GLuint Shader::GetUniformSize(GLint uniformType, GLint uniformSize,
 	return GetSizeOfType(uniformType);
 }
 
-GLuint Shader::GetSizeOfType(GLint type) {
+GLuint ShaderPrivate::GetSizeOfType(GLint type) {
 	switch (type) {
 	case GL_FLOAT:
 		return sizeof(float);
@@ -677,10 +677,10 @@ GLuint Shader::GetSizeOfType(GLint type) {
 	return 0;
 }
 
-Shader::UniformBlock::UniformBlock() : buffer(0) {
+ShaderPrivate::UniformBlock::UniformBlock() : buffer(0) {
 }
 
-Shader::UniformBlock::~UniformBlock() {
+ShaderPrivate::UniformBlock::~UniformBlock() {
 	if (buffer != 0) {
 		glDeleteBuffers(1, &buffer);
 	}

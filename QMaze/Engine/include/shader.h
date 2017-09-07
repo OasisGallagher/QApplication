@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <string>
+#include <memory>
 #include <gl/glew.h>
 
 #include "defs.h"
@@ -16,37 +17,10 @@ enum ShaderType {
 	ShaderTypeCount,
 };
 
-class ENGINE_EXPORT Shader : public Object {
-private:
-	struct Uniform {
-		GLenum type;
-		union {
-			GLuint offset;
-			GLuint location;
-		};
-
-		GLuint size;
-		GLuint stride;
-	};
-
-	typedef PtrTable<Uniform> Uniforms;
-
-	struct UniformBlock {
-		UniformBlock();
-		~UniformBlock();
-
-		GLuint size;
-		GLuint buffer;
-		GLuint binding;
-		
-		Uniforms uniforms;
-	};
-
-	typedef PtrTable<UniformBlock> UniformBlocks;
-
+class ShaderPrivate : public Object {
 public:
-	Shader();
-	~Shader();
+	ShaderPrivate();
+	~ShaderPrivate();
 
 public:
 	bool Load(const std::string& path);
@@ -81,6 +55,33 @@ private:
 	GLuint GenerateBindingIndex() const;
 
 private:
+	struct Uniform {
+		GLenum type;
+		union {
+			GLuint offset;
+			GLuint location;
+		};
+
+		GLuint size;
+		GLuint stride;
+	};
+
+	typedef PtrTable<Uniform> Uniforms;
+
+	struct UniformBlock {
+		UniformBlock();
+		~UniformBlock();
+
+		GLuint size;
+		GLuint buffer;
+		GLuint binding;
+		
+		Uniforms uniforms;
+	};
+
+	typedef PtrTable<UniformBlock> UniformBlocks;
+
+private:
 	Uniforms uniforms_;
 	UniformBlocks blocks_;
 
@@ -101,7 +102,6 @@ private:
 	bool PreprocessInclude(std::string &parameter);
 	bool PreprocessShader(std::string parameter);
 
-	bool ParseStatelessPreprocesser(const std::string& cmd, const std::string& parameter);
 	ShaderType ParseShaderType(const std::string& line);
 
 private:
@@ -109,4 +109,9 @@ private:
 	std::string* answer_;
 	std::string globals_;
 	std::string source_;
+};
+
+class ENGINE_EXPORT Shader : public std::shared_ptr<ShaderPrivate> {
+public:
+	static Shader Find(const std::string& path);
 };

@@ -3,10 +3,10 @@
 
 class RenderTarget;
 
-class ENGINE_EXPORT Camera {
+class CameraPrivate {
 public:
-	Camera();
-	~Camera();
+	CameraPrivate();
+	~CameraPrivate();
 
 public:
 	enum ClearType {
@@ -53,4 +53,8 @@ private:
 	float fieldOfView_;
 
 	glm::mat4 proj_, view_;
+};
+
+class ENGINE_EXPORT Camera {
+	IMPLEMENT_SMART_OBJECT(Camera);
 };

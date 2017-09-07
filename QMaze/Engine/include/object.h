@@ -5,9 +5,9 @@
 
 #include "defs.h"
 
-class ENGINE_EXPORT Object {
+class ENGINE_EXPORT ObjectPrivate {
 public:
-	Object(ObjectType type);
+	ObjectPrivate(ObjectType type);
 
 	unsigned GetInstanceID() const { return id_; }
 	int GetType() const { return type_; }
@@ -27,4 +27,13 @@ private:
 	std::string name_;
 
 	static unsigned short ObjectIDContainer[ObjectTypeCount];
+};
+
+class ENGINE_EXPORT Object {
+public:
+	operator bool() const { return !!ptr; }
+	IMPLEMENT_SMART_POINTER(Object)
+
+protected:
+	SmartPointer<ObjectPrivate>::T ptr;
 };

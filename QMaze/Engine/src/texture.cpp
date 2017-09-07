@@ -6,7 +6,18 @@
 
 #include "Magick++.h"
 
-static const void* ReadRawTexture(const std::string& path, int& width, int& height) {
+void TexturePrivate::Bind(GLenum target) {
+	AssertX(glIsTexture(texture_), "invalid texture");
+	glActiveTexture(target);
+	glBindTexture(GetBindTarget(), texture_);
+}
+
+void TexturePrivate::Unbind() {
+	Texture tex = Texture2D::Create();
+	glBindTexture(GetBindTarget(), 0);
+}
+
+const void* TexturePrivate::ReadRawTexture(const std::string& path, int& width, int& height) {
 	Magick::Image image;
 	static Magick::Blob blob;
 
@@ -25,27 +36,18 @@ static const void* ReadRawTexture(const std::string& path, int& width, int& heig
 	return blob.data();
 }
 
-Texture2D::Texture2D() : texture_(0) {
+Texture2DPrivate::Texture2DPrivate() : TexturePrivate(ObjectTexture2D) {
 }
 
-Texture2D::~Texture2D() {
+Texture2DPrivate::~Texture2DPrivate() {
 	Destroy();
 }
 
-void Texture2D::Bind(GLenum target) {
-	AssertX(glIsTexture(texture_), "invalid texture");
-	glActiveTexture(target);
-	glBindTexture(GL_TEXTURE_2D, texture_);
-}
-
-void Texture2D::Unbind() {
-}
-
-bool Texture2D::Load(const std::string& path) {
+bool Texture2DPrivate::Load(const std::string& path) {
 	return LoadTexture(path);
 }
 
-bool Texture2D::LoadTexture(const std::string& path) {
+bool Texture2DPrivate::LoadTexture(const std::string& path) {
 	int width, height;
 	const void* data = ReadRawTexture(path, width, height);
 	if (data == nullptr) {
@@ -67,21 +69,21 @@ bool Texture2D::LoadTexture(const std::string& path) {
 	return true;
 }
 
-void Texture2D::Destroy() {
+void Texture2DPrivate::Destroy() {
 	if (texture_ != 0) {
 		glDeleteTextures(1, &texture_);
 		texture_ = 0;
 	}
 }
 
-Texture3D::Texture3D() : texture_(0) {
+Texture3DPrivate::Texture3DPrivate() : TexturePrivate(ObjectTexture2D) {
 }
 
-Texture3D::~Texture3D() {
+Texture3DPrivate::~Texture3DPrivate() {
 	Destroy();
 }
 
-bool Texture3D::Load(const std::string* textures) {
+bool Texture3DPrivate::Load(const std::string* textures) {
 	GLuint textureID = CreateCubeTexture(textures);
 	if (textureID != 0) {
 		Destroy();
@@ -92,7 +94,7 @@ bool Texture3D::Load(const std::string* textures) {
 	return false;
 }
 
-GLuint Texture3D::CreateCubeTexture(const std::string* textures) {
+GLuint Texture3DPrivate::CreateCubeTexture(const std::string* textures) {
 	GLuint textureID;
 	glGenTextures(1, &textureID);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
@@ -119,15 +121,7 @@ GLuint Texture3D::CreateCubeTexture(const std::string* textures) {
 	return textureID;
 }
 
-void Texture3D::Bind(GLenum target) {
-	glActiveTexture(target);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, texture_);
-}
-
-void Texture3D::Unbind() {
-}
-
-void Texture3D::Destroy() {
+void Texture3DPrivate::Destroy() {
 	if (texture_ != 0) {
 		glDeleteTextures(1, &texture_);
 		texture_ = 0;

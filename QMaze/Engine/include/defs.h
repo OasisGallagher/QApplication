@@ -1,4 +1,6 @@
 #pragma once
+#include <memory>
+
 #include <gl/glew.h>
 #include <glm/glm.hpp>
 
@@ -13,6 +15,8 @@
 enum ObjectType {
 	ObjectSkybox,
 	ObjectShader,
+	ObjectTexture2D,
+	ObjectTexture3D,
 	ObjectTypeCount,
 };
 
@@ -75,3 +79,29 @@ struct DirectionalLight {
 	PADDING(12);
 	glm::vec3 direction;
 };
+
+template <class Ty>
+struct SmartPointer {
+	typedef std::shared_ptr<Ty> T;
+};
+
+#define PRIVATE(Pointer) Pointer ## Private
+
+
+#define IMPLEMENT_CREATION(Pointer) \
+public: \
+	static Pointer Create() { \
+		Pointer pointer; \
+		pointer.ptr = std::make_shared<PRIVATE(Pointer)>(); \
+		return pointer; \
+	} 
+
+#define IMPLEMENT_SMART_POINTER(Pointer) \
+public: \
+	PRIVATE(Pointer)* operator -> () const { return (PRIVATE(Pointer)*)ptr.get(); } \
+private: 
+
+#define IMPLEMENT_SMART_OBJECT(Pointer) \
+	IMPLEMENT_CREATION(Pointer) \
+	IMPLEMENT_SMART_POINTER(Pointer)
+	
