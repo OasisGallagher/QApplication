@@ -1,73 +1,21 @@
 #pragma once
-#include <string>
 #include <gl/glew.h>
 
-#include "defs.h"
 #include "object.h"
 
-class TexturePrivate : public ObjectPrivate {
+class ENGINE_EXPORT Texture : virtual public Object {
 public:
-	TexturePrivate(ObjectType type) : ObjectPrivate(type) {
-
-	}
-
-public:
-	void Bind(GLenum target);
-	void Unbind();
-
-public:
-	GLuint GetHandle() const { return texture_; }
-
-protected:
-	virtual GLenum GetBindTarget() = 0;
-
-protected:
-	const void* ReadRawTexture(const std::string& path, int& width, int& height);
-
-protected:
-	GLuint texture_;
+	virtual void Bind(GLenum target) = 0;
+	virtual void Unbind() = 0;
+	virtual GLuint GetNativePointer() const = 0;
 };
 
-class Texture2DPrivate : public TexturePrivate {
+class ENGINE_EXPORT Texture2D : virtual public Texture {
 public:
-	Texture2DPrivate();
-	~Texture2DPrivate();
-
-public:
-	bool Load(const std::string& path);
-
-protected:
-	virtual GLenum GetBindTarget() { return GL_TEXTURE_2D; }
-
-private:
-	bool LoadTexture(const std::string& path);
-	void Destroy();
+	virtual bool Load(const std::string& path) = 0;
 };
 
-class Texture3DPrivate : public TexturePrivate {
+class ENGINE_EXPORT Texture3D : virtual public Texture {
 public:
-	Texture3DPrivate();
-	~Texture3DPrivate();
-
-public:
-	bool Load(const std::string* textures);
-
-protected:
-	virtual GLenum GetBindTarget() { return GL_TEXTURE_3D; }
-
-private:
-	void Destroy();
-	GLuint CreateCubeTexture(const std::string* textures);
-};
-
-class ENGINE_EXPORT Texture : public Object {
-	IMPLEMENT_SMART_POINTER(Texture)
-};
-
-class ENGINE_EXPORT Texture2D : public Texture {
-	IMPLEMENT_SMART_OBJECT(Texture2D)
-};
-
-class ENGINE_EXPORT Texture3D : public Texture {
-	IMPLEMENT_SMART_OBJECT(Texture3D)
+	virtual bool Load(const std::string* textures) = 0;
 };

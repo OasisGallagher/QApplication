@@ -4,32 +4,35 @@
 #include "camera.h"
 #include "skybox.h"
 #include "shader.h"
-#include "loader.h"
 #include "surface.h"
 #include "texture.h"
-#include "utilities.h"
-#include "renderstate.h"
+#include "internal/misc/loader.h"
+#include "internal/memory/factory.h"
+#include "internal/base/renderstate.h"
+#include "internal/base/textureinternal.h"
+#include "internal/base/surfaceinternal.h"
+#include "internal/sprites/skyboxinternal.h"
 
-Skybox::Skybox(Camera* camera, std::string* textures) : Object(ObjectSkybox) {
+SkyboxInternal::SkyboxInternal(Camera* camera, std::string* textures) {
 	camera_ = camera;
-	shader_ = new Shader;
+	shader_ = Factory::Create<ShaderInternal>();
 	shader_->Load("shaders/skybox.glsl");
 	shader_->Link();
 
-	texture_ = new Texture3D;
+	texture_ = Factory::Create<Texture3DInternal>();
 	texture_->Load(textures);
 
-	mesh_ = new Surface;
+	mesh_ = Factory::Create<SurfaceInternal>();
 	mesh_->Load("models/sphere.obj");
 }
 
-Skybox::~Skybox() {
+SkyboxInternal::~SkyboxInternal() {
 	delete mesh_;
 	delete shader_;
 	delete texture_;
 }
 
-void Skybox::Render() {
+void SkyboxInternal::Render() {
 	shader_->Bind();
 	
 	RenderState::PushCullFaceEnabled(GL_TRUE);
@@ -39,9 +42,6 @@ void Skybox::Render() {
 	RenderState::PushDepthTestFunc(GL_LEQUAL);
 
 	glm::mat4 m(1);
-	float scale = 20.f;
-	m = glm::translate(m, camera_->GetPosition()) * glm::scale(m, glm::vec3(scale)) * rotation_;
-	
 	glm::mat4 mvp = camera_->GetProjMatrix() * camera_->GetViewMatrix() * m;
 	shader_->SetUniform("MVP", &mvp);
 
@@ -58,10 +58,6 @@ void Skybox::Render() {
 	texture_->Unbind();
 }
 
-Texture3D* Skybox::GetTexture() {
+Texture3D* SkyboxInternal::GetTexture() {
 	return texture_;
-}
-
-void Skybox::Rotate(const glm::mat4& rotation) {
-	rotation_ = rotation;
 }

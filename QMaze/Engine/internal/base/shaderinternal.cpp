@@ -1,16 +1,11 @@
-#include "debug.h"
-#include "loader.h"
-#include "shader.h"
-#include "utilities.h"
-#include "renderstate.h"
+#include "shaderinternal.h"
 
-struct ShaderDescription {
-	GLenum glShaderType;
-	const char* name;
-	const char* tag;
-};
+#include "tools/debug.h"
+#include "tools/string.h"
+#include "internal/misc/loader.h"
+#include "internal/base/renderstate.h"
 
-static const ShaderDescription descriptions[] = {
+ShaderDescription ShaderInternal::descriptions_[] =  {
 	GL_VERTEX_SHADER, "VertexShader", "vert",
 	GL_TESS_CONTROL_SHADER, "TessellationControlShader", "tesc",
 	GL_TESS_EVALUATION_SHADER, "TessellationEvaluationShader", "tese",
@@ -18,23 +13,20 @@ static const ShaderDescription descriptions[] = {
 	GL_FRAGMENT_SHADER, "FragmentShader", "frag"
 };
 
-static const char* SHADER = "shader";
-static const char* INCLUDE = "include";
-
-ShaderPrivate::ShaderPrivate() : Object(ObjectShader) {
+ShaderInternal::ShaderInternal() : ObjectInternal(ObjectShader) {
 	program_ = glCreateProgram();
 	std::fill(shaderObjs_, shaderObjs_ + ShaderTypeCount, 0);
 }
 
-ShaderPrivate::~ShaderPrivate() {
+ShaderInternal::~ShaderInternal() {
 	glDeleteProgram(program_);
 	ClearShaders();
 }
 
-bool ShaderPrivate::Load(const std::string& path) {
-	ShaderXLoader loader;
+bool ShaderInternal::Load(const std::string& path) {
+	ShaderParser parser;
 	std::string sources[ShaderTypeCount];
-	if (!loader.Load(path, sources)) {
+	if (!parser.Parse(path, sources)) {
 		return false;
 	}
 
@@ -47,7 +39,7 @@ bool ShaderPrivate::Load(const std::string& path) {
 	return true;
 }
 
-bool ShaderPrivate::Load(ShaderType shaderType, const std::string& path) {
+bool ShaderInternal::Load(ShaderType shaderType, const std::string& path) {
 	std::string source;
 	if (!TextLoader::Load(path, source)) {
 		return false;
@@ -56,26 +48,26 @@ bool ShaderPrivate::Load(ShaderType shaderType, const std::string& path) {
 	return LoadShader(shaderType, source.c_str());
 }
 
-bool ShaderPrivate::Link() {
+bool ShaderInternal::Link() {
 	for (int i = 0; i < ShaderTypeCount; ++i) {
 		if (i == ShaderTypeVertex || i == ShaderTypeFragment) {
-			AssertX(shaderObjs_[i], Utility::Format("invalid %s.", descriptions[i].name));
+			AssertX(shaderObjs_[i], String::Format("invalid %s.", Description((ShaderType)i).name));
 		}
 	}
 
 	return LinkShader();
 }
 
-bool ShaderPrivate::Bind() {
+bool ShaderInternal::Bind() {
 	RenderState::PushProgram(program_);
 	return true;
 }
 
-void ShaderPrivate::Unbind() {
+void ShaderInternal::Unbind() {
 	RenderState::PopProgram();
 }
 
-bool ShaderPrivate::GetErrorMessage(GLuint shaderObj, std::string& answer) {
+bool ShaderInternal::GetErrorMessage(GLuint shaderObj, std::string& answer) {
 	if (shaderObj == 0) {
 		answer = "invalid shader id";
 		return false;
@@ -94,12 +86,12 @@ bool ShaderPrivate::GetErrorMessage(GLuint shaderObj, std::string& answer) {
 	return false;
 }
 
-GLuint ShaderPrivate::GenerateBindingIndex() const {
+GLuint ShaderInternal::GenerateBindingIndex() const {
 	static GLuint bindingIndex = 1;
 	return bindingIndex++;
 }
 
-void ShaderPrivate::AddAllBlocks() {
+void ShaderInternal::AddAllBlocks() {
 	blocks_.clear();
 
 	GLsizei nameWritten;
@@ -172,7 +164,7 @@ void ShaderPrivate::AddAllBlocks() {
 	}
 }
 
-void ShaderPrivate::AddAllUniforms() {
+void ShaderInternal::AddAllUniforms() {
 	uniforms_.clear();
 
 	GLenum type;
@@ -209,7 +201,7 @@ void ShaderPrivate::AddAllUniforms() {
 	delete[] name;
 }
 
-bool ShaderPrivate::LinkShader() {
+bool ShaderInternal::LinkShader() {
 	glLinkProgram(program_);
 	
 	GLint status = GL_FALSE;
@@ -236,7 +228,7 @@ bool ShaderPrivate::LinkShader() {
 	return true;
 }
 
-void ShaderPrivate::ClearShaders() {
+void ShaderInternal::ClearShaders() {
 	for (int i = 0; i < ShaderTypeCount; ++i) {
 		if (shaderObjs_[i] != 0) {
 			glDeleteShader(shaderObjs_[i]);
@@ -245,8 +237,8 @@ void ShaderPrivate::ClearShaders() {
 	}
 }
 
-bool ShaderPrivate::LoadShader(ShaderType shaderType, const char* source) {
-	GLuint shaderObj = glCreateShader(descriptions[shaderType].glShaderType);
+bool ShaderInternal::LoadShader(ShaderType shaderType, const char* source) {
+	GLuint shaderObj = glCreateShader(Description(shaderType).glShaderType);
 
 	glShaderSource(shaderObj, 1, &source, nullptr);
 	glCompileShader(shaderObj);
@@ -262,23 +254,23 @@ bool ShaderPrivate::LoadShader(ShaderType shaderType, const char* source) {
 		return true;
 	}
 
-	AssertX(false, descriptions[shaderType].name + std::string(" ") + message);
+	AssertX(false, Description(shaderType).name + std::string(" ") + message);
 	return false;
 }
 
-void ShaderPrivate::SetUniform(const std::string& name, int value) {
+void ShaderInternal::SetUniform(const std::string& name, int value) {
 	AssertX(uniforms_.contains(name), "invalid uniform " + name + ".");
 	Uniform* u = uniforms_[name];
 	glProgramUniform1i(program_, u->location, value);
 }
 
-void ShaderPrivate::SetUniform(const std::string& name, float value) {
+void ShaderInternal::SetUniform(const std::string& name, float value) {
 	AssertX(uniforms_.contains(name), "invalid uniform " + name + ".");
 	Uniform* u = uniforms_[name];
 	glProgramUniform1f(program_, u->location, value);
 }
 
-void ShaderPrivate::SetUniform(const std::string& name, const void* value) {
+void ShaderInternal::SetUniform(const std::string& name, const void* value) {
 	AssertX(uniforms_.contains(name), "invalid uniform " + name + ".");
 	Uniform* u = uniforms_[name];
 	switch (u->type) {
@@ -439,7 +431,7 @@ void ShaderPrivate::SetUniform(const std::string& name, const void* value) {
 	}
 }
 
-void ShaderPrivate::SetBlock(const std::string& name, const void* value) {
+void ShaderInternal::SetBlock(const std::string& name, const void* value) {
 	AssertX(blocks_.contains(name), "invalid block name " + name + ".");
 	UniformBlock* block = blocks_[name];
 	glBindBuffer(GL_UNIFORM_BUFFER, block->buffer);
@@ -447,7 +439,7 @@ void ShaderPrivate::SetBlock(const std::string& name, const void* value) {
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
-void ShaderPrivate::SetBlockUniform(const std::string& blockName, const std::string& uniformName, const void* value) {
+void ShaderInternal::SetBlockUniform(const std::string& blockName, const std::string& uniformName, const void* value) {
 	AssertX(blocks_.contains(blockName), "invalid block name " + blockName + ".");
 	UniformBlock* block = blocks_[blockName];
 
@@ -468,7 +460,7 @@ void ShaderPrivate::SetBlockUniform(const std::string& blockName, const std::str
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
-void ShaderPrivate::SetBlockUniformArrayElement(const std::string& blockName, const std::string& uniformName, GLint index, const void* value) {
+void ShaderInternal::SetBlockUniformArrayElement(const std::string& blockName, const std::string& uniformName, GLint index, const void* value) {
 	AssertX(blocks_.contains(blockName), "invalid block name " + blockName + ".");
 	UniformBlock* block = blocks_[blockName];
 	AssertX(block->uniforms.contains(uniformName), "invalid uniform name " + uniformName + ".");
@@ -479,7 +471,7 @@ void ShaderPrivate::SetBlockUniformArrayElement(const std::string& blockName, co
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
-GLuint ShaderPrivate::GetUniformSize(GLint uniformType, GLint uniformSize, 
+GLuint ShaderInternal::GetUniformSize(GLint uniformType, GLint uniformSize, 
 	GLint uniformOffset, GLint uniformMatrixStride, GLint uniformArrayStride) {
 	if (uniformArrayStride > 0) {
 		return uniformSize * uniformArrayStride;
@@ -520,7 +512,7 @@ GLuint ShaderPrivate::GetUniformSize(GLint uniformType, GLint uniformSize,
 	return GetSizeOfType(uniformType);
 }
 
-GLuint ShaderPrivate::GetSizeOfType(GLint type) {
+GLuint ShaderInternal::GetSizeOfType(GLint type) {
 	switch (type) {
 	case GL_FLOAT:
 		return sizeof(float);
@@ -677,116 +669,11 @@ GLuint ShaderPrivate::GetSizeOfType(GLint type) {
 	return 0;
 }
 
-ShaderPrivate::UniformBlock::UniformBlock() : buffer(0) {
+ShaderInternal::UniformBlock::UniformBlock() : buffer(0) {
 }
 
-ShaderPrivate::UniformBlock::~UniformBlock() {
+ShaderInternal::UniformBlock::~UniformBlock() {
 	if (buffer != 0) {
 		glDeleteBuffers(1, &buffer);
 	}
-}
-
-
-bool ShaderXLoader::Load(const std::string& path, std::string* answer) {
-	std::vector<std::string> lines;
-	if (!TextLoader::Load("resources/" + path, lines)) {
-		return false;
-	}
-
-	Clear();
-
-	answer_ = answer;
-	return ParseShaderSource(lines);
-}
-
-void ShaderXLoader::Clear() {
-	type_ = ShaderTypeCount;
-	source_.clear();
-	globals_.clear();
-	answer_ = nullptr;
-}
-
-bool ShaderXLoader::ParseShaderSource(std::vector<std::string>& lines) {
-	ReadShaderSource(lines);
-
-	AssertX(type_ != ShaderTypeCount, "invalid shader file");
-	answer_[type_] = globals_ + source_;
-
-	return true;
-}
-
-bool ShaderXLoader::Preprocess(const std::string& line) {
-	size_t pos = line.find(' ');
-	AssertX(pos > 1, "unable to preprocess" + line);
-	std::string cmd = line.substr(1, pos - 1);
-	std::string parameter = Utility::Trim(line.substr(pos));
-
-	if (cmd == SHADER) {
-		return PreprocessShader(parameter);
-	}
-	else if (cmd == INCLUDE) {
-		return PreprocessInclude(parameter);
-	}
-
-	source_ += line + '\n';
-	return true;
-}
-
-ShaderType ShaderXLoader::ParseShaderType(const std::string& tag) {
-	for (size_t i = 0; i < ShaderTypeCount; ++i) {
-		if (tag == descriptions[i].tag) {
-			return (ShaderType)i;
-		}
-	}
-
-	AssertX(false, std::string("unkown shader tag ") + tag);
-	return ShaderTypeCount;
-}
-
-bool ShaderXLoader::ReadShaderSource(std::vector<std::string> &lines) {
-	for (size_t i = 0; i < lines.size(); ++i) {
-		const std::string& line = lines[i];
-		if (line.front() == '#' && !Preprocess(line)) {
-			return false;
-		}
-
-		if (line.front() != '#') {
-			source_ += line + '\n';
-		}
-	}
-
-	return true;
-}
-
-bool ShaderXLoader::PreprocessShader(std::string parameter) {
-	ShaderType newType = ParseShaderType(parameter);
-
-	if (newType != type_) {
-		if (type_ == ShaderTypeCount) {
-			globals_ = source_;
-		}
-		else {
-			if (!answer_[type_].empty()) {
-				Debug::LogError(std::string(descriptions[type_].name) + " already exists");
-				return false;
-			}
-
-			source_ = globals_ + source_;
-			answer_[type_] = source_;
-		}
-
-		source_.clear();
-		type_ = newType;
-	}
-
-	return true;
-}
-
-bool ShaderXLoader::PreprocessInclude(std::string &parameter) {
-	std::vector<std::string> lines;
-	if (!TextLoader::Load("shaders/" + parameter.substr(1, parameter.length() - 2), lines)) {
-		return false;
-	}
-
-	return ReadShaderSource(lines);
 }

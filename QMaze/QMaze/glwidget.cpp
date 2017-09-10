@@ -4,37 +4,35 @@
 #include <QtGui/QWheelEvent>
 #include <gl/glew.h>
 
-#include "mesh.h"
-#include "defs.h"
 #include "skybox.h"
 #include "camera.h"
 #include "shader.h"
 #include "skybox.h"
+#include "engine.h"
 #include "texture.h"
+#include "surface.h"
 #include "GLWidget.h"
 
-#include <environment.h>
-
-static void OnEngineLogReceived(LogLevel level, const std::string& message) {
+static void OnEngineLogReceived(int level, const char* message) {
 	switch (level) {
 	case LogLevelDebug:
-		qDebug() << message.c_str();
+		qDebug() << message;
 		break;
 	case LogLevelWarning:
-		qWarning() << message.c_str();
+		qWarning() << message;
 		break;
 	case LogLevelError:
 	case LogLevelFatal:
-		qFatal(message.c_str());
+		qFatal(message);
 		break;
 	}
 }
 
 Shader* reflect_, *refract_;
-SkyBox* skyBox_;
+Skybox* skyBox_;
 GLuint vao_, vbo_;
 Camera* camera_;
-Mesh* mesh_;
+Surface* surface_;
 
 GLWidget::GLWidget(QWidget *parent) 
 	: QGLWidget(parent), mpressed_(false), lpressed(false) {
@@ -42,7 +40,8 @@ GLWidget::GLWidget(QWidget *parent)
 }
 
 void GLWidget::initializeGL() {
-	Environment::Initialize(OnEngineLogReceived);
+	Engine::Ptr()->Initialize();
+	Engine::Ptr()->SetDebugCallback(OnEngineLogReceived);
 
 	glClearDepth(1);
 	glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
@@ -121,6 +120,7 @@ void RenderReflect() {
 }
 
 void GLWidget::paintGL() {
+	Engine::Ptr()->Update();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	RenderReflect();

@@ -1,110 +1,214 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="headers">
+    <Filter Include="internal">
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
-    <Filter Include="sources">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    <Filter Include="internal\base">
+      <UniqueIdentifier>{a5ee88c7-9643-440a-be06-26cdb17cb76a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="internal\sprites">
+      <UniqueIdentifier>{4d538f95-b8fe-4e72-a8b3-49cb0475678b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="internal\world">
+      <UniqueIdentifier>{4ee632eb-cd89-478a-8f7d-9bcbe89b17e0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="internal\base\include">
+      <UniqueIdentifier>{dcfe6761-fb80-4dea-84d8-59811f7dd10c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="internal\base\src">
+      <UniqueIdentifier>{52d8432e-7729-4213-8e65-8c50124f13f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="internal\world\include">
+      <UniqueIdentifier>{725c1364-19e7-49a7-850c-f7bd48aea61a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="internal\world\src">
+      <UniqueIdentifier>{9a204d23-73c2-48ff-8ee8-cefb02aec656}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="internal\sprites\include">
+      <UniqueIdentifier>{b1a88a82-1fde-408b-9747-4053423be3b0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="internal\sprites\src">
+      <UniqueIdentifier>{f5de384c-d5da-45b8-b5d7-4fac3d034669}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include">
+      <UniqueIdentifier>{619209de-ca24-4479-bfa3-b62bea17bc96}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="internal\memory">
+      <UniqueIdentifier>{fc15332d-324b-4971-b038-f578c3f65300}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="internal\memory\include">
+      <UniqueIdentifier>{99f53d4c-e122-4dc3-bc37-7d08cc4b26c8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="internal\memory\src">
+      <UniqueIdentifier>{267d6009-824e-4f16-8945-732e57717d21}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{10fefdc2-0492-4bd2-862a-c3098401f3c0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="tools">
+      <UniqueIdentifier>{4aae930e-eae0-47a3-a4f7-02c3154fb368}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="tools\include">
+      <UniqueIdentifier>{e71f9d77-60d2-426b-b7a3-9702344cffc9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="tools\src">
+      <UniqueIdentifier>{ed49453a-275e-471e-856f-37319a2b5cad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="internal\misc">
+      <UniqueIdentifier>{33b6bd70-8c14-40e8-b7c5-0add8e276c5a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="internal\misc\include">
+      <UniqueIdentifier>{38e2e4a4-6275-4764-96bb-692789d21da0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="internal\misc\src">
+      <UniqueIdentifier>{abcc09ba-35f3-4516-ac04-29b4179b0997}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\camera.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="include\debug.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="include\defs.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="include\loader.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="include\shader.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="include\skybox.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="include\texture.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="include\utilities.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="include\environment.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="include\scene.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="include\object.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="include\renderstate.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="include\rendertarget.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="include\sprite.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="include\ptrtable.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="include\world.h">
-      <Filter>headers</Filter>
+      <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\material.h">
-      <Filter>headers</Filter>
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\object.h">
+      <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\renderer.h">
-      <Filter>headers</Filter>
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\rendertarget.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\shader.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\skybox.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\sprite.h">
+      <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\surface.h">
-      <Filter>headers</Filter>
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\texture.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\world.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="internal\base\materialinternal.h">
+      <Filter>internal\base\include</Filter>
+    </ClInclude>
+    <ClInclude Include="internal\base\objectinternal.h">
+      <Filter>internal\base\include</Filter>
+    </ClInclude>
+    <ClInclude Include="internal\base\rendererinternal.h">
+      <Filter>internal\base\include</Filter>
+    </ClInclude>
+    <ClInclude Include="internal\base\rendertargetinternal.h">
+      <Filter>internal\base\include</Filter>
+    </ClInclude>
+    <ClInclude Include="internal\base\shaderinternal.h">
+      <Filter>internal\base\include</Filter>
+    </ClInclude>
+    <ClInclude Include="internal\base\surfaceinternal.h">
+      <Filter>internal\base\include</Filter>
+    </ClInclude>
+    <ClInclude Include="internal\base\textureinternal.h">
+      <Filter>internal\base\include</Filter>
+    </ClInclude>
+    <ClInclude Include="internal\world\worldinternal.h">
+      <Filter>internal\world\include</Filter>
+    </ClInclude>
+    <ClInclude Include="internal\sprites\camerainternal.h">
+      <Filter>internal\sprites\include</Filter>
+    </ClInclude>
+    <ClInclude Include="internal\sprites\skyboxinternal.h">
+      <Filter>internal\sprites\include</Filter>
+    </ClInclude>
+    <ClInclude Include="internal\sprites\spriteinternal.h">
+      <Filter>internal\sprites\include</Filter>
+    </ClInclude>
+    <ClInclude Include="internal\base\renderstate.h">
+      <Filter>internal\base\include</Filter>
+    </ClInclude>
+    <ClInclude Include="internal\memory\factory.h">
+      <Filter>internal\memory\include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\engine.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="tools\debug.h">
+      <Filter>tools\include</Filter>
+    </ClInclude>
+    <ClInclude Include="tools\mathf.h">
+      <Filter>tools\include</Filter>
+    </ClInclude>
+    <ClInclude Include="tools\path.h">
+      <Filter>tools\include</Filter>
+    </ClInclude>
+    <ClInclude Include="tools\string.h">
+      <Filter>tools\include</Filter>
+    </ClInclude>
+    <ClInclude Include="internal\misc\defs.h">
+      <Filter>internal\misc\include</Filter>
+    </ClInclude>
+    <ClInclude Include="internal\misc\loader.h">
+      <Filter>internal\misc\include</Filter>
+    </ClInclude>
+    <ClInclude Include="internal\misc\ptrtable.h">
+      <Filter>internal\misc\include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\defines.h">
+      <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\camera.cpp">
-      <Filter>sources</Filter>
+    <ClCompile Include="internal\base\objectinternal.cpp">
+      <Filter>internal\base\src</Filter>
     </ClCompile>
-    <ClCompile Include="src\debug.cpp">
-      <Filter>sources</Filter>
+    <ClCompile Include="internal\base\materialinternal.cpp">
+      <Filter>internal\base\src</Filter>
     </ClCompile>
-    <ClCompile Include="src\loader.cpp">
-      <Filter>sources</Filter>
+    <ClCompile Include="internal\base\rendertargetinternal.cpp">
+      <Filter>internal\base\src</Filter>
     </ClCompile>
-    <ClCompile Include="src\shader.cpp">
-      <Filter>sources</Filter>
+    <ClCompile Include="internal\base\shaderinternal.cpp">
+      <Filter>internal\base\src</Filter>
     </ClCompile>
-    <ClCompile Include="src\skybox.cpp">
-      <Filter>sources</Filter>
+    <ClCompile Include="internal\base\surfaceinternal.cpp">
+      <Filter>internal\base\src</Filter>
     </ClCompile>
-    <ClCompile Include="src\texture.cpp">
-      <Filter>sources</Filter>
+    <ClCompile Include="internal\base\textureinternal.cpp">
+      <Filter>internal\base\src</Filter>
     </ClCompile>
-    <ClCompile Include="src\utilities.cpp">
-      <Filter>sources</Filter>
+    <ClCompile Include="internal\world\worldinternal.cpp">
+      <Filter>internal\world\src</Filter>
     </ClCompile>
-    <ClCompile Include="src\environment.cpp">
-      <Filter>sources</Filter>
+    <ClCompile Include="internal\sprites\camerainternal.cpp">
+      <Filter>internal\sprites\src</Filter>
     </ClCompile>
-    <ClCompile Include="src\object.cpp">
-      <Filter>sources</Filter>
+    <ClCompile Include="internal\sprites\skyboxinternal.cpp">
+      <Filter>internal\sprites\src</Filter>
     </ClCompile>
-    <ClCompile Include="src\rendertarget.cpp">
-      <Filter>sources</Filter>
+    <ClCompile Include="internal\sprites\spriteinternal.cpp">
+      <Filter>internal\sprites\src</Filter>
     </ClCompile>
-    <ClCompile Include="src\sprite.cpp">
-      <Filter>sources</Filter>
+    <ClCompile Include="internal\memory\factory.cpp">
+      <Filter>internal\memory\src</Filter>
     </ClCompile>
-    <ClCompile Include="src\surface.cpp">
-      <Filter>sources</Filter>
+    <ClCompile Include="src\engine.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="tools\debug.cpp">
+      <Filter>tools\src</Filter>
+    </ClCompile>
+    <ClCompile Include="internal\misc\loader.cpp">
+      <Filter>internal\misc\src</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -1,11 +1,10 @@
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "defs.h"
-#include "debug.h"
 #include "camera.h"
-#include "utilities.h"
+#include "tools/debug.h"
+#include "internal/sprites/camerainternal.h"
 
-CameraPrivate::CameraPrivate() {
+CameraInternal::CameraInternal() : ObjectInternal(ObjectTypeCamera) {
 	aspect_ = 1.3f;
 	near_ = 1.f;
 	far_ = 100.f;
@@ -17,10 +16,10 @@ CameraPrivate::CameraPrivate() {
 	theta_ = glm::radians(90.f);
 }
 
-CameraPrivate::~CameraPrivate() {
+CameraInternal::~CameraInternal() {
 }
 
-void CameraPrivate::LookAt(const glm::vec3& eye, const glm::vec3& center) {
+void CameraInternal::LookAt(const glm::vec3& eye, const glm::vec3& center) {
 	pos_ = eye;
 
 	center_ = center;
@@ -31,7 +30,7 @@ void CameraPrivate::LookAt(const glm::vec3& eye, const glm::vec3& center) {
 	phi_ = atanf(fwd.z / fwd.x);
 }
 
-void CameraPrivate::Zoom(float delta) {
+void CameraInternal::Zoom(float delta) {
 	if (delta == 0) { return; }
 	glm::vec3 fwd(
 		sinf(theta_) * cosf(phi_),
@@ -42,12 +41,12 @@ void CameraPrivate::Zoom(float delta) {
 	pos_ += fwd * delta;
 }
 
-void CameraPrivate::Rotate(const glm::vec2& delta) {
+void CameraInternal::Rotate(const glm::vec2& delta) {
 	phi_ += delta.x;
 	theta_ += delta.y;
 }
 
-void CameraPrivate::Move(const glm::vec2& delta) {
+void CameraInternal::Move(const glm::vec2& delta) {
 	glm::vec3 fwd(
 		sinf(theta_) * cosf(phi_),
 		cosf(theta_),
@@ -66,15 +65,15 @@ void CameraPrivate::Move(const glm::vec2& delta) {
 	pos_ += up * delta.y;
 }
 
-const glm::vec3& CameraPrivate::GetPosition() {
+const glm::vec3& CameraInternal::GetPosition() {
 	return pos_;
 }
 
-const glm::mat4& CameraPrivate::GetProjMatrix() {
+const glm::mat4& CameraInternal::GetProjMatrix() {
 	return proj_;
 }
 
-const glm::mat4& CameraPrivate::GetViewMatrix() {
+const glm::mat4& CameraInternal::GetViewMatrix() {
 	//return view_ = glm::lookAt(pos_, center_, glm::vec3(0, 1, 0));
 
 	glm::vec3 fwd(

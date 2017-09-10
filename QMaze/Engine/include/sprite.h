@@ -1,52 +1,34 @@
 #pragma once
+#include <glm/glm.hpp>
+
 #include "object.h"
 
-class ENGINE_EXPORT Sprite : public Object {
+class Surface;
+
+class ENGINE_EXPORT Sprite : virtual public Object {
 public:
-	Sprite(int type, Sprite* parent);
+	virtual void SetParent(Sprite* value) = 0;
+	virtual Sprite* GetParent() const = 0;
 
-public:
-	void SetParent(Object* value) { parent_ = value; }
-	Object* GetParent() const { return parent_; }
+	virtual int GetChildCount() const = 0;
+	virtual Sprite* GetChildAt(int i) = 0;
 
-	int GetChildCount() const { return (int)children_.size(); }
-	Object* GetChildAt(int i) const { return children_[i]; }
+	virtual void SetScale(const glm::vec3& value) = 0;
+	virtual void SetPosition(const glm::vec3& value) = 0;
+	virtual void SetEulerAngles(const glm::vec3& value) = 0;
 
-public:
-	void SetScale(const glm::vec3& value);
-	void SetPosition(const glm::vec3& value);
-	void SetEulerAngles(const glm::vec3& value);
+	virtual glm::vec3 GetScale() const = 0;
+	virtual glm::vec3 GetPosition() const = 0;
+	virtual glm::vec3 GetEulerAngles() const = 0;
 
-	glm::vec3 GetScale() const { return scale_; }
-	glm::vec3 GetPosition() const { return position_; }
-	glm::vec3 GetEulerAngles() const { return eulerAngles_; }
+	virtual glm::mat4 GetLocalToWorldMatrix() = 0;
+	virtual glm::mat4 GetWorldToLocalMatrix() = 0;
 
-	glm::mat4 GetLocalToWorldMatrix();
-	glm::mat4 GetWorldToLocalMatrix();
+	virtual glm::vec3 GetLocalToWorldPosition(const glm::vec3& position) = 0;
+	virtual glm::vec3 GetWorldToLocalPosition(const glm::vec3& position) = 0;
 
-	glm::vec3 GetLocalToWorldPosition(const glm::vec3& position);
-	glm::vec3 GetWorldToLocalPosition(const glm::vec3& position);
+	virtual void Update() = 0;
 
-private:
-	enum DirtyFlag {
-		DirtyFlagLocalToWorldMatrix,
-		DirtyFlagWorldToLocalMatrix,
-		DirtyFlagSize,
-	};
-
-private:
-	bool IsDirty(DirtyFlag bit) const { return dirtyFlags_.test(bit); }
-	void SetDiry(DirtyFlag bit, bool value) { dirtyFlags_.set(bit, value); }
-
-private:
-	Object* parent_;
-	std::vector<Object*> children_;
-	std::bitset<DirtyFlagSize> dirtyFlags_;
-
-	glm::vec3 scale_;
-	glm::vec3 eulerAngles_;
-	glm::vec3 position_;
-
-	glm::mat4 localToWorldMatrix_;
-	glm::mat4 worldToLocalMatrix_;
+	virtual void SetSurface(Surface* value) = 0;
+	virtual Surface* GetSurface() = 0;
 };

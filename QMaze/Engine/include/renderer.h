@@ -1,8 +1,4 @@
+#include "object.h"
 
-class Renderer {
-public:
-	Renderer();
-
-private:
-
+class ENGINE_EXPORT Renderer : virtual public Object {
 };

@@ -3,12 +3,13 @@
 #include <assimp/postprocess.h>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "defs.h"
-#include "debug.h"
-#include "surface.h"
-#include "texture.h"
-#include "material.h"
-#include "utilities.h"
+#include "tools/debug.h"
+#include "tools/mathf.h"
+#include "tools/path.h"
+#include "surfaceinternal.h"
+#include "internal/memory/factory.h"
+#include "internal/base/textureinternal.h"
+#include "internal/base/materialinternal.h"
 
 static void aiMaterixToGlm(glm::mat4& answer, const aiMatrix4x4& mat) {
 	answer = glm::mat4(
@@ -28,27 +29,27 @@ static void aiMaterixToGlm(glm::mat4& answer, const aiMatrix3x3& mat) {
 		);
 }
 
-SurfacePrivate::SurfacePrivate() {
+SurfaceInternal::SurfaceInternal() : ObjectInternal(ObjectTypeSurface) {
 	vao_ = 0;
-	memset(vbos_, 0, COUNT_OF(vbos_));
+	memset(vbos_, 0, CountOf(vbos_));
 }
 
-SurfacePrivate::~SurfacePrivate() {
+SurfaceInternal::~SurfaceInternal() {
 	Clear();
 }
 
-void SurfacePrivate::Clear() {
+void SurfaceInternal::Clear() {
 	glDeleteVertexArrays(1, &vao_);
-	glDeleteVertexArrays(COUNT_OF(vbos_), vbos_);
+	glDeleteVertexArrays(CountOf(vbos_), vbos_);
 }
 
-bool SurfacePrivate::Load(const std::string& path) {
+bool SurfaceInternal::Load(const std::string& path) {
 	Clear();
 
 	glGenVertexArrays(1, &vao_);
 	glBindVertexArray(vao_);
 
-	glGenBuffers(COUNT_OF(vbos_), vbos_);
+	glGenBuffers(CountOf(vbos_), vbos_);
 
 	Assimp::Importer importer;
 	unsigned flags = aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_CalcTangentSpace;
@@ -64,8 +65,8 @@ bool SurfacePrivate::Load(const std::string& path) {
 	return result;
 }
 
-bool SurfacePrivate::InitFromScene(const aiScene* scene, const std::string& path) {
-	Material* materials = new Material[scene->mNumMaterials];
+bool SurfaceInternal::InitFromScene(const aiScene* scene, const std::string& path) {
+	Material** materials = new Material*[scene->mNumMaterials];
 
 	if (!InitMaterials(scene, path, materials)) {
 		return false;
@@ -120,7 +121,7 @@ bool SurfacePrivate::InitFromScene(const aiScene* scene, const std::string& path
 	return true;
 }
 
-void SurfacePrivate::InitAttribute(const aiMesh* mesh, Attribute& attribute) {
+void SurfaceInternal::InitAttribute(const aiMesh* mesh, Attribute& attribute) {
 	const aiVector3D zero(0);
 	for (unsigned i = 0; i < mesh->mNumVertices; ++i) {
 		const aiVector3D* pos = &mesh->mVertices[i];
@@ -142,13 +143,14 @@ void SurfacePrivate::InitAttribute(const aiMesh* mesh, Attribute& attribute) {
 	}
 }
 
-bool SurfacePrivate::InitMaterials(const aiScene* scene, const std::string& path, Material* materials) {
-	std::string dir = Utility::GetDirectoryPath(path);
+bool SurfaceInternal::InitMaterials(const aiScene* scene, const std::string& path, Material** materials) {
+	std::string dir = Path::GetDirectory(path);
 
 	bool success = true;
 	for (unsigned i = 0; i < scene->mNumMaterials; ++i) {
 		const aiMaterial* mat = scene->mMaterials[i];
-		
+		materials[i] = Factory::Create<MaterialInternal>();
+
 		if (mat->GetTextureCount(aiTextureType_DIFFUSE) > 0) {
 			aiString dpath;
 			if (mat->GetTexture(aiTextureType_DIFFUSE, 0, &dpath) != AI_SUCCESS) {
@@ -158,14 +160,14 @@ bool SurfacePrivate::InitMaterials(const aiScene* scene, const std::string& path
 			std::string fullPath = "textures/";
 			fullPath += dpath.data;
 			
-			Texture2D texture = Texture2D::Create();
+			Texture2D* texture = Factory::Create<Texture2DInternal>();
 			
 			if (!texture->Load(fullPath)) {
 				success = false;
 				continue;
 			}
 
-			materials[i] = Material::Create();
+			materials[i] = Factory::Create<MaterialInternal>();
 			materials[i]->SetDiffuseTexture(texture);
 		}
 	}
@@ -173,17 +175,17 @@ bool SurfacePrivate::InitMaterials(const aiScene* scene, const std::string& path
 	return success;
 }
 
-void SurfacePrivate::Render(GLenum mode) {
+void SurfaceInternal::Render(GLenum mode) {
 	glBindVertexArray(vao_);
 
 	AssertX(mode == GL_TRIANGLES || mode == GL_PATCHES, "invalid mode");
 
 	for (unsigned i = 0; i < meshes_.size(); ++i) {
 		
-		Texture diffuse = meshes_[i].material->GetDiffuseTexture();
+		Texture* diffuse = meshes_[i].material->GetDiffuseTexture();
 		
 		if (diffuse) {
-			diffuse->Bind(Globals::ColorTexture);
+			diffuse->Bind(GL_TEXTURE0/*Globals::ColorTexture*/);
 		}
 
 		glDrawElementsBaseVertex(mode, meshes_[i].numIndices, GL_UNSIGNED_INT,

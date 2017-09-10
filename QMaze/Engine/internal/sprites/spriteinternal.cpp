@@ -2,35 +2,35 @@
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/quaternion.hpp>
 
-#include "sprite.h"
+#include "internal/sprites/spriteinternal.h"
 
-Sprite::Sprite(int type, Sprite* parent) :Object(type) {
+SpriteInternal::SpriteInternal(Sprite* parent) : ObjectInternal(ObjectTypeSprite) {
 	parent_ = parent;
 	dirtyFlags_.set();
 }
 
-void Sprite::SetScale(const glm::vec3& value) {
+void SpriteInternal::SetScale(const glm::vec3& value) {
 	if (scale_ == value) { return; }
 	scale_ = value;
 	SetDiry(DirtyFlagLocalToWorldMatrix, true);
 	SetDiry(DirtyFlagWorldToLocalMatrix, true);
 }
 
-void Sprite::SetPosition(const glm::vec3& value) {
+void SpriteInternal::SetPosition(const glm::vec3& value) {
 	if (position_ == value) { return; }
 	position_ = value;
 	SetDiry(DirtyFlagLocalToWorldMatrix, true);
 	SetDiry(DirtyFlagWorldToLocalMatrix, true);
 }
 
-void Sprite::SetEulerAngles(const glm::vec3& value) {
+void SpriteInternal::SetEulerAngles(const glm::vec3& value) {
 	if (eulerAngles_ == value) { return; }
 	eulerAngles_ = value;
 	SetDiry(DirtyFlagLocalToWorldMatrix, true);
 	SetDiry(DirtyFlagWorldToLocalMatrix, true);
 }
 
-glm::mat4 Sprite::GetLocalToWorldMatrix() {
+glm::mat4 SpriteInternal::GetLocalToWorldMatrix() {
 	if (IsDirty(DirtyFlagLocalToWorldMatrix)) {
 		glm::mat4 ans(1.f);
 		glm::quat q(eulerAngles_);
@@ -41,7 +41,7 @@ glm::mat4 Sprite::GetLocalToWorldMatrix() {
 	return localToWorldMatrix_;
 }
 
-glm::mat4 Sprite::GetWorldToLocalMatrix() {
+glm::mat4 SpriteInternal::GetWorldToLocalMatrix() {
 	if (IsDirty(DirtyFlagWorldToLocalMatrix)) {
 		worldToLocalMatrix_ = glm::inverse(GetLocalToWorldMatrix());
 		SetDiry(DirtyFlagWorldToLocalMatrix, false);
@@ -50,10 +50,10 @@ glm::mat4 Sprite::GetWorldToLocalMatrix() {
 	return worldToLocalMatrix_;
 }
 
-glm::vec3 Sprite::GetLocalToWorldPosition(const glm::vec3& position) {
+glm::vec3 SpriteInternal::GetLocalToWorldPosition(const glm::vec3& position) {
 	return glm::vec3(GetLocalToWorldMatrix() * glm::vec4(position, 1));
 }
 
-glm::vec3 Sprite::GetWorldToLocalPosition(const glm::vec3& position) {
+glm::vec3 SpriteInternal::GetWorldToLocalPosition(const glm::vec3& position) {
 	return glm::vec3(GetWorldToLocalMatrix() * glm::vec4(position, 1));
 }

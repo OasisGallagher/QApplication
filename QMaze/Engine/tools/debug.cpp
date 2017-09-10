@@ -5,22 +5,23 @@
 #include <fstream>
 
 #include "debug.h"
-#include "utilities.h"
+#include "tools/mathf.h"
+#include "tools/string.h"
 
 int Debug::length_ = 0;
 std::stack<std::string> Debug::samples_;
-fnLogCallback Debug::fnptr_ = nullptr;
+LogCallback Debug::fnptr_ = nullptr;
 
 std::ofstream debug("main/debug/debug.txt");
 
-void Debug::SetLogCallback(fnLogCallback cb) {
+void Debug::SetLogCallback(LogCallback cb) {
 	fnptr_ = cb;
 }
 
 void Debug::Log(const std::string& text) {
 	//qDebug() << text.c_str();
 	//OS::SetConsoleColor(White);
-	if (fnptr_ != nullptr) { fnptr_(LogLevelDebug, text); }
+	if (fnptr_ != nullptr) { fnptr_(LogLevelDebug, text.c_str()); }
 	//std::cout << text << "\n";
 	//debug << text << "\n";
 }
@@ -31,7 +32,7 @@ void Debug::LogWarning(const std::string& text) {
 	//std::cout << "[W] " << text << "\n";
 	//debug << "[W] " << text << "\n";
 	//OS::SetConsoleColor(White);
-	if (fnptr_ != nullptr) { fnptr_(LogLevelWarning, text); }
+	if (fnptr_ != nullptr) { fnptr_(LogLevelWarning, text.c_str()); }
 }
 
 void Debug::LogError(const std::string& text) {
@@ -41,20 +42,20 @@ void Debug::LogError(const std::string& text) {
 	//debug << "[E] " << text << "\n";
 	//OS::SetConsoleColor(White);
 	//OS::Break(text.c_str());
-	if (fnptr_ != nullptr) { fnptr_(LogLevelError, text); }
+	if (fnptr_ != nullptr) { fnptr_(LogLevelError, text.c_str()); }
 }
 
 std::string Debug::Now() {
 	time_t now = time(nullptr);
 	tm* ptr = localtime(&now);
-	return Utility::Format("%02d:%02d:%02d", ptr->tm_hour, ptr->tm_min, ptr->tm_sec);
+	return String::Format("%02d:%02d:%02d", ptr->tm_hour, ptr->tm_min, ptr->tm_sec);
 }
 
 void Debug::Break(const std::string& expression, const char* file, int line) {
 	std::ostringstream oss;
 	oss << expression << "\n";
 	oss << "at " << file << ":" << line;
-	if (fnptr_ != nullptr) { fnptr_(LogLevelFatal, oss.str()); }
+	if (fnptr_ != nullptr) { fnptr_(LogLevelFatal, oss.str().c_str()); }
 	//qFatal(oss.str().c_str());
 	//Debug::LogError(oss.str());
 
@@ -65,7 +66,7 @@ void Debug::Break(const std::string& expression, const std::string& message, con
 	std::ostringstream oss;
 	oss << expression + ":\n" + message << "\n";
 	oss << "at " << file << ":" << line;
-	if (fnptr_ != nullptr) { fnptr_(LogLevelFatal, oss.str()); }
+	if (fnptr_ != nullptr) { fnptr_(LogLevelFatal, oss.str().c_str()); }
 	//qFatal(oss.str().c_str());
 	//Debug::LogError(oss.str());
 
@@ -84,7 +85,7 @@ void Debug::StartProgress() {
 void Debug::LogProgress(const char* text, int current, int total) {
 	std::cout << std::string(length_, '\b');
 
-	std::string log = Utility::Format("%s (%d/%d).", text, current, total);
+	std::string log = String::Format("%s (%d/%d).", text, current, total);
 	std::cout << log;
 	length_ = log.length();
 }
@@ -107,5 +108,5 @@ void Debug::EndSample() {
 	samples_.pop();
 	clock_t elapsed = clock() - atol(samp.c_str() + pos + 1);
 	samp[pos] = 0;
-	Debug::Log(Utility::Format("\"%s\" costs %.2f seconds.", samp.c_str(), ((float)elapsed / CLOCKS_PER_SEC)));
+	Debug::Log(String::Format("\"%s\" costs %.2f seconds.", samp.c_str(), ((float)elapsed / CLOCKS_PER_SEC)));
 }

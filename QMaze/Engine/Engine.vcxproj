@@ -104,8 +104,8 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;_USRDLL;__EXPORT_ENGINE__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>.\include;..\3rdParty\glm-0.9.7.1;..\3rdParty\assimp-3.0\include;..\3rdParty\glew-2.1.0\include;..\3rdParty\image-magick-6\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>4251;4996;4267</DisableSpecificWarnings>
+      <AdditionalIncludeDirectories>.\include;$(SolutionDir)Engine;..\3rdParty\glm-0.9.7.1;..\3rdParty\assimp-3.0\include;..\3rdParty\glew-2.1.0\include;..\3rdParty\image-magick-6\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4251;4996;4267;4250</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -153,39 +153,55 @@ copy $(TargetDir)$(TargetName).dll $(SolutionDir)$(SolutionName)\bin</Command>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="internal\base\materialinternal.cpp" />
+    <ClCompile Include="internal\base\objectinternal.cpp" />
+    <ClCompile Include="internal\base\rendertargetinternal.cpp" />
+    <ClCompile Include="internal\base\shaderinternal.cpp" />
+    <ClCompile Include="internal\base\surfaceinternal.cpp" />
+    <ClCompile Include="internal\base\textureinternal.cpp" />
+    <ClCompile Include="internal\memory\factory.cpp" />
+    <ClCompile Include="internal\misc\loader.cpp" />
+    <ClCompile Include="internal\sprites\camerainternal.cpp" />
+    <ClCompile Include="internal\sprites\skyboxinternal.cpp" />
+    <ClCompile Include="internal\sprites\spriteinternal.cpp" />
+    <ClCompile Include="internal\world\worldinternal.cpp" />
+    <ClCompile Include="src\engine.cpp" />
+    <ClCompile Include="tools\debug.cpp" />
+  </ItemGroup>
+  <ItemGroup>
     <ClInclude Include="include\camera.h" />
-    <ClInclude Include="include\debug.h" />
-    <ClInclude Include="include\defs.h" />
-    <ClInclude Include="include\environment.h" />
-    <ClInclude Include="include\loader.h" />
+    <ClInclude Include="include\defines.h" />
+    <ClInclude Include="include\engine.h" />
     <ClInclude Include="include\material.h" />
-    <ClInclude Include="include\surface.h" />
     <ClInclude Include="include\object.h" />
-    <ClInclude Include="include\ptrtable.h" />
     <ClInclude Include="include\renderer.h" />
-    <ClInclude Include="include\renderstate.h" />
     <ClInclude Include="include\rendertarget.h" />
-    <ClInclude Include="include\scene.h" />
     <ClInclude Include="include\shader.h" />
     <ClInclude Include="include\skybox.h" />
     <ClInclude Include="include\sprite.h" />
+    <ClInclude Include="include\surface.h" />
     <ClInclude Include="include\texture.h" />
-    <ClInclude Include="include\utilities.h" />
     <ClInclude Include="include\world.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="src\camera.cpp" />
-    <ClCompile Include="src\debug.cpp" />
-    <ClCompile Include="src\environment.cpp" />
-    <ClCompile Include="src\loader.cpp" />
-    <ClCompile Include="src\surface.cpp" />
-    <ClCompile Include="src\object.cpp" />
-    <ClCompile Include="src\rendertarget.cpp" />
-    <ClCompile Include="src\shader.cpp" />
-    <ClCompile Include="src\skybox.cpp" />
-    <ClCompile Include="src\sprite.cpp" />
-    <ClCompile Include="src\texture.cpp" />
-    <ClCompile Include="src\utilities.cpp" />
+    <ClInclude Include="internal\base\materialinternal.h" />
+    <ClInclude Include="internal\base\objectinternal.h" />
+    <ClInclude Include="internal\base\rendererinternal.h" />
+    <ClInclude Include="internal\base\renderstate.h" />
+    <ClInclude Include="internal\base\rendertargetinternal.h" />
+    <ClInclude Include="internal\base\shaderinternal.h" />
+    <ClInclude Include="internal\base\surfaceinternal.h" />
+    <ClInclude Include="internal\base\textureinternal.h" />
+    <ClInclude Include="internal\memory\factory.h" />
+    <ClInclude Include="internal\misc\defs.h" />
+    <ClInclude Include="internal\misc\loader.h" />
+    <ClInclude Include="internal\misc\ptrtable.h" />
+    <ClInclude Include="internal\sprites\camerainternal.h" />
+    <ClInclude Include="internal\sprites\skyboxinternal.h" />
+    <ClInclude Include="internal\sprites\spriteinternal.h" />
+    <ClInclude Include="internal\world\worldinternal.h" />
+    <ClInclude Include="tools\debug.h" />
+    <ClInclude Include="tools\mathf.h" />
+    <ClInclude Include="tools\path.h" />
+    <ClInclude Include="tools\string.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

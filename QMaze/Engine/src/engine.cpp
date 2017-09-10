@@ -1,25 +1,55 @@
-#include "debug.h"
-#include "environment.h"
+#include <gl/glew.h>
 
-bool Environment::Initialize(fnLogCallback cb) {
+#include "engine.h"
+
+#include "world.h"
+#include "tools/debug.h"
+#include "internal/memory/factory.h"
+
+Engine Engine::engine_;
+
+#ifndef _STDCALL
+#define _STDCALL __stdcall
+#endif
+
+static void _STDCALL GLDebugMessageCallback(
+	GLenum source, 
+	GLenum type, 
+	GLuint id, 
+	GLenum severity, 
+	GLsizei length, 
+	const GLchar* message, 
+	const GLvoid* userParam
+);
+
+bool Engine::Initialize() {
+	AssertX(world_ != nullptr, "can not initialize engine twice.");
+
 	glewExperimental = true;
-	
+
 	if (glewInit() != GLEW_OK) {
-		Debug::LogError("failed to initialize GLEW\n");
 		return false;
 	}
 
 	if (GLEW_ARB_debug_output) {
-		glDebugMessageCallbackARB(DebugOutputCallback, nullptr);
+		glDebugMessageCallbackARB(GLDebugMessageCallback, nullptr);
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
 	}
 
-	Debug::SetLogCallback(cb);
+	Object* obj = Factory::Create("World");
 
 	return true;
 }
 
-void Environment::DebugOutputCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const GLvoid* userParam) {
+void Engine::SetDebugCallback(LogCallback callback) {
+	Debug::SetLogCallback(callback);
+}
+
+void Engine::Update() {
+	world_->Update();
+}
+
+static void _STDCALL GLDebugMessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const GLvoid* userParam) {
 	// Shader.
 	if (source == GL_DEBUG_SOURCE_SHADER_COMPILER_ARB) {
 		return;

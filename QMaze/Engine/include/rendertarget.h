@@ -1,46 +1,31 @@
 #pragma once
 #include <gl/glew.h>
+#include "defines.h"
+#include "object.h"
 
-#include "defs.h"
-
-class ENGINE_EXPORT RenderTarget {
+class ENGINE_EXPORT RenderTarget : virtual public Object {
 public:
-	RenderTarget();
-	~RenderTarget();
+	virtual void Create(GLsizei width, GLsizei height) = 0;
 
-public:
-	void Create(GLsizei width, GLsizei height);
+	virtual void Bind(GLenum* buffers, GLuint count) = 0;
+	virtual void Unbind() = 0;
 
-	void Bind(GLenum* buffers, GLuint count);
-	void Unbind();
+	virtual void Clear(GLbitfield buffers) = 0;
 
-	void Clear(GLbitfield buffers);
+	virtual void AddRenderTexture(GLenum internalFormat,
+		GLenum minFilter,
+		GLenum magFilter,
+		GLenum wrapS,
+		GLenum wrapT) = 0;
 
-	void AddRenderTexture(GLenum internalFormat,
-						  GLenum minFilter,
-						  GLenum magFilter,
-						  GLenum wrapS,
-						  GLenum wrapT);
+	virtual void AddDepthTexture(GLenum internalFormat,
+		GLenum minFilter,
+		GLenum magFilter,
+		GLenum wrapS,
+		GLenum wrapT) = 0;
 
-	void AddDepthTexture(GLenum internalFormat,
-						 GLenum minFilter,
-						 GLenum magFilter,
-						 GLenum wrapS,
-						 GLenum wrapT);
+	virtual void AddDepthRenderBuffer() = 0;
 
-	void AddDepthRenderBuffer();
-
-	GLuint GetDepthTexture() const;
-	GLuint GetRenderTexture(GLuint index) const;
-
-private:
-	GLuint fbo_;
-	GLuint depth_;
-
-	GLuint index_;
-	GLuint* textures_;
-	GLuint max_textures_;
-
-	GLsizei width_;
-	GLsizei height_;
+	virtual GLuint GetDepthTexture() const = 0;
+	virtual GLuint GetRenderTexture(GLuint index) const = 0;
 };

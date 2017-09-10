@@ -2,11 +2,18 @@
 #include <stack>
 #include <string>
 
-#include "defs.h"
+typedef void(*LogCallback)(int level, const char* message);
 
 class Debug {
+	enum {
+		LogLevelDebug,
+		LogLevelWarning,
+		LogLevelError,
+		LogLevelFatal,
+	};
+
 public:
-	static void SetLogCallback(fnLogCallback cb);
+	static void SetLogCallback(LogCallback cb);
 
 	static void Log(const std::string& text);
 	static void LogWarning(const std::string& text);
@@ -31,7 +38,7 @@ private:
 private:
 	static int length_;
 	static std::stack<std::string> samples_;
-	static fnLogCallback fnptr_;
+	static LogCallback fnptr_;
 
 };
 

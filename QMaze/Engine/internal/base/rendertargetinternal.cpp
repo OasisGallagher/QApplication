@@ -1,3 +1,4 @@
+/*
 #include "debug.h"
 #include "renderstate.h"
 #include "rendertarget.h"
@@ -141,3 +142,4 @@ void RenderTarget::AddRenderTexture(GLenum internalFormat, GLenum minFilter, GLe
 
 	RenderState::PopFramebuffer();
 }
+*/
