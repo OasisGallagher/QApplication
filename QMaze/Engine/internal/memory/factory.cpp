@@ -1,6 +1,7 @@
 #include "internal/memory/factory.h"
 
 #include "internal/world/worldinternal.h"
+#include "internal/sprites/camerainternal.h"
 
 Factory Factory::instance;
 

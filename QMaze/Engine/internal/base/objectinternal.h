@@ -7,7 +7,7 @@
 
 #define DEFINE_FACTORY_METHOD(Class) \
 	public: \
-		static Object* Create() { return new Class ## Internal; } \
+		static Object* Create() { return Factory::Create<Class ## Internal>(); } \
 	private:
 
 class ObjectInternal : virtual public Object {

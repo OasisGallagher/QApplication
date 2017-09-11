@@ -77,24 +77,6 @@ void Debug::EnableMemoryLeakCheck() {
 	//OS::EnableMemoryLeakCheck();
 }
 
-void Debug::StartProgress() {
-	length_ = 0;
-	//OS::SetConsoleColor(Green);
-}
-
-void Debug::LogProgress(const char* text, int current, int total) {
-	std::cout << std::string(length_, '\b');
-
-	std::string log = String::Format("%s (%d/%d).", text, current, total);
-	std::cout << log;
-	length_ = log.length();
-}
-
-void Debug::EndProgress() {
-	std::cout << std::string(length_, '\b');
-	//OS::SetConsoleColor(White);
-}
-
 void Debug::StartSample(const std::string& text) {
 	Debug::Log("\"" + text + "\" at " + Now() + ".");
 

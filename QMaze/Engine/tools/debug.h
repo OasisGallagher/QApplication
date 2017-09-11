@@ -28,10 +28,6 @@ public:
 	static void StartSample(const std::string& text);
 	static void EndSample();
 
-	static void StartProgress();
-	static void LogProgress(const char* text, int current, int total);
-	static void EndProgress();
-
 private:
 	Debug();
 
@@ -39,7 +35,6 @@ private:
 	static int length_;
 	static std::stack<std::string> samples_;
 	static LogCallback fnptr_;
-
 };
 
 #define Verify(expression) \
