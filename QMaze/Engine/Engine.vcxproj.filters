@@ -166,6 +166,15 @@
     <ClInclude Include="include\defines.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="internal\memory\memory.h">
+      <Filter>internal\memory\include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\mesh.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="internal\base\meshinternal.h">
+      <Filter>internal\base\include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="internal\base\objectinternal.cpp">
@@ -209,6 +218,9 @@
     </ClCompile>
     <ClCompile Include="internal\misc\loader.cpp">
       <Filter>internal\misc\src</Filter>
+    </ClCompile>
+    <ClCompile Include="internal\memory\memory.cpp">
+      <Filter>internal\memory\src</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
