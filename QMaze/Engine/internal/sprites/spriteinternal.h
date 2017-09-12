@@ -2,16 +2,16 @@
 #include "sprite.h"
 #include "internal/base/objectinternal.h"
 
-class SpriteInternal : public Sprite, public ObjectInternal {
+class SpriteInternal : virtual public ISprite, public ObjectInternal {
 public:
-	SpriteInternal(Sprite* parent = nullptr);
+	SpriteInternal(Sprite parent = Sprite());
 
 public:
-	virtual void SetParent(Sprite* value) { parent_ = value; }
-	virtual Sprite* GetParent() const { return parent_; }
+	virtual void SetParent(Sprite value) { parent_ = value; }
+	virtual Sprite GetParent() const { return parent_; }
 
 	virtual int GetChildCount() const { return (int)children_.size(); }
-	virtual Sprite* GetChildAt(int i) const { return children_[i]; }
+	virtual Sprite GetChildAt(int i) { return children_[i]; }
 
 public:
 	virtual void SetScale(const glm::vec3& value);
@@ -28,6 +28,11 @@ public:
 	virtual glm::vec3 GetLocalToWorldPosition(const glm::vec3& position);
 	virtual glm::vec3 GetWorldToLocalPosition(const glm::vec3& position);
 
+	virtual void Update();
+
+	virtual void SetSurface(Surface value);
+	virtual Surface GetSurface();
+
 private:
 	enum DirtyFlag {
 		DirtyFlagLocalToWorldMatrix,
@@ -40,8 +45,8 @@ private:
 	void SetDiry(DirtyFlag bit, bool value) { dirtyFlags_.set(bit, value); }
 
 private:
-	Sprite* parent_;
-	std::vector<Sprite*> children_;
+	Sprite parent_;
+	std::vector<Sprite> children_;
 	std::bitset<DirtyFlagSize> dirtyFlags_;
 
 	glm::vec3 scale_;

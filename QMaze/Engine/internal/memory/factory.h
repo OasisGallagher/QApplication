@@ -1,3 +1,5 @@
+#pragma once
+
 #include <map>
 
 #include "object.h"
@@ -5,24 +7,24 @@
 #include "tools/debug.h"
 
 class Factory {
-	typedef Object* (*FatroyMethod)();
+	typedef Object (*FatroyMethod)();
 	typedef std::map<std::string, FatroyMethod> Container;
 	Factory();
 
 public:
-	template <class Ty>
-	static Ty* Create() {
-		return Memory::Create<Ty>();
+	template <class Internal>
+	static typename Internal::Interface Create() {
+		return typename Internal::Interface(Memory::Create<Internal>());
 	}
 
-	static Object* Create(const std::string& name) {
+	static Object Create(const std::string& name) {
 		Container::iterator pos = instance.factoryMethods_.find(name);
 		AssertX(pos != instance.factoryMethods_.end(), "no factroy method exists for: " + name);
-		return instance.factoryMethods_[name]();
+		return Object(pos->second());
 	}
 
-	static void Release(Object* pointer) {
-		Memory::Release(pointer);
+	static void Release(Object pointer) {
+		/*Memory::Release(pointer);*/
 	}
 
 	static void AddFactoryMethod(const std::string& name, FatroyMethod method) {

@@ -3,14 +3,14 @@
 #include <map>
 
 template <class Ty>
-class PtrTable {
+class PtrMap {
 public:
 	typedef Ty* value_type;
 	typedef std::map<std::string, value_type> container_type;
 	typedef typename container_type::iterator iterator;
 
 public:
-	~PtrTable() {
+	~PtrMap() {
 		clear();
 	}
 

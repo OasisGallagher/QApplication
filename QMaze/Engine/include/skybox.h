@@ -2,8 +2,10 @@
 #include "object.h"
 #include "texture.h"
 
-class ENGINE_EXPORT Skybox : virtual public Object {
+class ENGINE_EXPORT ISkybox : virtual public IObject {
 public:
 	virtual void Render() = 0;
-	virtual Texture3D* GetTexture() = 0;
+	virtual ITexture3D* GetTexture() = 0;
 };
+
+typedef smart_ptr<ISkybox> Skybox;

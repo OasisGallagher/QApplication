@@ -3,10 +3,11 @@
 
 #include "camera.h"
 #include "internal/base/objectinternal.h"
+#include "internal/sprites/spriteinternal.h"
 
-class RenderTarget;
+class IRenderTarget;
 
-class CameraInternal : public Camera, public ObjectInternal {
+class CameraInternal : public ICamera, public SpriteInternal {
 	DEFINE_FACTORY_METHOD(Camera)
 
 public:
@@ -18,7 +19,6 @@ public:
 	virtual void SetClearColor(const glm::vec3& color) {}
 
 	virtual void Render(){}
-	virtual void SetRenderTarget(RenderTarget* target) {}
 
 	virtual void Zoom(const float delta);
 	virtual void Move(const glm::vec2& delta);

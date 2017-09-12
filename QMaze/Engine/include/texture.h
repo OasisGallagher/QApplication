@@ -3,19 +3,23 @@
 
 #include "object.h"
 
-class ENGINE_EXPORT Texture : virtual public Object {
+class ENGINE_EXPORT ITexture : virtual public IObject {
 public:
-	virtual void Bind(GLenum target) = 0;
+	virtual void Bind(GLenum location) = 0;
 	virtual void Unbind() = 0;
 	virtual GLuint GetNativePointer() const = 0;
 };
 
-class ENGINE_EXPORT Texture2D : virtual public Texture {
+class ENGINE_EXPORT ITexture2D : virtual public ITexture {
 public:
 	virtual bool Load(const std::string& path) = 0;
 };
 
-class ENGINE_EXPORT Texture3D : virtual public Texture {
+class ENGINE_EXPORT ITexture3D : virtual public ITexture {
 public:
 	virtual bool Load(const std::string* textures) = 0;
 };
+
+typedef smart_ptr<ITexture> Texture;
+typedef smart_ptr<ITexture2D> Texture2D;
+typedef smart_ptr<ITexture3D> Texture3D;

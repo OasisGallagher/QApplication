@@ -4,7 +4,7 @@
 
 #include "internal/sprites/spriteinternal.h"
 
-SpriteInternal::SpriteInternal(Sprite* parent) : ObjectInternal(ObjectTypeSprite) {
+SpriteInternal::SpriteInternal(Sprite parent) : ObjectInternal(ObjectTypeSprite) {
 	parent_ = parent;
 	dirtyFlags_.set();
 }
@@ -56,4 +56,16 @@ glm::vec3 SpriteInternal::GetLocalToWorldPosition(const glm::vec3& position) {
 
 glm::vec3 SpriteInternal::GetWorldToLocalPosition(const glm::vec3& position) {
 	return glm::vec3(GetWorldToLocalMatrix() * glm::vec4(position, 1));
+}
+
+void SpriteInternal::Update() {
+
+}
+
+void SpriteInternal::SetSurface(Surface value) {
+
+}
+
+Surface SpriteInternal::GetSurface() {
+	return Surface();
 }

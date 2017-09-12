@@ -7,5 +7,5 @@ Factory Factory::instance;
 
 Factory::Factory() {
 	AddFactoryMethod("World", WorldInternal::Create);
-	AddFactoryMethod("Camera", CameraInternal::Create)
+	AddFactoryMethod("Camera", CameraInternal::Create);
 }

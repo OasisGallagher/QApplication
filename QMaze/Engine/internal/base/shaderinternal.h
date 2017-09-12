@@ -3,7 +3,6 @@
 #include <gl/glew.h>
 
 #include "shader.h"
-#include "internal/misc/ptrtable.h"
 #include "internal/base/objectinternal.h"
 
 enum ShaderType {
@@ -21,7 +20,9 @@ struct ShaderDescription {
 	const char* tag;
 };
 
-class ShaderInternal : public Shader, public ObjectInternal {
+class ShaderInternal : public IShader, public ObjectInternal {
+	DEFINE_FACTORY_METHOD(Shader)
+
 public:
 	static const ShaderDescription& Description(ShaderType shaderType) {
 		return descriptions_[shaderType];
@@ -33,14 +34,9 @@ public:
 
 public:
 	virtual bool Load(const std::string& path);
-	virtual bool Load(ShaderType shaderType, const std::string& path);
-	virtual bool Link();
-	virtual bool Bind();
-	virtual void Unbind();
+	virtual GLuint GetNativePointer() const { return program_; }
 
 public:
-	virtual GLuint GetProgram() const { return program_; }
-
 	virtual void SetUniform(const std::string& name, int value);
 	virtual void SetUniform(const std::string& name, float value);
 	virtual void SetUniform(const std::string& name, const void* value);
@@ -50,9 +46,9 @@ public:
 	virtual void SetBlockUniformArrayElement(const std::string& blockName, const std::string& uniformName, GLint index, const void* value);
 
 private:
-	bool LinkShader();
-	void ClearShaders();
-	bool LoadShader(ShaderType shaderType, const char* source);
+	bool Link();
+	bool LoadSource(ShaderType shaderType, const char* source);
+	void ClearIntermediateShaders();
 
 	void AddAllBlocks();
 	void AddAllUniforms();
@@ -75,7 +71,7 @@ private:
 		GLuint stride;
 	};
 
-	typedef PtrTable<Uniform> Uniforms;
+	typedef PtrMap<Uniform> Uniforms;
 
 	struct UniformBlock {
 		UniformBlock();
@@ -88,7 +84,7 @@ private:
 		Uniforms uniforms;
 	};
 
-	typedef PtrTable<UniformBlock> UniformBlocks;
+	typedef PtrMap<UniformBlock> UniformBlocks;
 
 private:
 	Uniforms uniforms_;

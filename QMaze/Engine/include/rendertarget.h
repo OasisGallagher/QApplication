@@ -3,7 +3,7 @@
 #include "defines.h"
 #include "object.h"
 
-class ENGINE_EXPORT RenderTarget : virtual public Object {
+class ENGINE_EXPORT IRenderTarget : virtual public IObject {
 public:
 	virtual void Create(GLsizei width, GLsizei height) = 0;
 
@@ -29,3 +29,5 @@ public:
 	virtual GLuint GetDepthTexture() const = 0;
 	virtual GLuint GetRenderTexture(GLuint index) const = 0;
 };
+
+typedef smart_ptr<IRenderTarget> RenderTarget;

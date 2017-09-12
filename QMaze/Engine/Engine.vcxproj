@@ -162,12 +162,14 @@ copy $(TargetDir)$(TargetName).dll $(SolutionDir)$(SolutionName)\bin</Command>
     <ClCompile Include="internal\memory\factory.cpp" />
     <ClCompile Include="internal\memory\memory.cpp" />
     <ClCompile Include="internal\misc\loader.cpp" />
+    <ClCompile Include="internal\resources\resources.cpp" />
     <ClCompile Include="internal\sprites\camerainternal.cpp" />
     <ClCompile Include="internal\sprites\skyboxinternal.cpp" />
     <ClCompile Include="internal\sprites\spriteinternal.cpp" />
     <ClCompile Include="internal\world\worldinternal.cpp" />
     <ClCompile Include="src\engine.cpp" />
     <ClCompile Include="tools\debug.cpp" />
+    <ClCompile Include="tools\path.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\camera.h" />
@@ -195,9 +197,11 @@ copy $(TargetDir)$(TargetName).dll $(SolutionDir)$(SolutionName)\bin</Command>
     <ClInclude Include="internal\base\textureinternal.h" />
     <ClInclude Include="internal\memory\factory.h" />
     <ClInclude Include="internal\memory\memory.h" />
+    <ClInclude Include="internal\memory\smartptr.h" />
     <ClInclude Include="internal\misc\defs.h" />
     <ClInclude Include="internal\misc\loader.h" />
-    <ClInclude Include="internal\misc\ptrtable.h" />
+    <ClInclude Include="internal\misc\ptrmap.h" />
+    <ClInclude Include="internal\resources\resources.h" />
     <ClInclude Include="internal\sprites\camerainternal.h" />
     <ClInclude Include="internal\sprites\skyboxinternal.h" />
     <ClInclude Include="internal\sprites\spriteinternal.h" />

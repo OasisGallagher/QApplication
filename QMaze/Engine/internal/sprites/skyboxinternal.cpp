@@ -13,7 +13,7 @@
 #include "internal/base/surfaceinternal.h"
 #include "internal/sprites/skyboxinternal.h"
 
-SkyboxInternal::SkyboxInternal(Camera* camera, std::string* textures) {
+SkyboxInternal::SkyboxInternal(Camera camera, std::string* textures) {
 	camera_ = camera;
 	shader_ = Factory::Create<ShaderInternal>();
 	shader_->Load("shaders/skybox.glsl");
@@ -27,9 +27,6 @@ SkyboxInternal::SkyboxInternal(Camera* camera, std::string* textures) {
 }
 
 SkyboxInternal::~SkyboxInternal() {
-	delete mesh_;
-	delete shader_;
-	delete texture_;
 }
 
 void SkyboxInternal::Render() {
@@ -48,7 +45,7 @@ void SkyboxInternal::Render() {
 	texture_->Bind(GL_TEXTURE0);
 	shader_->SetUniform("textureSampler", 0);
 
-	mesh_->Render();
+	//mesh_->Render();
 
 	RenderState::PopCullFaceEnabled();
 	RenderState::PopCullFaceFunc();
@@ -58,6 +55,6 @@ void SkyboxInternal::Render() {
 	texture_->Unbind();
 }
 
-Texture3D* SkyboxInternal::GetTexture() {
+Texture3D SkyboxInternal::GetTexture() {
 	return texture_;
 }

@@ -1,12 +1,14 @@
+#pragma once
+
 #include "mesh.h"
 #include "internal/base/objectinternal.h"
 
-class MeshInternal : public Mesh, public ObjectInternal {
-public:
-	virtual void SetVertices(const glm::vec3* value);
-	virtual void SetNormals(const glm::vec3* value);
-	virtual void SetUVs(const glm::vec3* value);
-	virtual void SetIndices(unsigned* indices);
+class MeshInternal : public IMesh, public ObjectInternal {
+	DEFINE_FACTORY_METHOD(Mesh)
 
-	virtual void SetTriangles(unsigned vertexCount, unsigned baseVertex, unsigned baseIndex);
+public:
+	MeshInternal() :ObjectInternal(ObjectTypeMesh) {}
+
+	virtual void SetMaterial(Material material) {}
+	virtual void SetTriangles(unsigned vertexCount, unsigned baseVertex, unsigned baseIndex) {}
 };

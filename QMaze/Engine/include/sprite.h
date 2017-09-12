@@ -2,16 +2,18 @@
 #include <glm/glm.hpp>
 
 #include "object.h"
+#include "surface.h"
 
-class Surface;
+class ISprite;
+typedef smart_ptr<ISprite> Sprite;
 
-class ENGINE_EXPORT Sprite : virtual public Object {
+class ENGINE_EXPORT ISprite : virtual public IObject {
 public:
-	virtual void SetParent(Sprite* value) = 0;
-	virtual Sprite* GetParent() const = 0;
+	virtual void SetParent(Sprite value) = 0;
+	virtual Sprite GetParent() const = 0;
 
 	virtual int GetChildCount() const = 0;
-	virtual Sprite* GetChildAt(int i) = 0;
+	virtual Sprite GetChildAt(int i) = 0;
 
 	virtual void SetScale(const glm::vec3& value) = 0;
 	virtual void SetPosition(const glm::vec3& value) = 0;
@@ -29,6 +31,6 @@ public:
 
 	virtual void Update() = 0;
 
-	virtual void SetSurface(Surface* value) = 0;
-	virtual Surface* GetSurface() = 0;
+	virtual void SetSurface(Surface value) = 0;
+	virtual Surface GetSurface() = 0;
 };

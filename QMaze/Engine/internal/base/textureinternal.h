@@ -5,14 +5,14 @@
 #include "texture.h"
 #include "internal/base/objectinternal.h"
 
-class TextureInternal : virtual public Texture, public ObjectInternal {
+class TextureInternal : virtual public ITexture, public ObjectInternal {
 public:
 	TextureInternal(ObjectType type) :ObjectInternal(type) {
 
 	}
 
 public:
-	virtual void Bind(GLenum target);
+	virtual void Bind(GLenum location);
 	virtual void Unbind();
 	virtual GLuint GetNativePointer() const { return texture_; }
 
@@ -24,9 +24,12 @@ protected:
 
 protected:
 	GLuint texture_;
+	GLenum location_;
 };
 
-class Texture2DInternal : public Texture2D, public TextureInternal {
+class Texture2DInternal : public ITexture2D, public TextureInternal {
+	DEFINE_FACTORY_METHOD(Texture2D)
+
 public:
 	Texture2DInternal();
 	~Texture2DInternal();
@@ -42,7 +45,9 @@ private:
 	void Destroy();
 };
 
-class Texture3DInternal : public Texture3D, public TextureInternal {
+class Texture3DInternal : public ITexture3D, public TextureInternal {
+	DEFINE_FACTORY_METHOD(Texture3D)
+
 public:
 	Texture3DInternal();
 	~Texture3DInternal();

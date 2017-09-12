@@ -2,7 +2,6 @@
 
 #include "engine.h"
 
-#include "world.h"
 #include "tools/debug.h"
 #include "internal/memory/factory.h"
 
@@ -23,7 +22,7 @@ static void _STDCALL GLDebugMessageCallback(
 );
 
 bool Engine::Initialize() {
-	AssertX(world_ != nullptr, "can not initialize engine twice.");
+	AssertX(world_, "can not initialize engine twice.");
 
 	glewExperimental = true;
 
@@ -36,7 +35,7 @@ bool Engine::Initialize() {
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
 	}
 
-	Object* obj = Factory::Create("World");
+	world_ = dynamic_ptr_cast<World>(Factory::Create("World"));
 
 	return true;
 }

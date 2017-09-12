@@ -4,13 +4,9 @@
 #include <glm/glm.hpp>
 
 #include "object.h"
+#include "internal/memory/factory.h"
 
-#define DEFINE_FACTORY_METHOD(Class) \
-	public: \
-		static Object* Create() { return Factory::Create<Class ## Internal>(); } \
-	private:
-
-class ObjectInternal : virtual public Object {
+class ObjectInternal : virtual public IObject {
 public:
 	ObjectInternal(ObjectType type);
 	virtual ~ObjectInternal() {}
@@ -36,3 +32,8 @@ private:
 	static unsigned ObjectIDContainer[ObjectTypeCount];
 };
 
+#define DEFINE_FACTORY_METHOD(Name) \
+	public: \
+		typedef Name Interface; \
+		static Object Create() { return Factory::Create<Name ## Internal>(); } \
+	private:

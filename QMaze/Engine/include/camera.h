@@ -7,7 +7,7 @@ enum ClearType {
 	ClearSkybox,
 };
 
-class ENGINE_EXPORT Camera : virtual public Sprite {
+class ENGINE_EXPORT ICamera : virtual public ISprite {
 public:
 	virtual void SetColorType(ClearType type) = 0;
 	virtual void SetClearColor(const glm::vec3& color) = 0;
@@ -32,3 +32,5 @@ public:
 	virtual const glm::mat4& GetProjMatrix() = 0;
 	virtual const glm::mat4& GetViewMatrix() = 0;
 };
+
+typedef smart_ptr<ICamera> Camera;

@@ -4,7 +4,7 @@
 #include "tools/debug.h"
 #include "internal/sprites/camerainternal.h"
 
-CameraInternal::CameraInternal() : ObjectInternal(ObjectTypeCamera) {
+CameraInternal::CameraInternal() {
 	aspect_ = 1.3f;
 	near_ = 1.f;
 	far_ = 100.f;

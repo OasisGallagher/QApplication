@@ -1,16 +1,18 @@
 #include <Magick++.h>
 #include <glm/glm.hpp>
 
-#include "textureinternal.h"
 #include "tools/debug.h"
+#include "textureinternal.h"
 
-void TextureInternal::Bind(GLenum target) {
+void TextureInternal::Bind(GLenum location) {
 	AssertX(glIsTexture(texture_), "invalid texture");
-	glActiveTexture(target);
+	location_ = location;
+	glActiveTexture(location);
 	glBindTexture(GetBindTarget(), texture_);
 }
 
 void TextureInternal::Unbind() {
+	glActiveTexture(location_);
 	glBindTexture(GetBindTarget(), 0);
 }
 

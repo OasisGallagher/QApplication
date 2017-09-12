@@ -1,7 +1,6 @@
 #pragma once
+#include "world.h"
 #include "defines.h"
-
-class World;
 
 enum {
 	LogLevelDebug,
@@ -27,9 +26,10 @@ public:
 	void SetDebugCallback(LogCallback callback);
 
 	void Update();
-	World* WorldPtr() { return world_; }
+	World WorldPtr() { return world_; }
 
 private:
-	World* world_;
+	World world_;
+
 	static Engine engine_;
 };
