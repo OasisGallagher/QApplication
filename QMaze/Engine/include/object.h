@@ -20,6 +20,8 @@ enum ObjectType {
 class ENGINE_EXPORT IObject {
 public:
 	virtual ~IObject() {}
+
+public:
 	virtual unsigned GetInstanceID() const = 0;
 	virtual int GetType() const = 0;
 

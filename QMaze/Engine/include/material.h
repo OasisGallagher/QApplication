@@ -7,9 +7,6 @@
 
 class ENGINE_EXPORT IMaterial : virtual public IObject {
 public:
-	virtual void SetDiffuseTexture(Texture value) = 0;
-	virtual Texture GetDiffuseTexture() = 0;
-
 	virtual void SetShader(Shader shader) = 0;
 	virtual Shader GetShader() = 0;
 

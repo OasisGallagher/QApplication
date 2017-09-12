@@ -196,6 +196,9 @@
     <ClInclude Include="internal\misc\ptrmap.h">
       <Filter>internal\containers\include</Filter>
     </ClInclude>
+    <ClInclude Include="include\variables.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="internal\base\objectinternal.cpp">

@@ -12,9 +12,6 @@ public:
 	~MaterialInternal() {}
 
 public:
-	virtual void SetDiffuseTexture(Texture value) { diffuse_ = value; }
-	virtual Texture GetDiffuseTexture() { return diffuse_; }
-
 	virtual void SetShader(Shader value);
 	virtual Shader GetShader() { return shader_; }
 

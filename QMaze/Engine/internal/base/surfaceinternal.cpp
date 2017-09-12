@@ -7,6 +7,7 @@
 #include "tools/path.h"
 #include "tools/debug.h"
 #include "tools/mathf.h"
+#include "variables.h"
 #include "surfaceinternal.h"
 #include "internal/memory/memory.h"
 #include "internal/memory/factory.h"
@@ -179,7 +180,7 @@ bool SurfaceInternal::InitMaterials(const aiScene* scene, const std::string& pat
 			}
 
 			materials[i] = Factory::Create<MaterialInternal>();
-			materials[i]->SetDiffuseTexture(texture);
+			materials[i]->SetTexture(Variables::MainTexture, texture);
 			materials[i]->SetShader(Resources::FindShader("buildin/texture"));
 		}
 	}

@@ -181,6 +181,7 @@ copy $(TargetDir)$(TargetName).dll $(SolutionDir)$(SolutionName)\bin</Command>
     <ClInclude Include="include\renderer.h" />
     <ClInclude Include="include\rendertarget.h" />
     <ClInclude Include="include\shader.h" />
+    <ClInclude Include="include\variables.h" />
     <ClInclude Include="include\skybox.h" />
     <ClInclude Include="include\sprite.h" />
     <ClInclude Include="include\surface.h" />
