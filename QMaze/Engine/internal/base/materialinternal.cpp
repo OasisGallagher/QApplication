@@ -2,7 +2,7 @@
 
 MaterialInternal::MaterialInternal(Shader shader)
 	: ObjectInternal(ObjectTypeMaterial), shader_(shader)
-	, maxTextureUnits_(0) {
+	, maxTextureUnits_(0), oldProgram_(0) {
 	glGetIntegerv(GL_MAX_TEXTURE_UNITS, &maxTextureUnits_);
 }
 
@@ -61,10 +61,14 @@ void MaterialInternal::SetBlock(const std::string& name, const void* value) {
 
 void MaterialInternal::Bind() {
 	BindTextures();
+	glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram_);
+	glUseProgram(shader_->GetNativePointer());
 }
 
 void MaterialInternal::Unbind() {
 	UnbindTextures();
+	glUseProgram(oldProgram_);
+	oldProgram_ = 0;
 }
 
 void MaterialInternal::UpdateVariables() {

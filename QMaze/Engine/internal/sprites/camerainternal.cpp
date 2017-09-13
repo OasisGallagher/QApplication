@@ -12,13 +12,17 @@ CameraInternal::CameraInternal() {
 
 	proj_ = glm::perspective(fieldOfView_, aspect_, near_, far_);
 
-	phi_ = glm::radians(-90.f);
-	theta_ = glm::radians(90.f);
+	//phi_ = glm::radians(-90.f);
+	//theta_ = glm::radians(90.f);
 }
 
 CameraInternal::~CameraInternal() {
 }
 
+void CameraInternal::Update() {
+
+}
+/*
 void CameraInternal::LookAt(const glm::vec3& eye, const glm::vec3& center) {
 	pos_ = eye;
 
@@ -68,11 +72,11 @@ void CameraInternal::Move(const glm::vec2& delta) {
 const glm::vec3& CameraInternal::GetPosition() {
 	return pos_;
 }
-
+*/
 const glm::mat4& CameraInternal::GetProjMatrix() {
 	return proj_;
 }
-
+/*
 const glm::mat4& CameraInternal::GetViewMatrix() {
 	//return view_ = glm::lookAt(pos_, center_, glm::vec3(0, 1, 0));
 
@@ -93,3 +97,4 @@ const glm::mat4& CameraInternal::GetViewMatrix() {
 	view_= glm::lookAt(pos_, pos_ - fwd, up);
 	return view_;
 }
+*/

@@ -13,7 +13,7 @@ public:
 
 public:
 	virtual unsigned GetInstanceID() const { return id_; }
-	virtual int GetType() const { return type_; }
+	virtual ObjectType GetType() const { return type_; }
 
 	virtual std::string GetName() const { return name_; }
 	virtual void SetName(const std::string& value) { name_ = value; }

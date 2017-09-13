@@ -7,6 +7,9 @@
 
 class ENGINE_EXPORT IMaterial : virtual public IObject {
 public:
+	virtual void Bind() = 0;
+	virtual void Unbind() = 0;
+
 	virtual void SetShader(Shader shader) = 0;
 	virtual Shader GetShader() = 0;
 

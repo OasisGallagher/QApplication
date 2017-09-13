@@ -17,10 +17,12 @@ public:
 
 	virtual void SetScale(const glm::vec3& value) = 0;
 	virtual void SetPosition(const glm::vec3& value) = 0;
+	virtual void SetRotation(const glm::quat& value) = 0;
 	virtual void SetEulerAngles(const glm::vec3& value) = 0;
 
 	virtual glm::vec3 GetScale() const = 0;
 	virtual glm::vec3 GetPosition() const = 0;
+	virtual glm::quat GetRotation() const = 0;
 	virtual glm::vec3 GetEulerAngles() const = 0;
 
 	virtual glm::mat4 GetLocalToWorldMatrix() = 0;

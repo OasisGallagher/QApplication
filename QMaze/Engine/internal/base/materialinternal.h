@@ -55,6 +55,7 @@ private:
 private:
 	Shader shader_;
 	Texture diffuse_;
+	int oldProgram_;
 	int maxTextureUnits_;
 	std::vector<Texture> textures_;
 

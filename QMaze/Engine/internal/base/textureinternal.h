@@ -17,7 +17,7 @@ public:
 	virtual GLuint GetNativePointer() const { return texture_; }
 
 protected:
-	virtual GLenum GetBindTarget() = 0;
+	virtual GLenum GetTextureType() = 0;
 
 protected:
 	const void* ReadRawTexture(const std::string& path, int& width, int& height);
@@ -38,7 +38,7 @@ public:
 	virtual bool Load(const std::string& path);
 
 protected:
-	virtual GLenum GetBindTarget() { return GL_TEXTURE_2D; }
+	virtual GLenum GetTextureType() { return GL_TEXTURE_2D; }
 
 private:
 	bool LoadTexture(const std::string& path);
@@ -56,7 +56,7 @@ public:
 	bool Load(const std::string* textures);
 
 protected:
-	virtual GLenum GetBindTarget() { return GL_TEXTURE_3D; }
+	virtual GLenum GetTextureType() { return GL_TEXTURE_3D; }
 
 private:
 	void Destroy();

@@ -1,7 +1,7 @@
 #include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/quaternion.hpp>
 
+#include "tools/mathf.h"
 #include "internal/sprites/spriteinternal.h"
 
 SpriteInternal::SpriteInternal(Sprite parent) : ObjectInternal(ObjectTypeSprite) {
@@ -23,18 +23,21 @@ void SpriteInternal::SetPosition(const glm::vec3& value) {
 	SetDiry(DirtyFlagWorldToLocalMatrix, true);
 }
 
-void SpriteInternal::SetEulerAngles(const glm::vec3& value) {
-	if (eulerAngles_ == value) { return; }
-	eulerAngles_ = value;
+void SpriteInternal::SetRotation(const glm::quat& value) {
+	if (Mathf::Approximately(glm::dot(rotation_, value), 0)) { return; }
+	rotation_ = value;
 	SetDiry(DirtyFlagLocalToWorldMatrix, true);
 	SetDiry(DirtyFlagWorldToLocalMatrix, true);
+}
+
+void SpriteInternal::SetEulerAngles(const glm::vec3& value) {
+	SetRotation(glm::quat(value));
 }
 
 glm::mat4 SpriteInternal::GetLocalToWorldMatrix() {
 	if (IsDirty(DirtyFlagLocalToWorldMatrix)) {
 		glm::mat4 ans(1.f);
-		glm::quat q(eulerAngles_);
-		localToWorldMatrix_ = glm::translate(ans, position_) * glm::toMat4(q) * glm::scale(ans, scale_);
+		localToWorldMatrix_ = glm::translate(ans, position_) * glm::toMat4(rotation_) * glm::scale(ans, scale_);
 		SetDiry(DirtyFlagLocalToWorldMatrix, false);
 	}
 
@@ -63,9 +66,9 @@ void SpriteInternal::Update() {
 }
 
 void SpriteInternal::SetSurface(Surface value) {
-
+	surface_ = value;
 }
 
 Surface SpriteInternal::GetSurface() {
-	return Surface();
+	return surface_;
 }

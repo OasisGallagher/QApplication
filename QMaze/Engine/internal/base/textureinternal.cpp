@@ -8,12 +8,12 @@ void TextureInternal::Bind(GLenum location) {
 	AssertX(glIsTexture(texture_), "invalid texture");
 	location_ = location;
 	glActiveTexture(location);
-	glBindTexture(GetBindTarget(), texture_);
+	glBindTexture(GetTextureType(), texture_);
 }
 
 void TextureInternal::Unbind() {
 	glActiveTexture(location_);
-	glBindTexture(GetBindTarget(), 0);
+	glBindTexture(GetTextureType(), 0);
 }
 
 const void* TextureInternal::ReadRawTexture(const std::string& path, int& width, int& height) {

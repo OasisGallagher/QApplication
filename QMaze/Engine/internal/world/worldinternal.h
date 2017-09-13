@@ -1,4 +1,6 @@
 #pragma once
+#include <set>
+
 #include "world.h"
 #include "camera.h"
 #include "sprite.h"
@@ -12,7 +14,16 @@ public:
 	}
 
 public:
-	virtual void Update() {}
-	virtual Camera AddCamera() { return Camera(); }
-	virtual Sprite AddSprite() { return Sprite(); }
+	virtual void Update();
+	virtual Camera AddCamera();
+	virtual Sprite AddSprite();
+
+private:
+	struct SpriteComparer {
+		bool operator () (Sprite lhs, Sprite rhs) const;
+	};
+
+	typedef std::set<Sprite, SpriteComparer> SpriteContainer;
+
+	SpriteContainer sprites_;
 };

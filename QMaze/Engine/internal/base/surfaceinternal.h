@@ -27,6 +27,8 @@ public:
 
 	virtual void SetAttribute(const SurfaceAttribute& value);
 	virtual void AddMesh(Mesh mesh);
+	virtual int GetMeshCount() const;
+	virtual Mesh GetMesh(int index);
 
 	virtual void Bind();
 	virtual void Unbind();
@@ -41,9 +43,9 @@ private:
 	};
 
 	void InitAttribute(const aiMesh* mesh, SurfaceAttribute& attribute);
-	void InitMeshes(const aiScene* scene, Material* materials);
+	void InitMeshes(const aiScene* scene, MeshTextures* textures);
 	bool InitFromScene(const aiScene* scene, const std::string& path);
-	bool InitMaterials(const aiScene* scene, const std::string& path, Material* materials);
+	void InitTextures(const aiScene* scene, const std::string& path, MeshTextures* textures);
 	void InitMeshAttributes(const aiScene* scene, unsigned numVertices, unsigned numIndices);
 
 	void Clear();

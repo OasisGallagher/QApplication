@@ -23,10 +23,6 @@ public:
 		return Object(pos->second());
 	}
 
-	static void Release(Object pointer) {
-		/*Memory::Release(pointer);*/
-	}
-
 	static void AddFactoryMethod(const std::string& name, FatroyMethod method) {
 		bool done = instance.factoryMethods_.insert(std::make_pair(name, method)).second;
 		AssertX(done, "failed to add factroy method for: " + name);

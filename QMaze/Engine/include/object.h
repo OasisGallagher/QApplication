@@ -14,6 +14,7 @@ enum ObjectType {
 	ObjectTypeSprite,
 	ObjectTypeSurface,
 	ObjectTypeMaterial,
+	ObjectTypeRenderer,
 	ObjectTypeCount,
 };
 
@@ -23,7 +24,7 @@ public:
 
 public:
 	virtual unsigned GetInstanceID() const = 0;
-	virtual int GetType() const = 0;
+	virtual ObjectType GetType() const = 0;
 
 	virtual std::string GetName() const = 0;
 	virtual void SetName(const std::string& value) = 0;

@@ -154,7 +154,10 @@ copy $(TargetDir)$(TargetName).dll $(SolutionDir)$(SolutionName)\bin</Command>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="internal\base\materialinternal.cpp" />
+    <ClCompile Include="internal\base\meshinternal.cpp" />
     <ClCompile Include="internal\base\objectinternal.cpp" />
+    <ClCompile Include="internal\base\rendererinternal.cpp" />
+    <ClCompile Include="internal\base\renderoptions.cpp" />
     <ClCompile Include="internal\base\rendertargetinternal.cpp" />
     <ClCompile Include="internal\base\shaderinternal.cpp" />
     <ClCompile Include="internal\base\surfaceinternal.cpp" />
@@ -181,7 +184,6 @@ copy $(TargetDir)$(TargetName).dll $(SolutionDir)$(SolutionName)\bin</Command>
     <ClInclude Include="include\renderer.h" />
     <ClInclude Include="include\rendertarget.h" />
     <ClInclude Include="include\shader.h" />
-    <ClInclude Include="include\variables.h" />
     <ClInclude Include="include\skybox.h" />
     <ClInclude Include="include\sprite.h" />
     <ClInclude Include="include\surface.h" />
@@ -191,15 +193,16 @@ copy $(TargetDir)$(TargetName).dll $(SolutionDir)$(SolutionName)\bin</Command>
     <ClInclude Include="internal\base\meshinternal.h" />
     <ClInclude Include="internal\base\objectinternal.h" />
     <ClInclude Include="internal\base\rendererinternal.h" />
+    <ClInclude Include="internal\base\renderoptions.h" />
     <ClInclude Include="internal\base\renderstate.h" />
     <ClInclude Include="internal\base\rendertargetinternal.h" />
     <ClInclude Include="internal\base\shaderinternal.h" />
     <ClInclude Include="internal\base\surfaceinternal.h" />
     <ClInclude Include="internal\base\textureinternal.h" />
+    <ClInclude Include="internal\base\variables.h" />
     <ClInclude Include="internal\memory\factory.h" />
     <ClInclude Include="internal\memory\memory.h" />
     <ClInclude Include="internal\memory\smartptr.h" />
-    <ClInclude Include="internal\misc\defs.h" />
     <ClInclude Include="internal\misc\loader.h" />
     <ClInclude Include="internal\misc\ptrmap.h" />
     <ClInclude Include="internal\resources\resources.h" />

@@ -1,8 +1,13 @@
 #pragma once
+#include <glm/gtc/quaternion.hpp>
+
 #include "sprite.h"
+#include "surface.h"
 #include "internal/base/objectinternal.h"
 
 class SpriteInternal : virtual public ISprite, public ObjectInternal {
+	DEFINE_FACTORY_METHOD(Sprite)
+
 public:
 	SpriteInternal(Sprite parent = Sprite());
 
@@ -16,11 +21,13 @@ public:
 public:
 	virtual void SetScale(const glm::vec3& value);
 	virtual void SetPosition(const glm::vec3& value);
+	virtual void SetRotation(const glm::quat& value);
 	virtual void SetEulerAngles(const glm::vec3& value);
 
 	virtual glm::vec3 GetScale() const { return scale_; }
 	virtual glm::vec3 GetPosition() const { return position_; }
-	virtual glm::vec3 GetEulerAngles() const { return eulerAngles_; }
+	virtual glm::quat GetRotation() const { return rotation_; }
+	virtual glm::vec3 GetEulerAngles() const { return glm::eulerAngles(rotation_); }
 
 	virtual glm::mat4 GetLocalToWorldMatrix();
 	virtual glm::mat4 GetWorldToLocalMatrix();
@@ -46,11 +53,12 @@ private:
 
 private:
 	Sprite parent_;
+	Surface surface_;
 	std::vector<Sprite> children_;
 	std::bitset<DirtyFlagSize> dirtyFlags_;
 
 	glm::vec3 scale_;
-	glm::vec3 eulerAngles_;
+	glm::quat rotation_;
 	glm::vec3 position_;
 
 	glm::mat4 localToWorldMatrix_;

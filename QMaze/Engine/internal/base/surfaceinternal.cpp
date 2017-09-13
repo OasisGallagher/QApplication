@@ -62,6 +62,14 @@ void SurfaceInternal::AddMesh(Mesh mesh) {
 	meshes_.push_back(mesh);
 }
 
+Mesh SurfaceInternal::GetMesh(int index) {
+	return meshes_[index];
+}
+
+int SurfaceInternal::GetMeshCount() const {
+	return meshes_.size();
+}
+
 bool SurfaceInternal::Load(const std::string& path) {
 	Clear();
 
@@ -85,19 +93,17 @@ bool SurfaceInternal::Load(const std::string& path) {
 }
 
 bool SurfaceInternal::InitFromScene(const aiScene* scene, const std::string& path) {
-	Material* materials = Memory::CreateArray<Material>(scene->mNumMaterials);
-	if (!InitMaterials(scene, path, materials)) {
-		Debug::LogError("material incomplete.");
-	}
+	MeshTextures* textures = Memory::CreateArray<MeshTextures>(scene->mNumMaterials);
+	InitTextures(scene, path, textures);
 
-	InitMeshes(scene, materials);
+	InitMeshes(scene, textures);
 
-	Memory::ReleaseArray(materials);
+	Memory::ReleaseArray(textures);
 
 	return true;
 }
 
-void SurfaceInternal::InitMeshes(const aiScene* scene, Material* materials) {
+void SurfaceInternal::InitMeshes(const aiScene* scene, MeshTextures* textures) {
 	meshes_.reserve(scene->mNumMeshes);
 
 	unsigned vertexCount = 0, indexCount = 0;
@@ -107,7 +113,7 @@ void SurfaceInternal::InitMeshes(const aiScene* scene, Material* materials) {
 		mesh->SetTriangles(scene->mMeshes[i]->mNumFaces * 3, vertexCount, indexCount);
 
 		if (scene->mMeshes[i]->mMaterialIndex < scene->mNumMaterials) {
-			mesh->SetMaterial(materials[scene->mMeshes[i]->mMaterialIndex]);
+			mesh->SetTextures(textures[scene->mMeshes[i]->mMaterialIndex]);
 		}
 
 		vertexCount += scene->mMeshes[i]->mNumVertices;
@@ -155,37 +161,41 @@ void SurfaceInternal::InitAttribute(const aiMesh* mesh, SurfaceAttribute& attrib
 	}
 }
 
-bool SurfaceInternal::InitMaterials(const aiScene* scene, const std::string& path, Material* materials) {
+void SurfaceInternal::InitTextures(const aiScene* scene, const std::string& path, MeshTextures* textures) {
 	std::string dir = Path::GetDirectory(path);
 
-	bool status = true;
 	for (unsigned i = 0; i < scene->mNumMaterials; ++i) {
 		const aiMaterial* mat = scene->mMaterials[i];
-		
+
+		aiString dpath;
+		std::string prefix = "textures/";
+		if (mat->GetTextureCount(aiTextureType_NORMALS) > 0) {
+			if (mat->GetTexture(aiTextureType_NORMALS, 0, &dpath) == AI_SUCCESS) {
+				Texture2D texture = Factory::Create<Texture2DInternal>();
+				if (texture->Load(prefix + dpath.data)) {
+					textures[i].normal = texture;
+				}
+			}
+		}
+
 		if (mat->GetTextureCount(aiTextureType_DIFFUSE) > 0) {
-			aiString dpath;
-			if (mat->GetTexture(aiTextureType_DIFFUSE, 0, &dpath) != AI_SUCCESS) {
-				continue;
+			if (mat->GetTexture(aiTextureType_DIFFUSE, 0, &dpath) == AI_SUCCESS) {
+				Texture2D texture = Factory::Create<Texture2DInternal>();
+				if (texture->Load(prefix + dpath.data)) {
+					textures[i].diffuse = texture;
+				}
 			}
+		}
 
-			std::string fullPath = "textures/";
-			fullPath += dpath.data;
-			
-			Texture2D texture = Factory::Create<Texture2DInternal>();
-			
-			if (!texture->Load(fullPath)) {
-				Factory::Release(texture);
-				status = false;
-				continue;
+		if (mat->GetTextureCount(aiTextureType_SPECULAR) > 0) {
+			if (mat->GetTexture(aiTextureType_SPECULAR, 0, &dpath) == AI_SUCCESS) {
+				Texture2D texture = Factory::Create<Texture2DInternal>();
+				if (texture->Load(prefix + dpath.data)) {
+					textures[i].specular = texture;
+				}
 			}
-
-			materials[i] = Factory::Create<MaterialInternal>();
-			materials[i]->SetTexture(Variables::MainTexture, texture);
-			materials[i]->SetShader(Resources::FindShader("buildin/texture"));
 		}
 	}
-
-	return status;
 }
 
 void SurfaceInternal::UpdateGLBuffers(const SurfaceAttribute& attribute) {
