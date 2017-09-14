@@ -31,6 +31,7 @@ void RendererInternal::AddOption(RenderCapacity cap, RenderParameter parameter0,
 			option = Memory::Create<Cull>(parameter0);
 			break;
 		case RC_DepthTest:
+			option = Memory::Create<DepthTest>(parameter0);
 			break;
 		case RC_Blend:
 			option = Memory::Create<Blend>(parameter0, parameter1);
@@ -46,10 +47,7 @@ void RendererInternal::DrawCall() {
 		Mesh mesh = surface_->GetMesh(i);
 
 		for (int j = 0; j < GetMaterialCount(); ++j) {
-			Material material = GetMaterial(j);
-			material->Bind();
-			DrawMesh(mesh, material);
-			material->Unbind();
+			DrawMesh(mesh, GetMaterial(j));
 		}
 	}
 
@@ -71,10 +69,14 @@ void RendererInternal::DrawMesh(Mesh mesh, Material material) {
 		material->SetTexture(Variables::specularTexture, textures.specular);
 	}
 
+	material->Bind();
+
 	unsigned vertexCount, baseVertex, baseIndex;
 	mesh->GetTriangles(vertexCount, baseVertex, baseIndex);
 
 	glDrawElementsBaseVertex(GL_TRIANGLES, vertexCount, GL_UNSIGNED_INT, (void*)(sizeof(unsigned)* baseIndex), baseVertex);
+
+	material->Unbind();
 }
 
 void RendererInternal::ClearRenderOptions() {
@@ -95,18 +97,4 @@ void RendererInternal::UnbindRenderOptions() {
 	for (int i = 0; i < options_.size(); ++i) {
 		options_[i]->Unbind();
 	}
-}
-
-void RendererInternal::AddMaterial(Material material) {
-}
-
-Material RendererInternal::GetMaterial(int index) {
-	return Material();
-}
-
-void RendererInternal::SetMaterial(int index, Material value) {
-}
-
-int RendererInternal::GetMaterialCount() const {
-	return 0;
 }

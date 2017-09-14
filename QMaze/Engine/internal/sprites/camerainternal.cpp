@@ -1,7 +1,13 @@
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "engine.h"
 #include "camera.h"
 #include "tools/debug.h"
+#include "internal/base/variables.h"
+#include "internal/resources/resources.h"
+#include "internal/base/shaderinternal.h"
+#include "internal/base/materialinternal.h"
+#include "internal/base/rendererinternal.h"
 #include "internal/sprites/camerainternal.h"
 
 CameraInternal::CameraInternal() {
@@ -14,13 +20,49 @@ CameraInternal::CameraInternal() {
 
 	//phi_ = glm::radians(-90.f);
 	//theta_ = glm::radians(90.f);
+	glClearDepth(1);
 }
 
 CameraInternal::~CameraInternal() {
 }
 
-void CameraInternal::Update() {
+void CameraInternal::SetClearColor(const glm::vec3& color) {
+	glClearColor(color.r, color.g, color.b, 1);
+}
 
+void CameraInternal::Update() {
+	World world = Engine::Ptr()->WorldPtr();
+	std::vector<Sprite> sprites;
+	if (!world->CollectSprites(&sprites, fieldOfView_, aspect_, near_, far_)) {
+		return;
+	}
+
+	for (int i = 0; i < sprites.size(); ++i) {
+		Sprite sprite = sprites[i];
+		if (sprite->GetSurface()) {
+			RenderSprite(sprite);
+		}
+	}
+}
+
+void CameraInternal::RenderSprite(Sprite sprite) {
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	Surface surface = sprite->GetSurface();
+	Renderer renderer = Factory::Create<RendererInternal>();
+	renderer->SetSurface(surface);
+	renderer->AddOption(RC_Cull, Back);
+	renderer->AddOption(RC_DepthTest, Less);
+
+	Material material = Factory::Create<MaterialInternal>();
+	Shader shader = Resources::FindShader("buildin/shaders/texture");
+	material->SetShader(shader);
+
+	glm::mat4 matrix = proj_ * GetWorldToLocalMatrix() * sprite->GetLocalToWorldMatrix();
+	material->SetMatrix(Variables::modelToClipSpaceMatrix, matrix);
+	renderer->AddMaterial(material);
+
+	renderer->Render();
 }
 /*
 void CameraInternal::LookAt(const glm::vec3& eye, const glm::vec3& center) {

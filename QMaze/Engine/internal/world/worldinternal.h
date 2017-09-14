@@ -10,13 +10,12 @@ class WorldInternal : public ObjectInternal, public IWorld {
 	DEFINE_FACTORY_METHOD(World)
 
 public:
-	WorldInternal() : ObjectInternal(ObjectTypeWorld) {
-	}
+	WorldInternal();
 
 public:
 	virtual void Update();
-	virtual Camera AddCamera();
-	virtual Sprite AddSprite();
+	virtual Object Create(const std::string& type);
+	virtual bool CollectSprites(std::vector<Sprite>* sprites, float fieldOfView, float aspect, float nearClipPlane, float farClipPlane);
 
 private:
 	struct SpriteComparer {

@@ -28,12 +28,6 @@ static void OnEngineLogReceived(int level, const char* message) {
 	}
 }
 
-Shader* reflect_, *refract_;
-Skybox* skyBox_;
-GLuint vao_, vbo_;
-Camera* camera_;
-Surface* surface_;
-
 GLWidget::GLWidget(QWidget *parent) 
 	: QGLWidget(parent), mpressed_(false), lpressed(false) {
 	setMouseTracking(true);
@@ -43,95 +37,49 @@ void GLWidget::initializeGL() {
 	Engine::Ptr()->Initialize();
 	Engine::Ptr()->SetDebugCallback(OnEngineLogReceived);
 
-	glClearDepth(1);
-	glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
+	World world = Engine::Ptr()->WorldPtr();
+	Camera camera = dynamic_ptr_cast<Camera>(world->Create("Camera"));
+	camera->SetClearColor(glm::vec3(0.0f, 0.0f, 0.4f));
 
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	Sprite sprite = dynamic_ptr_cast<Sprite>(world->Create("Sprite"));
+	sprite->SetPosition(glm::vec3(4, 1, -9));
 
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_BACK);
+	Surface surface = dynamic_ptr_cast<Surface>(world->Create("Surface"));
+	/* Mesh.
+	Mesh mesh = dynamic_ptr_cast<Mesh>(world->Create("Mesh"));
+	SurfaceAttribute attribute;
+	attribute.positions.push_back(glm::vec3(-1.0f, -1.0f, 0.0f));
+	attribute.positions.push_back(glm::vec3(1.0f, -1.0f, 0.0f));
+	attribute.positions.push_back(glm::vec3(0.0f, 1.0f, 0.0f));
+	attribute.indices.push_back(0);
+	attribute.indices.push_back(1);
+	attribute.indices.push_back(2);
 
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LESS);
+	surface->SetAttribute(attribute);
+	mesh->SetTriangles(3, 0, 0);
+	surface->AddMesh(mesh);
+	*/
 
-	camera_ = new Camera;
-	reflect_ = new Shader;
-	refract_ = new Shader;
+	surface->Load("models/suzanne.obj");
+	MeshTextures textures = surface->GetMesh(0)->GetTextures();
+	textures.diffuse = dynamic_ptr_cast<Texture2D>(world->Create("Texture2D"));
+	textures.diffuse->Load("textures/suzanne_uvmap.dds");
+	surface->GetMesh(0)->SetTextures(textures);
 
-	std::string textures[] = {
-		"textures/lake_skybox/right.jpg",
-		"textures/lake_skybox/left.jpg",
-		"textures/lake_skybox/top.jpg",
-		"textures/lake_skybox/bottom.jpg",
-		"textures/lake_skybox/back.jpg",
-		"textures/lake_skybox/front.jpg",
-	};
-
-	skyBox_ = new SkyBox(camera_, textures);
-	mesh_ = new Mesh;
-
-	mesh_->Load("models/cube.obj");
-
-	reflect_->Load("shaders/reflect.glsl");
-	reflect_->Link();
-
-	refract_->Load("shaders/refract.glsl");
-	refract_->Link();
-
-	camera_->Reset(glm::vec3(0, 1, 5), glm::vec3(0));
+	sprite->SetSurface(surface);
 }
 
 void GLWidget::resizeGL(int w, int h) {
 	glViewport(0, 0, w, h);
 }
 
-void RenderRefract() {
-	glm::mat4 m;
-	m[3] = glm::vec4(1.3f, 0, 0, 1);
-	glm::mat4 mvp = camera_->GetProjMatrix() * camera_->GetViewMatrix() * m;
-	glm::mat4 mv = camera_->GetViewMatrix() * m;
-
-	refract_->SetUniform("MV", &mv);
-	refract_->SetUniform("MVP", &mvp);
-
-	refract_->SetUniform("cube", Globals::ColorTextureIndex);
-	skyBox_->GetTexture()->Bind(Globals::ColorTexture);
-
-	refract_->Bind();
-	mesh_->Render();
-}
-
-void RenderReflect() {
-	glm::mat4 m;
-	m[3] = glm::vec4(-1.3f, 0, 0, 1);
-
-	glm::mat4 mvp = camera_->GetProjMatrix() * camera_->GetViewMatrix() * m;
-	glm::mat4 mv = camera_->GetViewMatrix() * m;
-
-	reflect_->SetUniform("MV", &mv);
-	reflect_->SetUniform("MVP", &mvp);
-
-	reflect_->SetUniform("cube", Globals::ColorTextureIndex);
-	skyBox_->GetTexture()->Bind(Globals::ColorTexture);
-
-	reflect_->Bind();
-	mesh_->Render();
-}
-
 void GLWidget::paintGL() {
 	Engine::Ptr()->Update();
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	RenderReflect();
-	RenderRefract();
-	skyBox_->Render();
-
 	QMetaObject::invokeMethod(this, "updateGL", Qt::QueuedConnection);
 }
 
 void GLWidget::wheelEvent(QWheelEvent* event) {
-	camera_->Zoom(-0.1f * 0.05f* event->delta());
+	//camera_->Zoom(-0.1f * 0.05f* event->delta());
 }
 
 void GLWidget::mousePressEvent(QMouseEvent *event) {
@@ -162,13 +110,13 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event) {
 	if (mpressed_) {
 		QPoint delta = event->pos() - mpos_;
 		mpos_ = event->pos();
-		camera_->Move(0.1f * 0.05f * glm::vec2(delta.x(), delta.y()));
+		//camera_->Move(0.1f * 0.05f * glm::vec2(delta.x(), delta.y()));
 	}
 
 	if (lpressed) {
 		QPoint delta = event->pos() - lpos_;
 		lpos_ = event->pos();
-		camera_->Rotate(-0.1f * 0.005f * glm::vec2(delta.x(), delta.y()));
+		//camera_->Rotate(-0.1f * 0.005f * glm::vec2(delta.x(), delta.y()));
 	}
 
 	QGLWidget::mouseMoveEvent(event);

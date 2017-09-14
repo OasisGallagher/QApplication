@@ -43,6 +43,7 @@ private:
 	typedef PtrMap<UniformBlock> UniformBlockContainer;
 
 	void UpdateVariables();
+	void UpdateVertexAttributes();
 	void AddAllUniforms();
 	void AddAllUniformBlocks();
 	void BindTextures();

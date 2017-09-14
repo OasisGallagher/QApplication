@@ -11,7 +11,6 @@ class ENGINE_EXPORT ICamera : virtual public ISprite {
 public:
 	virtual void SetColorType(ClearType type) = 0;
 	virtual void SetClearColor(const glm::vec3& color) = 0;
-	virtual void Render() = 0;
 
 	virtual void SetAspect(float value) = 0;
 	virtual void SetNearClipPlane(float value) = 0;

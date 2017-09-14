@@ -10,7 +10,7 @@ public:
 	virtual void Unbind() = 0;
 
 protected:
-	void Enable(GLenum cap, bool enable);
+	void Enable(GLenum cap, GLboolean enable);
 	GLenum RenderParamterToGLEnum(RenderParameter parameter);
 	bool IsValidParamter(RenderParameter parameter, int count, ...);
 };
@@ -24,7 +24,7 @@ public:
 
 private:
 	int oldMode_;
-	bool oldEnabled_;
+	GLboolean oldEnabled_;
 	RenderParameter parameter_;
 };
 
@@ -37,7 +37,7 @@ public:
 
 private:
 	int oldMode_;
-	bool oldEnabled_;
+	GLboolean oldEnabled_;
 	RenderParameter parameter_;
 };
 
@@ -49,7 +49,7 @@ public:
 	virtual void Unbind();
 
 private:
-	bool oldEnabled_;
+	GLboolean oldEnabled_;
 	int oldSrc_, oldDest_;
 	RenderParameter src_, dest_;
 };

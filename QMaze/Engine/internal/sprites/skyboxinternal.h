@@ -1,4 +1,5 @@
 #pragma once
+/*
 #include <string>
 #include <gl/glew.h>
 
@@ -27,3 +28,4 @@ private:
 	Shader shader_;
 	Texture3D texture_;
 };
+*/

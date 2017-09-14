@@ -1,3 +1,4 @@
+/*
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -58,3 +59,4 @@ void SkyboxInternal::Render() {
 Texture3D SkyboxInternal::GetTexture() {
 	return texture_;
 }
+*/

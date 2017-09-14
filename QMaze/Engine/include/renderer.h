@@ -1,4 +1,8 @@
+#pragma once
+
 #include "object.h"
+#include "surface.h"
+#include "material.h"
 
 enum RenderCapacity {
 	RC_Cull,

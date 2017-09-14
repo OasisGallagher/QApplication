@@ -37,6 +37,12 @@ static void aiMaterixToGlm(glm::mat4& answer, const aiMatrix3x3& mat) {
 SurfaceInternal::SurfaceInternal() 
 	: ObjectInternal(ObjectTypeSurface), vao_(0) {
 	std::fill(vbos_, vbos_ + CountOf(vbos_), 0);
+
+	glGenVertexArrays(1, &vao_);
+
+	Bind();
+	glGenBuffers(CountOf(vbos_), vbos_);
+	Unbind();
 }
 
 SurfaceInternal::~SurfaceInternal() {
@@ -54,8 +60,10 @@ void SurfaceInternal::Clear() {
 }
 
 void SurfaceInternal::SetAttribute(const SurfaceAttribute& value) {
-	Clear();
+	meshes_.clear();
+	Bind();
 	UpdateGLBuffers(value);
+	Unbind();
 }
 
 void SurfaceInternal::AddMesh(Mesh mesh) {
@@ -71,13 +79,7 @@ int SurfaceInternal::GetMeshCount() const {
 }
 
 bool SurfaceInternal::Load(const std::string& path) {
-	Clear();
-
-	glGenVertexArrays(1, &vao_);
 	Bind();
-
-	glGenBuffers(CountOf(vbos_), vbos_);
-
 	Assimp::Importer importer;
 	unsigned flags = aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_CalcTangentSpace;
 	std::string fpath = "resources/" + path;
@@ -130,13 +132,14 @@ void SurfaceInternal::InitMeshAttributes(const aiScene* scene, unsigned numVerti
 	attribute.positions.reserve(numVertices);
 	attribute.normals.reserve(numVertices);
 	attribute.uvs.reserve(numVertices);
+	attribute.tangents.reserve(numVertices);
 	attribute.indices.reserve(numIndices);
 
 	for (unsigned i = 0; i < scene->mNumMeshes; ++i) {
 		InitAttribute(scene->mMeshes[i], attribute);
 	}
 
-	SetAttribute(attribute);
+	UpdateGLBuffers(attribute);
 }
 
 void SurfaceInternal::InitAttribute(const aiMesh* mesh, SurfaceAttribute& attribute) {
@@ -150,6 +153,7 @@ void SurfaceInternal::InitAttribute(const aiMesh* mesh, SurfaceAttribute& attrib
 		attribute.positions.push_back(glm::vec3(pos->x, pos->y, pos->z));
 		attribute.normals.push_back(glm::vec3(normal->x, normal->y, normal->z));
 		attribute.uvs.push_back(glm::vec2(texCoord->x, texCoord->y));
+		attribute.tangents.push_back(glm::vec3(tangent->x, tangent->y, tangent->z));
 	}
 
 	for (unsigned i = 0; i < mesh->mNumFaces; ++i) {
@@ -199,23 +203,38 @@ void SurfaceInternal::InitTextures(const aiScene* scene, const std::string& path
 }
 
 void SurfaceInternal::UpdateGLBuffers(const SurfaceAttribute& attribute) {
-	glBindBuffer(GL_ARRAY_BUFFER, vbos_[VBOPositions]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * attribute.positions.size(), &attribute.positions[0], GL_STATIC_DRAW);
-	glEnableVertexAttribArray(VBOPositions);
-	glVertexAttribPointer(VBOPositions, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+	if (!attribute.positions.empty()) {
+		glBindBuffer(GL_ARRAY_BUFFER, vbos_[VBOPositions]);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * attribute.positions.size(), &attribute.positions[0], GL_STATIC_DRAW);
+		glEnableVertexAttribArray(VBOPositions);
+		glVertexAttribPointer(VBOPositions, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+	}
 
-	glBindBuffer(GL_ARRAY_BUFFER, vbos_[VBOUVs]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2) * attribute.uvs.size(), &attribute.uvs[0], GL_STATIC_DRAW);
-	glEnableVertexAttribArray(VBOUVs);
-	glVertexAttribPointer(VBOUVs, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
+	if (!attribute.uvs.empty()) {
+		glBindBuffer(GL_ARRAY_BUFFER, vbos_[VBOUVs]);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2) * attribute.uvs.size(), &attribute.uvs[0], GL_STATIC_DRAW);
+		glEnableVertexAttribArray(VBOUVs);
+		glVertexAttribPointer(VBOUVs, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
+	}
 
-	glBindBuffer(GL_ARRAY_BUFFER, vbos_[VBONormals]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * attribute.normals.size(), &attribute.normals[0], GL_STATIC_DRAW);
-	glEnableVertexAttribArray(VBONormals);
-	glVertexAttribPointer(VBONormals, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+	if (!attribute.normals.empty()) {
+		glBindBuffer(GL_ARRAY_BUFFER, vbos_[VBONormals]);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * attribute.normals.size(), &attribute.normals[0], GL_STATIC_DRAW);
+		glEnableVertexAttribArray(VBONormals);
+		glVertexAttribPointer(VBONormals, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+	}
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbos_[VBOIndices]);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned) * attribute.indices.size(), &attribute.indices[0], GL_STATIC_DRAW);
+	if (!attribute.tangents.empty()) {
+		glBindBuffer(GL_ARRAY_BUFFER, vbos_[VBOTangents]);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * attribute.tangents.size(), &attribute.tangents[0], GL_STATIC_DRAW);
+		glEnableVertexAttribArray(VBOTangents);
+		glVertexAttribPointer(VBOTangents, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+	}
+
+	if (!attribute.indices.empty()) {
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbos_[VBOIndices]);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned) * attribute.indices.size(), &attribute.indices[0], GL_STATIC_DRAW);
+	}
 }
 
 void SurfaceInternal::Bind() {
@@ -225,26 +244,3 @@ void SurfaceInternal::Bind() {
 void SurfaceInternal::Unbind() {
 	glBindVertexArray(0);
 }
-
-#ifdef __UNUSED__
-void SurfaceInternal::Render(GLenum mode) {
-	glBindVertexArray(vao_);
-
-	AssertX(mode == GL_TRIANGLES || mode == GL_PATCHES, "invalid mode");
-
-	for (unsigned i = 0; i < meshes_.size(); ++i) {
-		
-		ITexture* diffuse = meshes_[i].material->GetDiffuseTexture();
-		
-		if (diffuse) {
-			diffuse->Bind(GL_TEXTURE0/*Globals::ColorTexture*/);
-		}
-
-		glDrawElementsBaseVertex(mode, meshes_[i].numIndices, GL_UNSIGNED_INT,
-								 (void*)(sizeof(unsigned)* meshes_[i].baseIndex), meshes_[i].baseVertex);
-
-	}
-
-	glBindVertexArray(0);
-}
-#endif

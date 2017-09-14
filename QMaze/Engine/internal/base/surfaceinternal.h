@@ -38,6 +38,7 @@ private:
 		VBOPositions,
 		VBOUVs,
 		VBONormals,
+		VBOTangents,
 		VBOIndices,
 		VBOCount,
 	};

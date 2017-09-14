@@ -16,7 +16,7 @@ public:
 
 public:
 	virtual void SetColorType(ClearType type) {}
-	virtual void SetClearColor(const glm::vec3& color) {}
+	virtual void SetClearColor(const glm::vec3& color);
 
 	virtual void Update();
 	/*
@@ -39,6 +39,9 @@ public:
 	// virtual const glm::vec3& GetPosition();
 	// virtual const glm::mat4& GetViewMatrix();
 	virtual const glm::mat4& GetProjMatrix();
+
+private:
+	void RenderSprite(Sprite sprite);
 
 private:
 	//glm::vec3 pos_, center_;

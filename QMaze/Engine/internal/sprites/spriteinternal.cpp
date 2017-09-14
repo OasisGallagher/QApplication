@@ -4,7 +4,7 @@
 #include "tools/mathf.h"
 #include "internal/sprites/spriteinternal.h"
 
-SpriteInternal::SpriteInternal(Sprite parent) : ObjectInternal(ObjectTypeSprite) {
+SpriteInternal::SpriteInternal(Sprite parent) : ObjectInternal(ObjectTypeSprite), scale_(1) {
 	parent_ = parent;
 	dirtyFlags_.set();
 }

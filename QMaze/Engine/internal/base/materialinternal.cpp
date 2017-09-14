@@ -1,3 +1,4 @@
+#include "variables.h"
 #include "materialinternal.h"
 
 MaterialInternal::MaterialInternal(Shader shader)
@@ -11,6 +12,9 @@ void MaterialInternal::SetShader(Shader value) {
 	
 	UnbindTextures();
 	textures_.clear();
+
+	UpdateVertexAttributes();
+	shader_->Link();
 
 	UpdateVariables();
 }
@@ -43,7 +47,7 @@ void MaterialInternal::SetTexture(const std::string& name, Texture texture) {
 
 	Uniform* u = uniforms_[name];
 	textures_.push_back(texture);
-	glProgramUniform1f(shader_->GetNativePointer(), u->location, textures_.size() - 1);
+	glProgramUniform1ui(shader_->GetNativePointer(), u->location, textures_.size() - 1);
 }
 
 void MaterialInternal::SetMatrix(const std::string& name, const glm::mat4& matrix) {
@@ -51,7 +55,7 @@ void MaterialInternal::SetMatrix(const std::string& name, const glm::mat4& matri
 }
 
 void MaterialInternal::SetBlock(const std::string& name, const void* value) {
-	Assert(blocks_.contains(name), "invalid block name " + name + ".");
+	AssertX(blocks_.contains(name), "invalid block name " + name + ".");
 
 	UniformBlock* block = blocks_[name];
 	glBindBuffer(GL_UNIFORM_BUFFER, block->buffer);
@@ -75,6 +79,14 @@ void MaterialInternal::UpdateVariables() {
 	// http://www.lighthouse3d.com/tutorials/glsl-tutorial/uniform-blocks/
 	AddAllUniforms();
 	AddAllUniformBlocks();
+}
+
+void MaterialInternal::UpdateVertexAttributes() {
+	GLuint program = shader_->GetNativePointer();
+	glBindAttribLocation(program, 0, Variables::vertexPosition);
+	glBindAttribLocation(program, 1, Variables::vertexTexCoord);
+	glBindAttribLocation(program, 0, Variables::vertexNormal);
+	glBindAttribLocation(program, 1, Variables::vertexTangent);
 }
 
 void MaterialInternal::BindTextures() {

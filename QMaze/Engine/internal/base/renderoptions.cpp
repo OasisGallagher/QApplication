@@ -72,7 +72,7 @@ void Blend::Unbind() {
 	glBlendFunc(oldSrc_, oldDest_);
 }
 
-void RenderOption::Enable(GLenum cap, bool enable) {
+void RenderOption::Enable(GLenum cap, GLboolean enable) {
 	if (enable) { glEnable(cap); }
 	else { glDisable(cap); }
 }
@@ -94,7 +94,7 @@ bool RenderOption::IsValidParamter(RenderParameter parameter, int count, ...) {
 }
 
 GLenum RenderOption::RenderParamterToGLEnum(RenderParameter parameter) {
-	GLenum value = None;
+	GLenum value = GL_NONE;
 	switch (parameter) {
 		case Front:
 			value = GL_FRONT;
@@ -152,6 +152,6 @@ GLenum RenderOption::RenderParamterToGLEnum(RenderParameter parameter) {
 			break;
 	}
 
-	AssertX(value != None, "invalid render paramter " + std::to_string(parameter));
+	AssertX(value != GL_NONE, "invalid render paramter " + std::to_string(parameter));
 	return value;
 }

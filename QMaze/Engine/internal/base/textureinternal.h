@@ -7,7 +7,7 @@
 
 class TextureInternal : virtual public ITexture, public ObjectInternal {
 public:
-	TextureInternal(ObjectType type) :ObjectInternal(type) {
+	TextureInternal(ObjectType type) :ObjectInternal(type), texture_(0) {
 
 	}
 
