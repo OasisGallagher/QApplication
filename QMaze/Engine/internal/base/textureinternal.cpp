@@ -35,7 +35,7 @@ const void* TextureInternal::ReadRawTexture(const std::string& path, int& width,
 	return blob.data();
 }
 
-Texture2DInternal::Texture2DInternal() : TextureInternal(ObjectTexture2D) {
+Texture2DInternal::Texture2DInternal() : TextureInternal(ObjectTypeTexture2D) {
 }
 
 Texture2DInternal::~Texture2DInternal() {
@@ -75,7 +75,7 @@ void Texture2DInternal::Destroy() {
 	}
 }
 
-Texture3DInternal::Texture3DInternal() : TextureInternal(ObjectTexture2D) {
+Texture3DInternal::Texture3DInternal() : TextureInternal(ObjectTypeTexture2D) {
 }
 
 Texture3DInternal::~Texture3DInternal() {

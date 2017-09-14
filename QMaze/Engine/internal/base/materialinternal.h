@@ -1,7 +1,7 @@
 #pragma once
 
 #include "material.h"
-#include "internal/containers/ptrmap.h"
+#include "internal/base/uniform.h"
 #include "internal/base/objectinternal.h"
 
 class MaterialInternal : public IMaterial, public ObjectInternal {
@@ -20,46 +20,35 @@ public:
 
 	virtual void SetInt(const std::string& name, int value);
 	virtual void SetFloat(const std::string& name, float value);
-	virtual void SetValue(const std::string& name, const void* value);
 	virtual void SetTexture(const std::string& name, Texture texture);
 	virtual void SetMatrix(const std::string& name, const glm::mat4& matrix);
 
 	virtual void SetBlock(const std::string& name, const void* value);
 
 private:
-	struct Uniform {
-		GLenum type;
-		union { GLuint offset, location; };
-		GLuint size, stride;
-	};
-	typedef PtrMap<Uniform> UniformContainer;
-
-	struct UniformBlock {
-		~UniformBlock();
-
-		GLuint size, buffer, binding;
-		UniformContainer uniforms;
-	};
-	typedef PtrMap<UniformBlock> UniformBlockContainer;
+	bool IsSampler(int type);
 
 	void UpdateVariables();
 	void UpdateVertexAttributes();
+	
 	void AddAllUniforms();
 	void AddAllUniformBlocks();
+	
 	void BindTextures();
 	void UnbindTextures();
+	
 	GLuint GetSizeOfType(GLint type);
-	bool IsSampler(const std::string& name);
-	void SetUniform(struct Uniform* u, const void* value);
 	GLuint GetUniformSize(GLint uniformType, GLint uniformSize, GLint uniformOffset, GLint uniformMatrixStride, GLint uniformArrayStride);
+	
+	void SetUniform(struct Uniform* u, const void* value);
+	void SetValue(const std::string& name, const void* value);
 
 private:
 	Shader shader_;
 	Texture diffuse_;
 	int oldProgram_;
 	int maxTextureUnits_;
-	std::vector<Texture> textures_;
-
+	int textureUnitIndex_;
 	UniformContainer uniforms_;
 	UniformBlockContainer blocks_;
 };

@@ -12,7 +12,7 @@ ShaderDescription ShaderInternal::descriptions_[] =  {
 	GL_FRAGMENT_SHADER, "FragmentShader", "frag"
 };
 
-ShaderInternal::ShaderInternal() : ObjectInternal(ObjectShader) {
+ShaderInternal::ShaderInternal() : ObjectInternal(ObjectTypeShader) {
 	program_ = glCreateProgram();
 	std::fill(shaderObjs_, shaderObjs_ + ShaderTypeCount, 0);
 }

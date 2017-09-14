@@ -3,7 +3,7 @@
 
 MaterialInternal::MaterialInternal(Shader shader)
 	: ObjectInternal(ObjectTypeMaterial), shader_(shader)
-	, maxTextureUnits_(0), oldProgram_(0) {
+	, textureUnitIndex_(0), maxTextureUnits_(0), oldProgram_(0) {
 	glGetIntegerv(GL_MAX_TEXTURE_UNITS, &maxTextureUnits_);
 }
 
@@ -11,7 +11,6 @@ void MaterialInternal::SetShader(Shader value) {
 	shader_ = value;
 	
 	UnbindTextures();
-	textures_.clear();
 
 	UpdateVertexAttributes();
 	shader_->Link();
@@ -42,12 +41,12 @@ void MaterialInternal::SetValue(const std::string& name, const void* value) {
 
 void MaterialInternal::SetTexture(const std::string& name, Texture texture) {
 	AssertX(uniforms_.contains(name), "invalid uniform " + name + ".");
-	AssertX(IsSampler(name), "invalid sampler " + name + ".");
-	AssertX(textures_.size() < maxTextureUnits_, "too many textures.");
 
 	Uniform* u = uniforms_[name];
-	textures_.push_back(texture);
-	glProgramUniform1ui(shader_->GetNativePointer(), u->location, textures_.size() - 1);
+	AssertX(u->value.GetType() == UniformTexture, "invalid texture " + name + ".");
+
+	u->value.SetTexture(texture);
+	glProgramUniform1ui(shader_->GetNativePointer(), u->location, u->value.GetTextureIndex());
 }
 
 void MaterialInternal::SetMatrix(const std::string& name, const glm::mat4& matrix) {
@@ -90,21 +89,26 @@ void MaterialInternal::UpdateVertexAttributes() {
 }
 
 void MaterialInternal::BindTextures() {
-	for (int i = 0; i < textures_.size(); ++i) {
-		textures_[i]->Bind(GL_TEXTURE0 + i);
+	// TODO: iteration...
+	for (UniformContainer::iterator ite = uniforms_.begin(); ite != uniforms_.end(); ++ite) {
+		Uniform* uniform = ite->second;
+		if (uniform->value.GetType() == UniformTexture) {
+			uniform->value.GetTexture()->Bind(GL_TEXTURE0 + uniform->value.GetTextureIndex());
+		}
 	}
 }
 
 void MaterialInternal::UnbindTextures() {
-	for (int i = 0; i < textures_.size(); ++i) {
-		textures_[i]->Unbind();
+	for (UniformContainer::iterator ite = uniforms_.begin(); ite != uniforms_.end(); ++ite) {
+		Uniform* uniform = ite->second;
+		if (uniform->value.GetType() == UniformTexture) {
+			uniform->value.GetTexture()->Unbind();
+		}
 	}
 }
 
-bool MaterialInternal::IsSampler(const std::string& name) {
-	Uniform* u = uniforms_[name];
-	if (u == nullptr) { return false; }
-	switch (u->type) {
+bool MaterialInternal::IsSampler(int type) {
+	switch (type) {
 		case GL_SAMPLER_1D:
 		case GL_SAMPLER_2D:
 		case GL_SAMPLER_3D:
@@ -180,6 +184,16 @@ void MaterialInternal::AddAllUniforms() {
 		uniform->location = location;
 		uniform->size = size;
 		uniform->stride = stride;
+		if (type == GL_INT) {
+			uniform->value.SetInt(0);
+		}
+		else if (type == GL_FLOAT) {
+			uniform->value.SetFloat(0);
+		}
+		else if (IsSampler(type)) {
+			AssertX(textureUnitIndex_ < maxTextureUnits_, "too many textures.");
+			uniform->value.SetTextureLocation(textureUnitIndex_++);
+		}
 	}
 
 	delete[] name;
@@ -617,11 +631,5 @@ void MaterialInternal::SetUniform(Uniform* u, const void* value) {
 		case GL_DOUBLE_MAT4x3:
 			glProgramUniformMatrix4x3dv(program, u->location, u->size, false, (const GLdouble *)value);
 			break;
-	}
-}
-
-MaterialInternal::UniformBlock::~UniformBlock() {
-	if (buffer != 0) {
-		glDeleteBuffers(1, &buffer);
 	}
 }

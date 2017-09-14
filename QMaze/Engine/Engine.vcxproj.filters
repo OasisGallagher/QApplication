@@ -199,8 +199,11 @@
     <ClInclude Include="internal\base\variables.h">
       <Filter>internal\base\include</Filter>
     </ClInclude>
-    <ClInclude Include="include\time.h">
+    <ClInclude Include="include\timef.h">
       <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="internal\base\uniform.h">
+      <Filter>internal\base\include</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -266,6 +269,9 @@
     </ClCompile>
     <ClCompile Include="src\time.cpp">
       <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="internal\base\uniform.cpp">
+      <Filter>internal\base\src</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

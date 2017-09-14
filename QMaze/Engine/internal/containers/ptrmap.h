@@ -27,6 +27,9 @@ public:
 		cont_.clear();
 	}
 
+	iterator begin() { return cont_.begin(); }
+	iterator end() { return cont_.end(); }
+
 	value_type operator[](const std::string& name) {
 		iterator pos = cont_.find(name);
 		if (pos != cont_.end()){

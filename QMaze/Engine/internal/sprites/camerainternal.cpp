@@ -51,13 +51,12 @@ void CameraInternal::RenderSprite(Sprite sprite) {
 	Surface surface = sprite->GetSurface();
 	Renderer renderer = sprite->GetRenderer();
 
-	renderer->SetSurface(surface);
 	Material material = renderer->GetMaterial(0);
 
 	glm::mat4 matrix = proj_ * GetWorldToLocalMatrix() * sprite->GetLocalToWorldMatrix();
 	material->SetMatrix(Variables::modelToClipSpaceMatrix, matrix);
 	
-	renderer->Render();
+	renderer->Render(surface);
 }
 /*
 void CameraInternal::LookAt(const glm::vec3& eye, const glm::vec3& center) {

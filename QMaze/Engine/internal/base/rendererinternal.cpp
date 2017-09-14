@@ -9,14 +9,9 @@ RendererInternal::~RendererInternal() {
 	ClearRenderOptions();
 }
 
-void RendererInternal::Render() {
-	if (!surface_) {
-		Debug::LogError("invalid surface");
-		return;
-	}
-
+void RendererInternal::Render(Surface surface) {
 	BindRenderOptions();
-	DrawCall();
+	DrawCall(surface);
 	UnbindRenderOptions();
 }
 
@@ -41,17 +36,17 @@ void RendererInternal::AddOption(RenderCapacity cap, RenderParameter parameter0,
 	options_.push_back(option);
 }
 
-void RendererInternal::DrawCall() {
-	surface_->Bind();
-	for (int i = 0; i < surface_->GetMeshCount(); ++i) {
-		Mesh mesh = surface_->GetMesh(i);
+void RendererInternal::DrawCall(Surface surface) {
+	surface->Bind();
+	for (int i = 0; i < surface->GetMeshCount(); ++i) {
+		Mesh mesh = surface->GetMesh(i);
 
 		for (int j = 0; j < GetMaterialCount(); ++j) {
 			DrawMesh(mesh, GetMaterial(j));
 		}
 	}
 
-	surface_->Unbind();
+	surface->Unbind();
 }
 
 void RendererInternal::DrawMesh(Mesh mesh, Material material) {

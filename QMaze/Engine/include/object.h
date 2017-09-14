@@ -4,18 +4,18 @@
 #include "smartptr.h"
 
 enum ObjectType {
-	ObjectShader,
-	ObjectSkybox,
 	ObjectTypeMesh,
-	ObjectTexture2D,
-	ObjectTexture3D,
 	ObjectTypeWorld,
+	ObjectTypeShader,
 	ObjectTypeSurface,
 	ObjectTypeMaterial,
 	ObjectTypeRenderer,
-	
+	ObjectTypeTexture2D,
+	ObjectTypeTexture3D,
+
 	ObjectTypeSprite,
 	ObjectTypeCamera,
+	ObjectTypeSkybox,
 
 	ObjectTypeCount,
 };

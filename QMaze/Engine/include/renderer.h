@@ -37,8 +37,7 @@ enum RenderParameter {
 
 class ENGINE_EXPORT IRenderer : virtual public IObject {
 public:
-	virtual void Render() = 0;
-	virtual void SetSurface(Surface surface) = 0;
+	virtual void Render(Surface surface) = 0;
 	
 	virtual void AddMaterial(Material material) = 0;
 	virtual Material GetMaterial(int index) = 0;

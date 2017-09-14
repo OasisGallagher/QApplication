@@ -11,9 +11,13 @@
 
 Factory Factory::instance;
 
-#define ADD_FACTROY_METHOD(Name)	AddFactoryMethod(#Name, Name ## Internal::Create)
+#define ADD_FACTROY_METHOD(Name) \
+	AddFactoryMethod(#Name, Name ## Internal::Create);  \
+	AddFactoryMethod(ObjectType ## Name, Name ## Internal::Create)
 
 Factory::Factory() {
+	std::fill(methodArray_, methodArray_ + ObjectTypeCount, nullptr);
+
 	ADD_FACTROY_METHOD(Mesh);
 	ADD_FACTROY_METHOD(World);
 	ADD_FACTROY_METHOD(Camera);

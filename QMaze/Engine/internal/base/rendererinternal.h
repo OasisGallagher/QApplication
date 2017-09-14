@@ -12,7 +12,7 @@ public:
 	~RendererInternal();
 
 public:
-	virtual void Render();
+	virtual void Render(Surface surface);
 
 	virtual void AddMaterial(Material material) { materials_.push_back(material); }
 	virtual Material GetMaterial(int index) { return materials_[index]; }
@@ -23,7 +23,7 @@ public:
 	virtual void AddOption(RenderCapacity cap, RenderParameter parameter0, RenderParameter parameter1);
 
 private:
-	void DrawCall();
+	void DrawCall(Surface surface);
 	void DrawMesh(Mesh mesh, Material material);
 
 	void ClearRenderOptions();

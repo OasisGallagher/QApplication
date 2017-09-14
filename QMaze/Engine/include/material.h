@@ -15,7 +15,6 @@ public:
 
 	virtual void SetInt(const std::string& name, int value) = 0;
 	virtual void SetFloat(const std::string& name, float value) = 0;
-	virtual void SetValue(const std::string& name, const void* value) = 0;
 	virtual void SetTexture(const std::string& name, Texture texture) = 0;
 	virtual void SetMatrix(const std::string& name, const glm::mat4& matrix) = 0;
 
