@@ -39,7 +39,7 @@ void CameraInternal::Update() {
 
 	for (int i = 0; i < sprites.size(); ++i) {
 		Sprite sprite = sprites[i];
-		if (sprite->GetSurface()) {
+		if (sprite->GetRenderer() && sprite->GetSurface()) {
 			RenderSprite(sprite);
 		}
 	}
@@ -49,19 +49,14 @@ void CameraInternal::RenderSprite(Sprite sprite) {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	Surface surface = sprite->GetSurface();
-	Renderer renderer = Factory::Create<RendererInternal>();
-	renderer->SetSurface(surface);
-	renderer->AddOption(RC_Cull, Back);
-	renderer->AddOption(RC_DepthTest, Less);
+	Renderer renderer = sprite->GetRenderer();
 
-	Material material = Factory::Create<MaterialInternal>();
-	Shader shader = Resources::FindShader("buildin/shaders/texture");
-	material->SetShader(shader);
+	renderer->SetSurface(surface);
+	Material material = renderer->GetMaterial(0);
 
 	glm::mat4 matrix = proj_ * GetWorldToLocalMatrix() * sprite->GetLocalToWorldMatrix();
 	material->SetMatrix(Variables::modelToClipSpaceMatrix, matrix);
-	renderer->AddMaterial(material);
-
+	
 	renderer->Render();
 }
 /*

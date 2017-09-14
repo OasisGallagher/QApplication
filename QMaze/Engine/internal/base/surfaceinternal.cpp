@@ -95,7 +95,7 @@ bool SurfaceInternal::Load(const std::string& path) {
 }
 
 bool SurfaceInternal::InitFromScene(const aiScene* scene, const std::string& path) {
-	MeshTextures* textures = Memory::CreateArray<MeshTextures>(scene->mNumMaterials);
+	MaterialTextures* textures = Memory::CreateArray<MaterialTextures>(scene->mNumMaterials);
 	InitTextures(scene, path, textures);
 
 	InitMeshes(scene, textures);
@@ -105,7 +105,7 @@ bool SurfaceInternal::InitFromScene(const aiScene* scene, const std::string& pat
 	return true;
 }
 
-void SurfaceInternal::InitMeshes(const aiScene* scene, MeshTextures* textures) {
+void SurfaceInternal::InitMeshes(const aiScene* scene, MaterialTextures* textures) {
 	meshes_.reserve(scene->mNumMeshes);
 
 	unsigned vertexCount = 0, indexCount = 0;
@@ -115,7 +115,7 @@ void SurfaceInternal::InitMeshes(const aiScene* scene, MeshTextures* textures) {
 		mesh->SetTriangles(scene->mMeshes[i]->mNumFaces * 3, vertexCount, indexCount);
 
 		if (scene->mMeshes[i]->mMaterialIndex < scene->mNumMaterials) {
-			mesh->SetTextures(textures[scene->mMeshes[i]->mMaterialIndex]);
+			mesh->SetMaterialTextures(textures[scene->mMeshes[i]->mMaterialIndex]);
 		}
 
 		vertexCount += scene->mMeshes[i]->mNumVertices;
@@ -165,7 +165,7 @@ void SurfaceInternal::InitAttribute(const aiMesh* mesh, SurfaceAttribute& attrib
 	}
 }
 
-void SurfaceInternal::InitTextures(const aiScene* scene, const std::string& path, MeshTextures* textures) {
+void SurfaceInternal::InitTextures(const aiScene* scene, const std::string& path, MaterialTextures* textures) {
 	std::string dir = Path::GetDirectory(path);
 
 	for (unsigned i = 0; i < scene->mNumMaterials; ++i) {

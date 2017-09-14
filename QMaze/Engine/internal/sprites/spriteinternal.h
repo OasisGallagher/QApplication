@@ -37,8 +37,11 @@ public:
 
 	virtual void Update();
 
-	virtual void SetSurface(Surface value);
-	virtual Surface GetSurface();
+	virtual void SetSurface(Surface value){ surface_ = value; }
+	virtual Surface GetSurface() { return surface_; }
+
+	virtual void SetRenderer(Renderer value) { renderer_ = value; }
+	virtual Renderer GetRenderer() { return renderer_; }
 
 private:
 	enum DirtyFlag {
@@ -54,6 +57,8 @@ private:
 private:
 	Sprite parent_;
 	Surface surface_;
+	Renderer renderer_;
+
 	std::vector<Sprite> children_;
 	std::bitset<DirtyFlagSize> dirtyFlags_;
 

@@ -26,6 +26,8 @@ public:
 	void SetDebugCallback(LogCallback callback);
 
 	void Update();
+	void OnResize(int w, int h);
+
 	World WorldPtr() { return world_; }
 
 private:

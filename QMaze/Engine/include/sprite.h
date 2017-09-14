@@ -3,6 +3,7 @@
 
 #include "object.h"
 #include "surface.h"
+#include "renderer.h"
 
 class ISprite;
 typedef smart_ptr<ISprite> Sprite;
@@ -35,4 +36,7 @@ public:
 
 	virtual void SetSurface(Surface value) = 0;
 	virtual Surface GetSurface() = 0;
+
+	virtual void SetRenderer(Renderer renderer) = 0;
+	virtual Renderer GetRenderer() = 0;
 };

@@ -9,13 +9,13 @@ class MeshInternal : public IMesh, public ObjectInternal {
 public:
 	MeshInternal();
 
-	virtual void SetTextures(const MeshTextures& value) { textures_ = value; }
-	virtual MeshTextures GetTextures() { return textures_; }
+	virtual void SetMaterialTextures(const MaterialTextures& value) { textures_ = value; }
+	virtual MaterialTextures GetMaterialTextures() { return textures_; }
 	virtual void SetTriangles(unsigned vertexCount, unsigned baseVertex, unsigned baseIndex);
 	virtual void GetTriangles(unsigned& vertexCount, unsigned& baseVertex, unsigned& baseIndex);
 
 private:
-	MeshTextures textures_;
+	MaterialTextures textures_;
 
 	unsigned baseIndex_;
 	unsigned baseVertex_;

@@ -38,13 +38,13 @@ void GLWidget::initializeGL() {
 	Engine::Ptr()->SetDebugCallback(OnEngineLogReceived);
 
 	World world = Engine::Ptr()->WorldPtr();
-	Camera camera = dynamic_ptr_cast<Camera>(world->Create("Camera"));
+	Camera camera = dynamic_sp_cast<Camera>(world->Create("Camera"));
 	camera->SetClearColor(glm::vec3(0.0f, 0.0f, 0.4f));
 
-	Sprite sprite = dynamic_ptr_cast<Sprite>(world->Create("Sprite"));
+	Sprite sprite = dynamic_sp_cast<Sprite>(world->Create("Sprite"));
 	sprite->SetPosition(glm::vec3(4, 1, -9));
 
-	Surface surface = dynamic_ptr_cast<Surface>(world->Create("Surface"));
+	Surface surface = dynamic_sp_cast<Surface>(world->Create("Surface"));
 	/* Mesh.
 	Mesh mesh = dynamic_ptr_cast<Mesh>(world->Create("Mesh"));
 	SurfaceAttribute attribute;
@@ -61,16 +61,31 @@ void GLWidget::initializeGL() {
 	*/
 
 	surface->Load("models/suzanne.obj");
-	MeshTextures textures = surface->GetMesh(0)->GetTextures();
-	textures.diffuse = dynamic_ptr_cast<Texture2D>(world->Create("Texture2D"));
-	textures.diffuse->Load("textures/suzanne_uvmap.dds");
-	surface->GetMesh(0)->SetTextures(textures);
+	MaterialTextures textures = surface->GetMesh(0)->GetMaterialTextures();
+	Texture2D diffuse = dynamic_sp_cast<Texture2D>(world->Create("Texture2D"));
+	diffuse->Load("textures/suzanne_uvmap.dds");
+	textures.diffuse = diffuse;
+	
+	surface->GetMesh(0)->SetMaterialTextures(textures);
 
 	sprite->SetSurface(surface);
+
+	Renderer renderer = dynamic_sp_cast<Renderer>(world->Create("Renderer"));
+	renderer->AddOption(RC_Cull, Back);
+	renderer->AddOption(RC_DepthTest, Less);
+
+	Shader shader = dynamic_sp_cast<Shader>(world->Create("Shader")); 
+	shader->Load("buildin/shaders/texture");
+
+	Material material = dynamic_sp_cast<Material>(world->Create("Material"));
+	material->SetShader(shader);
+	renderer->AddMaterial(material);
+
+	sprite->SetRenderer(renderer);
 }
 
 void GLWidget::resizeGL(int w, int h) {
-	glViewport(0, 0, w, h);
+	Engine::Ptr()->OnResize(w, h);
 }
 
 void GLWidget::paintGL() {

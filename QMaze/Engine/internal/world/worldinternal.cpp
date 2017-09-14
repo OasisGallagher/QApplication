@@ -19,7 +19,7 @@ bool WorldInternal::SpriteComparer::operator() (Sprite lhs, Sprite rhs)const {
 Object WorldInternal::Create(const std::string& type) {
 	Object object = Factory::Create(type);
 	if (object->GetType() >= ObjectTypeSprite) {
-		sprites_.insert(dynamic_ptr_cast<Sprite>(object));
+		sprites_.insert(dynamic_sp_cast<Sprite>(object));
 	}
 
 	return object;

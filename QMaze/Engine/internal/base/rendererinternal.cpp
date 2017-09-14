@@ -55,7 +55,7 @@ void RendererInternal::DrawCall() {
 }
 
 void RendererInternal::DrawMesh(Mesh mesh, Material material) {
-	MeshTextures textures = mesh->GetTextures();
+	MaterialTextures textures = mesh->GetMaterialTextures();
 
 	if (textures.normal) {
 		material->SetTexture(Variables::normalTexture, textures.normal);

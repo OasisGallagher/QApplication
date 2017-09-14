@@ -263,7 +263,7 @@ smart_ptr<T> dynamic_pointer_cast(const smart_ptr<U>& ptr) // never throws
 }*/
 
 template<class T, class U>
-T dynamic_ptr_cast(const smart_ptr<U>& ptr) // never throws
+T dynamic_sp_cast(const smart_ptr<U>& ptr) // never throws
 {
 	T::element_type* p = dynamic_cast<typename T::element_type*>(ptr.get());
 	if (NULL != p) {

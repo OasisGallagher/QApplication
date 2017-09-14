@@ -44,9 +44,9 @@ private:
 	};
 
 	void InitAttribute(const aiMesh* mesh, SurfaceAttribute& attribute);
-	void InitMeshes(const aiScene* scene, MeshTextures* textures);
+	void InitMeshes(const aiScene* scene, MaterialTextures* textures);
 	bool InitFromScene(const aiScene* scene, const std::string& path);
-	void InitTextures(const aiScene* scene, const std::string& path, MeshTextures* textures);
+	void InitTextures(const aiScene* scene, const std::string& path, MaterialTextures* textures);
 	void InitMeshAttributes(const aiScene* scene, unsigned numVertices, unsigned numIndices);
 
 	void Clear();

@@ -3,16 +3,16 @@
 #include "object.h"
 #include "material.h"
 
-struct MeshTextures {
-	Texture2D normal;
-	Texture2D diffuse;
-	Texture2D specular;
+struct MaterialTextures {
+	Texture normal;
+	Texture diffuse;
+	Texture specular;
 };
 
 class IMesh : virtual public IObject {
 public:
-	virtual void SetTextures(const MeshTextures& value) = 0;
-	virtual MeshTextures GetTextures() = 0;
+	virtual void SetMaterialTextures(const MaterialTextures& value) = 0;
+	virtual MaterialTextures GetMaterialTextures() = 0;
 
 	virtual void SetTriangles(unsigned vertexCount, unsigned baseVertex, unsigned baseIndex) = 0;
 	virtual void GetTriangles(unsigned& vertexCount, unsigned& baseVertex, unsigned& baseIndex) = 0;

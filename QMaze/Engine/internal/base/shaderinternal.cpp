@@ -3,7 +3,6 @@
 #include "tools/debug.h"
 #include "tools/string.h"
 #include "internal/misc/loader.h"
-#include "internal/base/renderstate.h"
 
 ShaderDescription ShaderInternal::descriptions_[] =  {
 	GL_VERTEX_SHADER, "VertexShader", "vert",
@@ -26,7 +25,7 @@ ShaderInternal::~ShaderInternal() {
 bool ShaderInternal::Load(const std::string& path) {
 	ShaderParser parser;
 	std::string sources[ShaderTypeCount];
-	if (!parser.Parse(path, sources)) {
+	if (!parser.Parse(path + ".glsl", sources)) {
 		return false;
 	}
 

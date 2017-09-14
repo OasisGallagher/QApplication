@@ -35,13 +35,17 @@ bool Engine::Initialize() {
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
 	}
 
-	world_ = dynamic_ptr_cast<World>(Factory::Create("World"));
+	world_ = dynamic_sp_cast<World>(Factory::Create("World"));
 
 	return true;
 }
 
 void Engine::SetDebugCallback(LogCallback callback) {
 	Debug::SetLogCallback(callback);
+}
+
+void Engine::OnResize(int w, int h) {
+	glViewport(0, 0, w, h);
 }
 
 void Engine::Update() {

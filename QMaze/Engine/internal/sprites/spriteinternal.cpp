@@ -64,11 +64,3 @@ glm::vec3 SpriteInternal::GetWorldToLocalPosition(const glm::vec3& position) {
 void SpriteInternal::Update() {
 
 }
-
-void SpriteInternal::SetSurface(Surface value) {
-	surface_ = value;
-}
-
-Surface SpriteInternal::GetSurface() {
-	return surface_;
-}
