@@ -1,6 +1,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "camera.h"
+#include "shader.h"
 #include "texture.h"
 #include "surface.h"
 #include "internal/misc/loader.h"
@@ -9,53 +11,40 @@
 #include "internal/base/surfaceinternal.h"
 #include "internal/sprites/skyboxinternal.h"
 
-SkyboxInternal::SkyboxInternal(Camera camera, std::string* textures) {
-	shader_ = Factory::Create<ShaderInternal>();
-	shader_->Load("buildin/shaders/skybox.glsl");
-	shader_->Link();
+SkyboxInternal::SkyboxInternal() : SpriteInternal(ObjectTypeSkybox) {
+}
 
+bool SkyboxInternal::Load(const std::string(&textures)[6]) {
 	Texture3D texture = dynamic_sp_cast<Texture3D>(Factory::Create<Texture3DInternal>());
-	texture->Load(textures);
+	if (!texture->Load(textures)) {
+		return false;
+	}
 
 	Surface surface = Factory::Create<SurfaceInternal>();
-	surface->Load("models/sphere.obj");
+	if (!surface->Load("buildin/models/box.obj")) {
+		return false;
+	}
+
+	Shader shader = dynamic_sp_cast<Shader>(Factory::Create("Shader"));
+	if (!shader->Load("buildin/shaders/skybox")) {
+		return false;
+	}
 
 	MaterialTextures materialTextures = surface->GetMesh(0)->GetMaterialTextures();
 	materialTextures.diffuse = texture;
 	surface->GetMesh(0)->SetMaterialTextures(materialTextures);
 
 	SetSurface(surface);
-}
 
-SkyboxInternal::~SkyboxInternal() {
-}
+	Renderer renderer = dynamic_sp_cast<Renderer>(Factory::Create("Renderer"));
+	renderer->AddOption(RC_Cull, Front);
+	renderer->AddOption(RC_DepthTest, LessEqual);
 
-// void SkyboxInternal::Render() {
-// 	shader_->Bind();
-// 	
-// 	RenderState::PushCullFaceEnabled(GL_TRUE);
-// 	RenderState::PushCullFaceFunc(GL_FRONT);
-// 
-// 	RenderState::PushDepthTestEnabled(GL_TRUE);
-// 	RenderState::PushDepthTestFunc(GL_LEQUAL);
-// 
-// 	glm::mat4 m(1);
-// 	glm::mat4 mvp = camera_->GetProjMatrix() * camera_->GetViewMatrix() * m;
-// 	shader_->SetUniform("MVP", &mvp);
-// 
-// 	texture_->Bind(GL_TEXTURE0);
-// 	shader_->SetUniform("textureSampler", 0);
-// 
-// 	//mesh_->Render();
-// 
-// 	RenderState::PopCullFaceEnabled();
-// 	RenderState::PopCullFaceFunc();
-// 	RenderState::PopDepthTestEnabled();
-// 	RenderState::PopDepthTestFunc();
-// 
-// 	texture_->Unbind();
-// }
-// 
-// Texture3D SkyboxInternal::GetTexture() {
-// 	return texture_;
-// }
+	Material material = dynamic_sp_cast<Material>(Factory::Create("Material"));
+	material->SetShader(shader);
+	renderer->AddMaterial(material);
+
+	SetRenderer(renderer);
+
+	return true;
+}

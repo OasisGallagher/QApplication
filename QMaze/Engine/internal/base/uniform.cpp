@@ -6,6 +6,11 @@ int UniformVariable::GetInt() {
 	return intValue_;
 }
 
+bool UniformVariable::GetBool() {
+	AssertX(type_ == UniformBool, "invalid uniform type.");
+	return boolValue_;
+}
+
 float UniformVariable::GetFloat() {
 	AssertX(type_ == UniformFloat, "invalid uniform type.");
 	return floatValue_;
@@ -31,6 +36,11 @@ void UniformVariable::SetInt(int value) {
 	intValue_ = value;
 }
 
+void UniformVariable::SetBool(bool value) {
+	type_ = UniformBool;
+	boolValue_ = value;
+}
+
 void UniformVariable::SetFloat(float value) {
 	type_ = UniformFloat;
 	floatValue_ = value;
@@ -43,7 +53,7 @@ void UniformVariable::SetMat4(const glm::mat4& value) {
 
 void UniformVariable::SetTexture(Texture value) {
 	type_ = UniformTexture;
-	texture_ = texture;
+	texture_ = value;
 }
 
 void UniformVariable::SetTextureLocation(GLenum value) {

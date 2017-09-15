@@ -4,8 +4,12 @@
 #include "tools/mathf.h"
 #include "internal/sprites/spriteinternal.h"
 
-SpriteInternal::SpriteInternal(Sprite parent) : ObjectInternal(ObjectTypeSprite), scale_(1) {
-	parent_ = parent;
+SpriteInternal::SpriteInternal() : ObjectInternal(ObjectTypeSprite), scale_(1) {
+	dirtyFlags_.set();
+}
+
+SpriteInternal::SpriteInternal(ObjectType spriteType) : ObjectInternal(spriteType), scale_(1) {
+	AssertX(spriteType > ObjectTypeSprite, "invalid sprite type " + std::to_string(spriteType));
 	dirtyFlags_.set();
 }
 
@@ -59,6 +63,18 @@ glm::vec3 SpriteInternal::GetLocalToWorldPosition(const glm::vec3& position) {
 
 glm::vec3 SpriteInternal::GetWorldToLocalPosition(const glm::vec3& position) {
 	return glm::vec3(GetWorldToLocalMatrix() * glm::vec4(position, 1));
+}
+
+glm::vec3 SpriteInternal::GetUp() const {
+	return rotation_ * glm::vec3(0, 1, 0);
+}
+
+glm::vec3 SpriteInternal::GetRight() const {
+	return rotation_ * glm::vec3(1, 0, 0);
+}
+
+glm::vec3 SpriteInternal::GetForward() const {
+	return rotation_ * glm::vec3(0, 0, -1);
 }
 
 void SpriteInternal::Update() {

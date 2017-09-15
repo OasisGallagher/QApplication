@@ -32,6 +32,10 @@ public:
 	virtual glm::vec3 GetLocalToWorldPosition(const glm::vec3& position) = 0;
 	virtual glm::vec3 GetWorldToLocalPosition(const glm::vec3& position) = 0;
 
+	virtual glm::vec3 GetUp() const = 0;
+	virtual glm::vec3 GetRight() const = 0;
+	virtual glm::vec3 GetForward() const = 0;
+
 	virtual void Update() = 0;
 
 	virtual void SetSurface(Surface value) = 0;

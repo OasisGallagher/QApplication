@@ -1,4 +1,6 @@
 #include "variables.h"
+#include "tools/mathf.h"
+#include "tools/string.h"
 #include "materialinternal.h"
 
 MaterialInternal::MaterialInternal(Shader shader)
@@ -22,37 +24,48 @@ void MaterialInternal::SetInt(const std::string& name, int value) {
 	AssertX(uniforms_.contains(name), "invalid uniform " + name + ".");
 
 	Uniform* u = uniforms_[name];
-	glProgramUniform1i(shader_->GetNativePointer(), u->location, value);
+	AssertX(u->value.GetType() == UniformInt, name + " is not defined as int.");
+
+	if (u->value.GetInt() != value) {
+		glProgramUniform1i(shader_->GetNativePointer(), u->location, value);
+	}
 }
 
 void MaterialInternal::SetFloat(const std::string& name, float value) {
 	AssertX(uniforms_.contains(name), "invalid uniform " + name + ".");
 
 	Uniform* u = uniforms_[name];
-	glProgramUniform1f(shader_->GetNativePointer(), u->location, value);
+	AssertX(u->value.GetType() == UniformFloat, name + " is not defined as float.");
+
+	if (!Mathf::Approximately(u->value.GetFloat(), value)) {
+		glProgramUniform1f(shader_->GetNativePointer(), u->location, value);
+	}
 }
 
-void MaterialInternal::SetValue(const std::string& name, const void* value) {
+void MaterialInternal::SetTexture(const std::string& name, Texture value) {
 	AssertX(uniforms_.contains(name), "invalid uniform " + name + ".");
 
 	Uniform* u = uniforms_[name];
-	SetUniform(u, value);
+	AssertX(u->value.GetType() == UniformTexture, name + " is not defined as texture.");
+
+	if (u->value.GetTexture() != value) {
+		u->value.SetTexture(value);
+		glProgramUniform1ui(shader_->GetNativePointer(), u->location, u->value.GetTextureIndex());
+	}
 }
 
-void MaterialInternal::SetTexture(const std::string& name, Texture texture) {
+void MaterialInternal::SetMatrix(const std::string& name, const glm::mat4& value) {
 	AssertX(uniforms_.contains(name), "invalid uniform " + name + ".");
 
 	Uniform* u = uniforms_[name];
-	AssertX(u->value.GetType() == UniformTexture, "invalid texture " + name + ".");
+	AssertX(u->value.GetType() == UniformMat4, name + " is not defined as mat4.");
 
-	u->value.SetTexture(texture);
-	glProgramUniform1ui(shader_->GetNativePointer(), u->location, u->value.GetTextureIndex());
+	if (u->value.GetMat4() != value) {
+		SetValue(name, &value);
+	}
 }
 
-void MaterialInternal::SetMatrix(const std::string& name, const glm::mat4& matrix) {
-	SetValue(name, &matrix);
-}
-
+/*
 void MaterialInternal::SetBlock(const std::string& name, const void* value) {
 	AssertX(blocks_.contains(name), "invalid block name " + name + ".");
 
@@ -60,6 +73,39 @@ void MaterialInternal::SetBlock(const std::string& name, const void* value) {
 	glBindBuffer(GL_UNIFORM_BUFFER, block->buffer);
 	glBufferSubData(GL_UNIFORM_BUFFER, 0, block->size, value);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+}
+*/
+
+int MaterialInternal::GetInt(const std::string& name) {
+	AssertX(uniforms_.contains(name), "invalid uniform " + name + ".");
+
+	Uniform* u = uniforms_[name];
+	AssertX(u->value.GetType() == UniformInt, name + " is not defined as int.");
+	return u->value.GetInt();
+}
+
+float MaterialInternal::GetFloat(const std::string& name) {
+	AssertX(uniforms_.contains(name), "invalid uniform " + name + ".");
+
+	Uniform* u = uniforms_[name];
+	AssertX(u->value.GetType() == UniformFloat, name + " is not defined as float.");
+	return u->value.GetFloat();
+}
+
+Texture MaterialInternal::GetTexture(const std::string& name) {
+	AssertX(uniforms_.contains(name), "invalid uniform " + name + ".");
+
+	Uniform* u = uniforms_[name];
+	AssertX(u->value.GetType() == UniformTexture, name + " is not defined as texture.");
+	return u->value.GetTexture();
+}
+
+glm::mat4 MaterialInternal::GetMatrix(const std::string& name) {
+	AssertX(uniforms_.contains(name), "invalid uniform " + name + ".");
+
+	Uniform* u = uniforms_[name];
+	AssertX(u->value.GetType() == UniformMat4, name + " is not defined as mat4.");
+	return u->value.GetMat4();
 }
 
 void MaterialInternal::Bind() {
@@ -72,6 +118,13 @@ void MaterialInternal::Unbind() {
 	UnbindTextures();
 	glUseProgram(oldProgram_);
 	oldProgram_ = 0;
+}
+
+void MaterialInternal::SetValue(const std::string& name, const void* value) {
+	AssertX(uniforms_.contains(name), "invalid uniform " + name + ".");
+
+	Uniform* u = uniforms_[name];
+	SetUniform(u, value);
 }
 
 void MaterialInternal::UpdateVariables() {
@@ -99,6 +152,7 @@ void MaterialInternal::BindTextures() {
 }
 
 void MaterialInternal::UnbindTextures() {
+	// TODO: iteration...
 	for (UniformContainer::iterator ite = uniforms_.begin(); ite != uniforms_.end(); ++ite) {
 		Uniform* uniform = ite->second;
 		if (uniform->value.GetType() == UniformTexture) {
@@ -190,9 +244,18 @@ void MaterialInternal::AddAllUniforms() {
 		else if (type == GL_FLOAT) {
 			uniform->value.SetFloat(0);
 		}
+		else if (type == GL_FLOAT_MAT4) {
+			uniform->value.SetMat4(glm::mat4(1));
+		}
+		else if (type == GL_BOOL) {
+			uniform->value.SetBool(false);
+		}
 		else if (IsSampler(type)) {
 			AssertX(textureUnitIndex_ < maxTextureUnits_, "too many textures.");
 			uniform->value.SetTextureLocation(textureUnitIndex_++);
+		}
+		else {
+			Debug::LogError(String::Format("undefined uniform type 0x%x.", type));
 		}
 	}
 

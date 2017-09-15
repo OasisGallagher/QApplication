@@ -11,7 +11,8 @@
 #include "engine.h"
 #include "texture.h"
 #include "surface.h"
-#include "GLWidget.h"
+#include "glwidget.h"
+#include "cameracontroller.h"
 
 static void OnEngineLogReceived(int level, const char* message) {
 	switch (level) {
@@ -29,8 +30,13 @@ static void OnEngineLogReceived(int level, const char* message) {
 }
 
 GLWidget::GLWidget(QWidget *parent) 
-	: QGLWidget(parent), mpressed_(false), lpressed(false) {
+	: QGLWidget(parent) {
 	setMouseTracking(true);
+	controller_ = new CameraController;
+}
+
+GLWidget::~GLWidget() {
+	delete controller_;
 }
 
 void GLWidget::initializeGL() {
@@ -39,7 +45,24 @@ void GLWidget::initializeGL() {
 
 	World world = Engine::Ptr()->WorldPtr();
 	Camera camera = dynamic_sp_cast<Camera>(world->Create("Camera"));
-	camera->SetClearColor(glm::vec3(0.0f, 0.0f, 0.4f));
+	controller_->setCamera(camera);
+
+	camera->SetClearType(ClearTypeSkybox);
+
+	Skybox skybox = dynamic_sp_cast<Skybox>(world->Create("Skybox"));
+	std::string faces[] = {
+		"textures/lake_skybox/right.jpg",
+		"textures/lake_skybox/left.jpg",
+		"textures/lake_skybox/top.jpg",
+		"textures/lake_skybox/bottom.jpg",
+		"textures/lake_skybox/back.jpg",
+		"textures/lake_skybox/front.jpg",
+	};
+
+	skybox->Load(faces);
+	
+	camera->SetSkybox(skybox);
+	//camera->SetClearColor(glm::vec3(0.0f, 0.0f, 0.4f));
 
 	Sprite sprite = dynamic_sp_cast<Sprite>(world->Create("Sprite"));
 	sprite->SetPosition(glm::vec3(4, 1, -9));
@@ -94,46 +117,21 @@ void GLWidget::paintGL() {
 }
 
 void GLWidget::wheelEvent(QWheelEvent* event) {
-	//camera_->Zoom(-0.1f * 0.05f* event->delta());
+	controller_->onMouseWheel(event->delta());
 }
 
 void GLWidget::mousePressEvent(QMouseEvent *event) {
-	if (event->button() == Qt::MiddleButton) {
-		mpos_ = event->pos();
-		mpressed_ = true;
-	}
-	if (event->button() == Qt::LeftButton) {
-		lpos_ = event->pos();
-		lpressed = true;
-	}
-
+	controller_->onMousePress(event->button(), event->pos());
 	QGLWidget::mousePressEvent(event);
 }
 
 void GLWidget::mouseReleaseEvent(QMouseEvent* event) {
-	if (event->button() == Qt::MiddleButton) {
-		mpressed_ = false;
-	}
-	else if (event->button() == Qt::LeftButton) {
-		lpressed = false;
-	}
-
+	controller_->onMouseRelease(event->button());
 	QGLWidget::mouseReleaseEvent(event);
 }
 
 void GLWidget::mouseMoveEvent(QMouseEvent *event) {
-	if (mpressed_) {
-		QPoint delta = event->pos() - mpos_;
-		mpos_ = event->pos();
-		//camera_->Move(0.1f * 0.05f * glm::vec2(delta.x(), delta.y()));
-	}
-
-	if (lpressed) {
-		QPoint delta = event->pos() - lpos_;
-		lpos_ = event->pos();
-		//camera_->Rotate(-0.1f * 0.005f * glm::vec2(delta.x(), delta.y()));
-	}
-
+	controller_->onMouseMove(event->pos());
 	QGLWidget::mouseMoveEvent(event);
 }
 

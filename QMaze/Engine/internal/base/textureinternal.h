@@ -53,12 +53,12 @@ public:
 	~Texture3DInternal();
 
 public:
-	bool Load(const std::string* textures);
+	bool Load(const std::string (&textures)[6]);
 
 protected:
 	virtual GLenum GetTextureType() { return GL_TEXTURE_3D; }
 
 private:
 	void Destroy();
-	GLuint CreateCubeTexture(const std::string* textures);
+	GLuint CreateCubeTexture(const std::string(&textures)[6]);
 };

@@ -7,13 +7,7 @@ WorldInternal::WorldInternal() : ObjectInternal(ObjectTypeWorld) {
 }
 
 bool WorldInternal::SpriteComparer::operator() (Sprite lhs, Sprite rhs)const {
-	ObjectType lt = lhs->GetType(), rt = rhs->GetType();
-	if (lt == rt) {
-		// TODO: opaque or transparent...
-		return lhs->GetInstanceID() < rhs->GetInstanceID();
-	}
-
-	return lt != ObjectTypeCamera;
+	return lhs->GetInstanceID() < rhs->GetInstanceID();
 }
 
 Object WorldInternal::Create(const std::string& type) {

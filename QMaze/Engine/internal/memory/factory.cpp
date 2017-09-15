@@ -7,6 +7,7 @@
 #include "internal/base/textureinternal.h"
 #include "internal/base/rendererinternal.h"
 #include "internal/base/materialinternal.h"
+#include "internal/sprites/skyboxinternal.h"
 #include "internal/sprites/camerainternal.h"
 
 Factory Factory::instance;
@@ -22,6 +23,7 @@ Factory::Factory() {
 	ADD_FACTROY_METHOD(World);
 	ADD_FACTROY_METHOD(Camera);
 	ADD_FACTROY_METHOD(Shader);
+	ADD_FACTROY_METHOD(Skybox);
 	ADD_FACTROY_METHOD(Sprite);
 	ADD_FACTROY_METHOD(Surface);
 	ADD_FACTROY_METHOD(Material);

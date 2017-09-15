@@ -19,7 +19,6 @@ public:
 	virtual void SetMaterial(int index, Material value) { materials_[index] = value; }
 	virtual int GetMaterialCount() const { return materials_.size(); }
 
-	virtual void SetSurface(Surface surface);
 	virtual void AddOption(RenderCapacity cap, RenderParameter parameter0, RenderParameter parameter1);
 
 private:
@@ -31,7 +30,6 @@ private:
 	void UnbindRenderOptions();
 
 private:
-	Surface surface_;
 	std::vector<Material> materials_;
 	std::vector<RenderOption*> options_;
 };

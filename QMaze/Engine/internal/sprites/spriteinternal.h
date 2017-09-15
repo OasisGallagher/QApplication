@@ -9,7 +9,7 @@ class SpriteInternal : virtual public ISprite, public ObjectInternal {
 	DEFINE_FACTORY_METHOD(Sprite)
 
 public:
-	SpriteInternal(Sprite parent = Sprite());
+	SpriteInternal();
 
 public:
 	virtual void SetParent(Sprite value) { parent_ = value; }
@@ -35,6 +35,10 @@ public:
 	virtual glm::vec3 GetLocalToWorldPosition(const glm::vec3& position);
 	virtual glm::vec3 GetWorldToLocalPosition(const glm::vec3& position);
 
+	virtual glm::vec3 GetUp() const;
+	virtual glm::vec3 GetRight() const;
+	virtual glm::vec3 GetForward() const;
+
 	virtual void Update();
 
 	virtual void SetSurface(Surface value){ surface_ = value; }
@@ -42,6 +46,9 @@ public:
 
 	virtual void SetRenderer(Renderer value) { renderer_ = value; }
 	virtual Renderer GetRenderer() { return renderer_; }
+
+protected:
+	SpriteInternal(ObjectType spriteType);
 
 private:
 	enum DirtyFlag {

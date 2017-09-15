@@ -1,15 +1,22 @@
 #pragma once
 #include <glm/glm.hpp>
+
+#include "skybox.h"
 #include "sprite.h"
 
 enum ClearType {
-	ClearColor,
-	ClearSkybox,
+	ClearTypeColor,
+	ClearTypeSkybox,
 };
 
 class ENGINE_EXPORT ICamera : virtual public ISprite {
 public:
-	virtual void SetColorType(ClearType type) = 0;
+	virtual void SetClearType(ClearType type) = 0;
+	virtual ClearType GetClearType() = 0;
+
+	virtual void SetSkybox(Skybox skybox) = 0;
+	virtual Skybox GetSkybox() = 0;
+
 	virtual void SetClearColor(const glm::vec3& color) = 0;
 
 	virtual void SetAspect(float value) = 0;
@@ -22,7 +29,7 @@ public:
 	virtual float GetFarClipPlane() const = 0;
 	virtual float GetFieldOfView() const = 0;
 
-	virtual const glm::mat4& GetProjMatrix() = 0;
+	virtual const glm::mat4& GetProjectionMatrix() = 0;
 };
 
 typedef smart_ptr<ICamera> Camera;

@@ -2,10 +2,13 @@
 
 #include <QtOpenGL/QGLWidget>
 
+class CameraController;
+
 class GLWidget : public QGLWidget {
 	Q_OBJECT
 public:
 	GLWidget(QWidget *parent = NULL);
+	~GLWidget();
 
 protected:
 	void initializeGL();
@@ -19,9 +22,5 @@ protected:
 	void keyPressEvent(QKeyEvent *event);
 
 private:
-	bool mpressed_;
-	bool lpressed;
-
-	QPoint mpos_;
-	QPoint lpos_;
+	CameraController* controller_;
 };

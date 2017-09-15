@@ -8,6 +8,7 @@
 enum UniformType {
 	UniformNone,
 	UniformInt,
+	UniformBool,
 	UniformFloat,
 	UniformMat4,
 	UniformTexture,
@@ -19,6 +20,7 @@ public:
 
 public:
 	int GetInt();
+	bool GetBool();
 	float GetFloat();
 	glm::mat4 GetMat4();
 	Texture GetTexture();
@@ -27,6 +29,7 @@ public:
 	UniformType GetType() const { return type_; }
 
 	void SetInt(int value);
+	void SetBool(bool value);
 	void SetFloat(float value);
 	void SetMat4(const glm::mat4& value);
 	void SetTexture(Texture value);
@@ -35,6 +38,7 @@ public:
 private:
 	union {
 		int intValue_;
+		bool boolValue_;
 		float floatValue_;
 		glm::mat4 mat4Value_;
 		int textureIndex_;

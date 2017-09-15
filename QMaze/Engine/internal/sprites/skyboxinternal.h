@@ -1,16 +1,13 @@
 #pragma once
-#include "camera.h"
-#include "shader.h"
-
 #include "skybox.h"
 #include "internal/sprites/spriteinternal.h"
 
 class SkyboxInternal : public ISkybox, public SpriteInternal {
-public:
-	SkyboxInternal(Camera camera, std::string* textures);
-	~SkyboxInternal();
+	DEFINE_FACTORY_METHOD(Skybox)
 
-private:
-	Camera camera_;
-	Shader shader_;
+public:
+	SkyboxInternal();
+
+public:
+	virtual bool Load(const std::string(&textures)[6]);
 };

@@ -18,7 +18,12 @@ public:
 	virtual void SetTexture(const std::string& name, Texture texture) = 0;
 	virtual void SetMatrix(const std::string& name, const glm::mat4& matrix) = 0;
 
-	virtual void SetBlock(const std::string& name, const void* value) = 0;
+	virtual int GetInt(const std::string& name) = 0;
+	virtual float GetFloat(const std::string& name) = 0;
+	virtual Texture GetTexture(const std::string& name) = 0;
+	virtual glm::mat4 GetMatrix(const std::string& name) = 0;
+
+	//virtual void SetBlock(const std::string& name, const void* value) = 0;
 
 	/*virtual void SetBlockUniform(const std::string& blockName,
 		const std::string& uniformName, const void* value) = 0;

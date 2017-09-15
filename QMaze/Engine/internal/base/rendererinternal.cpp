@@ -15,10 +15,6 @@ void RendererInternal::Render(Surface surface) {
 	UnbindRenderOptions();
 }
 
-void RendererInternal::SetSurface(Surface surface) {
-	surface_ = surface;
-}
-
 void RendererInternal::AddOption(RenderCapacity cap, RenderParameter parameter0, RenderParameter parameter1) {
 	RenderOption* option = nullptr;
 	switch (cap) {
@@ -31,9 +27,14 @@ void RendererInternal::AddOption(RenderCapacity cap, RenderParameter parameter0,
 		case RC_Blend:
 			option = Memory::Create<Blend>(parameter0, parameter1);
 			break;
+		default:
+			Debug::LogError("invalid render capacity " + std::to_string(cap));
+			break;
 	}
 
-	options_.push_back(option);
+	if (option != nullptr) {
+		options_.push_back(option);
+	}
 }
 
 void RendererInternal::DrawCall(Surface surface) {

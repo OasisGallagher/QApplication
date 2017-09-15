@@ -20,10 +20,15 @@ public:
 
 	virtual void SetInt(const std::string& name, int value);
 	virtual void SetFloat(const std::string& name, float value);
-	virtual void SetTexture(const std::string& name, Texture texture);
-	virtual void SetMatrix(const std::string& name, const glm::mat4& matrix);
+	virtual void SetTexture(const std::string& name, Texture value);
+	virtual void SetMatrix(const std::string& name, const glm::mat4& value);
 
-	virtual void SetBlock(const std::string& name, const void* value);
+	virtual int GetInt(const std::string& name);
+	virtual float GetFloat(const std::string& name);
+	virtual Texture GetTexture(const std::string& name);
+	virtual glm::mat4 GetMatrix(const std::string& name);
+
+	//virtual void SetBlock(const std::string& name, const void* value);
 
 private:
 	bool IsSampler(int type);

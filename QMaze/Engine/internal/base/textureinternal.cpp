@@ -82,7 +82,7 @@ Texture3DInternal::~Texture3DInternal() {
 	Destroy();
 }
 
-bool Texture3DInternal::Load(const std::string* textures) {
+bool Texture3DInternal::Load(const std::string(&textures)[6]) {
 	GLuint textureID = CreateCubeTexture(textures);
 	if (textureID != 0) {
 		Destroy();
@@ -93,7 +93,7 @@ bool Texture3DInternal::Load(const std::string* textures) {
 	return false;
 }
 
-GLuint Texture3DInternal::CreateCubeTexture(const std::string* textures) {
+GLuint Texture3DInternal::CreateCubeTexture(const std::string(&textures)[6]) {
 	GLuint textureID;
 	glGenTextures(1, &textureID);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
