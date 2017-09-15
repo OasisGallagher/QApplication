@@ -1,21 +1,20 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "camera.h"
-#include "shader.h"
-#include "texture.h"
-#include "surface.h"
 #include "internal/misc/loader.h"
 #include "internal/memory/factory.h"
+#include "internal/base/shaderinternal.h"
 #include "internal/base/textureinternal.h"
 #include "internal/base/surfaceinternal.h"
+#include "internal/base/rendererinternal.h"
+#include "internal/base/materialinternal.h"
 #include "internal/sprites/skyboxinternal.h"
 
 SkyboxInternal::SkyboxInternal() : SpriteInternal(ObjectTypeSkybox) {
 }
 
 bool SkyboxInternal::Load(const std::string(&textures)[6]) {
-	Texture3D texture = dynamic_sp_cast<Texture3D>(Factory::Create<Texture3DInternal>());
+	TextureCube texture = Factory::Create<TextureCubeInternal>();
 	if (!texture->Load(textures)) {
 		return false;
 	}
@@ -25,7 +24,7 @@ bool SkyboxInternal::Load(const std::string(&textures)[6]) {
 		return false;
 	}
 
-	Shader shader = dynamic_sp_cast<Shader>(Factory::Create("Shader"));
+	Shader shader = Factory::Create<ShaderInternal>();
 	if (!shader->Load("buildin/shaders/skybox")) {
 		return false;
 	}
@@ -36,11 +35,13 @@ bool SkyboxInternal::Load(const std::string(&textures)[6]) {
 
 	SetSurface(surface);
 
-	Renderer renderer = dynamic_sp_cast<Renderer>(Factory::Create("Renderer"));
+	Renderer renderer = Factory::Create<RendererInternal>();
+	renderer->SetRenderQueue(RenderQueueBackground);
+
 	renderer->AddOption(RC_Cull, Front);
 	renderer->AddOption(RC_DepthTest, LessEqual);
 
-	Material material = dynamic_sp_cast<Material>(Factory::Create("Material"));
+	Material material = Factory::Create<MaterialInternal>();
 	material->SetShader(shader);
 	renderer->AddMaterial(material);
 

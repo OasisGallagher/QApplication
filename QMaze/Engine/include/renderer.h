@@ -4,16 +4,24 @@
 #include "surface.h"
 #include "material.h"
 
+enum RenderQueue {
+	RenderQueueBackground = 1000,
+	RenderQueueGeometry = 2000,
+	RenderQueueTransparent = 4000,
+};
+
 enum RenderCapacity {
 	RC_Cull,
 	RC_Blend,
 	RC_DepthTest,
+	RC_DepthWrite,
 };
 
 enum RenderParameter {
 	None,
 	Front,
 	Back,
+	On,
 	Off,
 
 	Never,
@@ -43,6 +51,9 @@ public:
 	virtual Material GetMaterial(int index) = 0;
 	virtual void SetMaterial(int index, Material value) = 0;
 	virtual int GetMaterialCount() const = 0;
+
+	virtual void SetRenderQueue(int value) = 0;
+	virtual int GetRenderQueue() const = 0;
 
 	virtual void AddOption(RenderCapacity cap, RenderParameter parameter0, RenderParameter parameter1 = (RenderParameter)None) = 0;
 };

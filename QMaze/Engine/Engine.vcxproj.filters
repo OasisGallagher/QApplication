@@ -205,6 +205,9 @@
     <ClInclude Include="internal\base\uniform.h">
       <Filter>internal\base\include</Filter>
     </ClInclude>
+    <ClInclude Include="include\screen.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="internal\base\objectinternal.cpp">
@@ -267,11 +270,11 @@
     <ClCompile Include="internal\base\meshinternal.cpp">
       <Filter>internal\base\src</Filter>
     </ClCompile>
-    <ClCompile Include="src\time.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="internal\base\uniform.cpp">
       <Filter>internal\base\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\timef.cpp">
+      <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -19,6 +19,9 @@ public:
 	virtual void SetMaterial(int index, Material value) { materials_[index] = value; }
 	virtual int GetMaterialCount() const { return materials_.size(); }
 
+	virtual int GetRenderQueue() const { return queue_; }
+	virtual void SetRenderQueue(int value) { queue_ = value; }
+
 	virtual void AddOption(RenderCapacity cap, RenderParameter parameter0, RenderParameter parameter1);
 
 private:
@@ -30,6 +33,7 @@ private:
 	void UnbindRenderOptions();
 
 private:
+	int queue_;
 	std::vector<Material> materials_;
 	std::vector<RenderOption*> options_;
 };

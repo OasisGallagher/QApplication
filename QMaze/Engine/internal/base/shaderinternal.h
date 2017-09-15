@@ -35,7 +35,7 @@ public:
 public:
 	virtual bool Load(const std::string& path);
 	virtual bool Link();
-	virtual GLuint GetNativePointer() const { return program_; }
+	virtual unsigned GetNativePointer() const { return program_; }
 
 private:
 	bool LoadSource(ShaderType shaderType, const char* source);

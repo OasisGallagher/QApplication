@@ -2,16 +2,16 @@
 
 #shader vert
 
-layout(location = 0) in vec3 vert;
+layout(location = 0) in vec3 c_position;
 
 uniform mat4 c_modelToClipSpaceMatrix;
 
 out vec3 UV;
 
 void main() {
-	vec4 pos = c_modelToClipSpaceMatrix * vec4(vert, 1);
+	vec4 pos = c_modelToClipSpaceMatrix * vec4(c_position, 1);
 	gl_Position = pos.xyww;
-	UV = vert;
+	UV = c_position;
 }
 
 #shader frag

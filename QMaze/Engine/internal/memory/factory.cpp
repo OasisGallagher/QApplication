@@ -29,5 +29,6 @@ Factory::Factory() {
 	ADD_FACTROY_METHOD(Material);
 	ADD_FACTROY_METHOD(Renderer);
 	ADD_FACTROY_METHOD(Texture2D);
-	ADD_FACTROY_METHOD(Texture3D);
+	ADD_FACTROY_METHOD(TextureCube);
+	ADD_FACTROY_METHOD(RenderTexture);
 }

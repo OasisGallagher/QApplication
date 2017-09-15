@@ -1,4 +1,3 @@
-#include <QDebug>
 #include "cameracontroller.h"
 
 CameraController::CameraController() :mpressed_(false), rpressed(false) {

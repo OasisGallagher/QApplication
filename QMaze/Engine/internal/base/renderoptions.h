@@ -41,6 +41,18 @@ private:
 	RenderParameter parameter_;
 };
 
+class DepthWrite : public RenderOption {
+public:
+	DepthWrite(RenderParameter parameter);
+
+	virtual void Bind();
+	virtual void Unbind();
+
+private:
+	GLint oldMask_;
+	RenderParameter parameter_;
+};
+
 class Blend : public RenderOption {
 public:
 	Blend(RenderParameter src, RenderParameter dest);

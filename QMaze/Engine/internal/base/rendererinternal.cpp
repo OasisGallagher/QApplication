@@ -2,7 +2,7 @@
 #include "renderoptions.h"
 #include "rendererinternal.h"
 
-RendererInternal::RendererInternal() : ObjectInternal(ObjectTypeRenderer) {
+RendererInternal::RendererInternal() : ObjectInternal(ObjectTypeRenderer), queue_(RenderQueueGeometry) {
 }
 
 RendererInternal::~RendererInternal() {
@@ -26,6 +26,9 @@ void RendererInternal::AddOption(RenderCapacity cap, RenderParameter parameter0,
 			break;
 		case RC_Blend:
 			option = Memory::Create<Blend>(parameter0, parameter1);
+			break;
+		case RC_DepthWrite:
+			option = Memory::Create<DepthWrite>(parameter0);
 			break;
 		default:
 			Debug::LogError("invalid render capacity " + std::to_string(cap));

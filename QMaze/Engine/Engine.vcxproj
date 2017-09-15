@@ -173,7 +173,7 @@ copy $(TargetDir)$(TargetName).dll $(SolutionDir)$(SolutionName)\bin</Command>
     <ClCompile Include="internal\sprites\spriteinternal.cpp" />
     <ClCompile Include="internal\world\worldinternal.cpp" />
     <ClCompile Include="src\engine.cpp" />
-    <ClCompile Include="src\time.cpp" />
+    <ClCompile Include="src\timef.cpp" />
     <ClCompile Include="tools\debug.cpp" />
     <ClCompile Include="tools\path.cpp" />
   </ItemGroup>
@@ -186,6 +186,7 @@ copy $(TargetDir)$(TargetName).dll $(SolutionDir)$(SolutionName)\bin</Command>
     <ClInclude Include="include\object.h" />
     <ClInclude Include="include\renderer.h" />
     <ClInclude Include="include\rendertarget.h" />
+    <ClInclude Include="include\screen.h" />
     <ClInclude Include="include\shader.h" />
     <ClInclude Include="include\skybox.h" />
     <ClInclude Include="include\sprite.h" />

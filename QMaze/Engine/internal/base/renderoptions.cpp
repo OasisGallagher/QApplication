@@ -45,6 +45,22 @@ void DepthTest::Unbind() {
 	glDepthFunc(oldMode_);
 }
 
+DepthWrite::DepthWrite(RenderParameter parameter) {
+	AssertX(IsValidParamter(parameter, 2,
+		On, Off
+	), "invalid paramter for 'DepthWrite'.");
+	parameter_ = parameter;
+}
+
+void DepthWrite::Bind() {
+	glGetIntegerv(GL_DEPTH_WRITEMASK, &oldMask_);
+	glDepthMask(parameter_ == On);
+}
+
+void DepthWrite::Unbind() {
+	glDepthMask(oldMask_);
+}
+
 Blend::Blend(RenderParameter src, RenderParameter dest) {
 	AssertX(IsValidParamter(src, 9,
 		Off, Zero, One, SrcColor, OneMinusSrcColor, SrcAlpha, OneMinusSrcAlpha, DestAlpha, OneMinusDestAlpha
