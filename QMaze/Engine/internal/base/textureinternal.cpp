@@ -111,7 +111,6 @@ bool TextureCubeInternal::Load(const std::string(&textures)[6]) {
 	}
 
 	glBindTexture(GL_TEXTURE_CUBE_MAP, oldBindingTexture);
-
 	return true;
 }
 
@@ -125,14 +124,14 @@ bool RenderTextureInternal::Load(RenderTextureFormat format, int width, int heig
 	height_ = height;
 
 	GLint oldBindingTexture = 0;
-	glGetIntegerv(GL_TEXTURE_BINDING_CUBE_MAP, &oldBindingTexture);
+	glGetIntegerv(GL_TEXTURE_2D, &oldBindingTexture);
 
 	glGenTextures(1, &texture_);
 	glBindTexture(GL_TEXTURE_2D, texture_);
 
-	GLenum internalFormat = RenderTextureFormatToGLEnum(format);
+	std::pair<GLenum, GLenum> formats = RenderTextureFormatToGLEnum(format);
 
-	glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, GL_RGB, GL_FLOAT, nullptr);
+	glTexImage2D(GL_TEXTURE_2D, 0, formats.first, width, height, 0, formats.second, GL_FLOAT, nullptr);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -144,10 +143,11 @@ bool RenderTextureInternal::Load(RenderTextureFormat format, int width, int heig
 	return true;
 }
 
-GLenum RenderTextureInternal::RenderTextureFormatToGLEnum(RenderTextureFormat format) {
+std::pair<GLenum, GLenum> RenderTextureInternal::RenderTextureFormatToGLEnum(RenderTextureFormat renderTextureFormat) {
 	GLenum internalFormat = GL_RGBA;
+	GLenum format = GL_RGBA;
 
-	switch (format) {
+	switch (renderTextureFormat) {
 		case  RenderTextureFormatRgba:
 			internalFormat = GL_RGBA;
 			break;
@@ -156,11 +156,12 @@ GLenum RenderTextureInternal::RenderTextureFormatToGLEnum(RenderTextureFormat fo
 			break;
 		case RenderTextureFormatDepth:
 			internalFormat = GL_DEPTH_COMPONENT24;
+			format = GL_DEPTH_COMPONENT;
 			break;
 		default:
-			Debug::LogError("invalid render texture format: " + std::to_string(format));
+			Debug::LogError("invalid render texture format: " + std::to_string(renderTextureFormat));
 			break;
 	}
 
-	return internalFormat;
+	return std::make_pair(internalFormat, format);
 }

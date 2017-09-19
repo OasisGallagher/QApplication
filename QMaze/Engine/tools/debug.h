@@ -28,6 +28,8 @@ public:
 	static void StartSample(const std::string& text);
 	static void EndSample();
 
+	static void AssertGLImpl(const char* file, int line);
+
 private:
 	Debug();
 
@@ -46,6 +48,9 @@ private:
 #if _DEBUG
 #define Assert(expression)	Verify(expression)
 #define AssertX(expression, message) VerifyX(expression, message)
+#define AssertGL() Debug::AssertGLImpl(__FILE__, __LINE__)
 #else
-	(void)0
+#define Assert(expression) (void)0
+#define AssertX(expression, message) (void)0
+#define AssertGL() (void)0
 #endif

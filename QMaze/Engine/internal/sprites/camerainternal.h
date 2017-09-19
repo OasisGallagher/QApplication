@@ -6,6 +6,8 @@
 #include "internal/base/objectinternal.h"
 #include "internal/sprites/spriteinternal.h"
 
+class Framebuffer;
+
 class CameraInternal : public ICamera, public SpriteInternal {
 	DEFINE_FACTORY_METHOD(Camera)
 	
@@ -49,8 +51,8 @@ public:
 	virtual const glm::mat4& GetProjectionMatrix();
 
 private:
+	void RenderDepthPass(std::vector<Sprite>& sprites);
 	int RenderBackgroundPass(std::vector<Sprite>& sprites, int from);
-	int RenderDepthPass(std::vector<Sprite>& sprites, int from);
 	int RenderOpaquePass(std::vector<Sprite>& sprites, int from);
 	int RenderTransparentPass(std::vector<Sprite>& sprites, int from);
 
@@ -63,14 +65,13 @@ private:
 	float fieldOfView_;
 	glm::mat4 projection_;
 
-	GLuint depthFramebuffer_;
-	GLuint renderTextureFramebuffer_;
+	Framebuffer* fbDepth_;
+	Framebuffer* fbRenderTexture_;
 
 	RenderPass pass_;
 
 	Skybox skybox_;
 	ClearType clearType_;
 
-	RenderTexture depthTexture_;
 	RenderTexture renderTexture_;
 };

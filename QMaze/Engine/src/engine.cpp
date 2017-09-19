@@ -3,6 +3,8 @@
 #include "engine.h"
 
 #include "tools/debug.h"
+#include "internal/misc/timef.h"
+#include "internal/misc/screen.h"
 #include "internal/memory/factory.h"
 
 Engine Engine::engine_;
@@ -21,8 +23,8 @@ static void _STDCALL GLDebugMessageCallback(
 	const GLvoid* userParam
 );
 
-bool Engine::Initialize() {
-	AssertX(world_, "can not initialize engine twice.");
+bool Engine::initialize() {
+	AssertX(!world_, "can not initialize engine twice.");
 
 	glewExperimental = true;
 
@@ -37,19 +39,50 @@ bool Engine::Initialize() {
 
 	world_ = dynamic_sp_cast<World>(Factory::Create("World"));
 
+	time_ = Memory::Create<Time>();
+	screen_ = Memory::Create<Screen>();
+
 	return true;
 }
 
-void Engine::SetDebugCallback(LogCallback callback) {
+void Engine::release() {
+	Memory::Release(time_);
+	Memory::Release(screen_);
+	world_.reset();
+}
+
+void Engine::setDebugCallback(LogCallback callback) {
 	Debug::SetLogCallback(callback);
 }
 
-void Engine::OnResize(int w, int h) {
+void Engine::onResize(int w, int h) {
+	screen_->SetContentSize(w, h);
 	glViewport(0, 0, w, h);
 }
 
-void Engine::Update() {
+void Engine::update() {
+	time_->Update();
 	world_->Update();
+}
+
+int Engine::frameCount() {
+	return time_->GetFrameCount();
+}
+
+float Engine::deltaTime() {
+	return time_->GetDeltaTime();
+}
+
+float Engine::realTimeSinceStartup() {
+	return time_->GetRealTimeSinceStartup();
+}
+
+int Engine::contextWidth() {
+	return screen_->GetContextWidth();
+}
+
+int Engine::contextHeight() {
+	return screen_->GetContextHeight();
 }
 
 static void _STDCALL GLDebugMessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const GLvoid* userParam) {

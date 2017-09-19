@@ -70,5 +70,5 @@ public:
 
 protected:
 	virtual GLenum GetGLTextureType() { return GL_TEXTURE_2D; }
-	GLenum RenderTextureFormatToGLEnum(RenderTextureFormat format);
+	std::pair<GLenum, GLenum> RenderTextureFormatToGLEnum(RenderTextureFormat renderTextureFormat);
 };

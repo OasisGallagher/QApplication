@@ -56,7 +56,7 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="qmaze.qrc"/>
+  <include location="../qmaze.qrc"/>
  </resources>
  <connections/>
 </ui>

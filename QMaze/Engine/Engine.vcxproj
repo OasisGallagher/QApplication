@@ -154,6 +154,7 @@ copy $(TargetDir)$(TargetName).dll $(SolutionDir)$(SolutionName)\bin</Command>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="internal\base\framebuffer.cpp" />
     <ClCompile Include="internal\base\materialinternal.cpp" />
     <ClCompile Include="internal\base\meshinternal.cpp" />
     <ClCompile Include="internal\base\objectinternal.cpp" />
@@ -167,13 +168,14 @@ copy $(TargetDir)$(TargetName).dll $(SolutionDir)$(SolutionName)\bin</Command>
     <ClCompile Include="internal\memory\factory.cpp" />
     <ClCompile Include="internal\memory\memory.cpp" />
     <ClCompile Include="internal\misc\loader.cpp" />
+    <ClCompile Include="internal\misc\screen.cpp" />
+    <ClCompile Include="internal\misc\timef.cpp" />
     <ClCompile Include="internal\resources\resources.cpp" />
     <ClCompile Include="internal\sprites\camerainternal.cpp" />
     <ClCompile Include="internal\sprites\skyboxinternal.cpp" />
     <ClCompile Include="internal\sprites\spriteinternal.cpp" />
     <ClCompile Include="internal\world\worldinternal.cpp" />
     <ClCompile Include="src\engine.cpp" />
-    <ClCompile Include="src\timef.cpp" />
     <ClCompile Include="tools\debug.cpp" />
     <ClCompile Include="tools\path.cpp" />
   </ItemGroup>
@@ -184,16 +186,15 @@ copy $(TargetDir)$(TargetName).dll $(SolutionDir)$(SolutionName)\bin</Command>
     <ClInclude Include="include\material.h" />
     <ClInclude Include="include\mesh.h" />
     <ClInclude Include="include\object.h" />
+    <ClInclude Include="include\posteffect.h" />
     <ClInclude Include="include\renderer.h" />
-    <ClInclude Include="include\rendertarget.h" />
-    <ClInclude Include="include\screen.h" />
     <ClInclude Include="include\shader.h" />
     <ClInclude Include="include\skybox.h" />
     <ClInclude Include="include\sprite.h" />
     <ClInclude Include="include\surface.h" />
     <ClInclude Include="include\texture.h" />
-    <ClInclude Include="include\timef.h" />
     <ClInclude Include="include\world.h" />
+    <ClInclude Include="internal\base\framebuffer.h" />
     <ClInclude Include="internal\base\materialinternal.h" />
     <ClInclude Include="internal\base\meshinternal.h" />
     <ClInclude Include="internal\base\objectinternal.h" />
@@ -211,6 +212,8 @@ copy $(TargetDir)$(TargetName).dll $(SolutionDir)$(SolutionName)\bin</Command>
     <ClInclude Include="internal\memory\smartptr.h" />
     <ClInclude Include="internal\misc\loader.h" />
     <ClInclude Include="internal\misc\ptrmap.h" />
+    <ClInclude Include="internal\misc\screen.h" />
+    <ClInclude Include="internal\misc\timef.h" />
     <ClInclude Include="internal\resources\resources.h" />
     <ClInclude Include="internal\sprites\camerainternal.h" />
     <ClInclude Include="internal\sprites\skyboxinternal.h" />

@@ -50,7 +50,7 @@ void MaterialInternal::SetTexture(const std::string& name, Texture value) {
 
 	if (u->value.GetTexture() != value) {
 		u->value.SetTexture(value);
-		glProgramUniform1ui(shader_->GetNativePointer(), u->location, u->value.GetTextureIndex());
+		glProgramUniform1i(shader_->GetNativePointer(), u->location, u->value.GetTextureIndex());
 	}
 }
 

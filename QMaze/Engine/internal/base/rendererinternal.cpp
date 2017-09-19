@@ -69,12 +69,10 @@ void RendererInternal::DrawMesh(Mesh mesh, Material material) {
 	}
 
 	material->Bind();
-
 	unsigned vertexCount, baseVertex, baseIndex;
 	mesh->GetTriangles(vertexCount, baseVertex, baseIndex);
 
 	glDrawElementsBaseVertex(GL_TRIANGLES, vertexCount, GL_UNSIGNED_INT, (void*)(sizeof(unsigned)* baseIndex), baseVertex);
-
 	material->Unbind();
 }
 

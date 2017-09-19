@@ -15,6 +15,8 @@ protected:
 	void resizeGL(int w, int h);
 	void paintGL();
 
+	void createScene();
+
 	void wheelEvent(QWheelEvent* event);
 	void mousePressEvent(QMouseEvent *event);
 	void mouseMoveEvent(QMouseEvent *event);
@@ -22,5 +24,6 @@ protected:
 	void keyPressEvent(QKeyEvent *event);
 
 private:
+	bool sceneCreated_;
 	CameraController* controller_;
 };

@@ -11,27 +11,42 @@ enum {
 
 typedef void(*LogCallback)(int level, const char* message);
 
+class Time;
+class Screen;
+
 class ENGINE_EXPORT Engine {
 public:
 	Engine() : world_(nullptr) {
 	}
 
 public:
-	static Engine* Ptr() {
-		return &engine_;
-	}
+	static Engine* get() { return &engine_; }
 
 public:
-	bool Initialize();
-	void SetDebugCallback(LogCallback callback);
+	bool initialize();
+	void release();
 
-	void Update();
-	void OnResize(int w, int h);
+	/**
+	 * make debug context !!!
+	 */
+	void setDebugCallback(LogCallback callback);
 
-	World WorldPtr() { return world_; }
+	void update();
+	void onResize(int w, int h);
+
+	World world() { return world_; }
+
+	float realTimeSinceStartup();
+	float deltaTime();
+	int frameCount();
+
+	int contextWidth();
+	int contextHeight();
 
 private:
 	World world_;
+	Time* time_;
+	Screen* screen_;
 
 	static Engine engine_;
 };
