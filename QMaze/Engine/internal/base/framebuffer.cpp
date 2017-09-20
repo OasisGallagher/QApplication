@@ -98,6 +98,7 @@ RenderTexture Framebuffer::GetDepthTexture() {
 	return depthTexture_;
 }
 
+#ifdef MRT
 void Framebuffer::AddRenderTexture(RenderTexture texture) {
 	int index = FindAttachmentIndex();
 	AssertX(index >= 0, "too many render textures");
@@ -123,6 +124,21 @@ void Framebuffer::RemoveRenderTexture(RenderTexture texture) {
 		}
 	}
 }
+
+#else
+
+void Framebuffer::SetRenderTexture(RenderTexture texture) {
+	PushFramebuffer();
+
+	renderTextures_[0] = texture;
+
+	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, texture ? texture->GetNativePointer() : 0, 0);
+
+	attachedRenderTextureCount_ = texture ? 1 : 0;
+
+	PopFramebuffer();
+}
+#endif	// MRT
 
 int Framebuffer::FindAttachmentIndex() {
 	for (int i = 0; i < maxRenderTextures_; ++i) {

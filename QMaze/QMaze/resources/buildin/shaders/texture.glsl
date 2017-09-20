@@ -18,9 +18,9 @@ in vec2 texCoord;
 
 out vec3 color;
 
-uniform sampler2D c_diffuseTexture;
+uniform sampler2D c_mainTexture;
 
 void main() {
-	color = texture(c_diffuseTexture, texCoord).rgb;
+	color = texture(c_mainTexture, texCoord).rgb;
 }
 

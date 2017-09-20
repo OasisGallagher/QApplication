@@ -27,8 +27,15 @@ CameraInternal::CameraInternal()
 	RenderTexture depthTexture = Factory::Create<RenderTextureInternal>();
 	depthTexture->Load(RenderTextureFormatDepth, w, h);
 	fbDepth_->SetDepthTexture(depthTexture);
+
 	fbRenderTexture_ = Memory::Create<Framebuffer>();
 	fbRenderTexture_->Create(w, h);
+	renderTexture_ = Factory::Create<RenderTextureInternal>();
+	renderTexture_->Load(RenderTextureFormatRgba, w, h);
+	fbRenderTexture_->SetRenderTexture(renderTexture_);
+
+	tempRenderTexture_ = Factory::Create<RenderTextureInternal>();
+	tempRenderTexture_->Load(RenderTextureFormatRgba, w, h);
 
 	glClearDepth(1);
 }
@@ -59,13 +66,15 @@ void CameraInternal::SetClearColor(const glm::vec3& value) {
 }
 
 void CameraInternal::SetRenderTexture(RenderTexture value) {
-	renderTexture_ = value;
-	fbRenderTexture_->RemoveRenderTexture(renderTexture_);
-	fbRenderTexture_->AddRenderTexture(value);
+	if (value) {
+		fbRenderTexture_->SetRenderTexture(value);
+	}
+	else {
+		fbRenderTexture_->SetRenderTexture(renderTexture_);
+	}
 }
 
 void CameraInternal::Update() {
-	float delta = Engine::get()->deltaTime();
 	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
 	if (clearType_ == ClearTypeSkybox && skybox_) {
@@ -82,11 +91,11 @@ void CameraInternal::Update() {
 
 	RenderDepthPass(sprites);
 
-	bool bindRenderFramebuffer = false;
-	if (fbRenderTexture_->GetRenderTextureCount() > 0) {
+	bool renderToTexture = false;
+	if (fbRenderTexture_->GetRenderTexture(0) != renderTexture_ || !postEffects_.empty()) {
 		fbRenderTexture_->Bind();
 		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-		bindRenderFramebuffer = true;
+		renderToTexture = true;
 	}
 	else {
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -97,12 +106,26 @@ void CameraInternal::Update() {
 	from = RenderOpaquePass(sprites, from);
 	from = RenderTransparentPass(sprites, from);
 
-	int read = 0;
+	RenderTexture mainTexture = fbRenderTexture_->GetRenderTexture(0);
+	RenderTexture tempTexture = tempRenderTexture_;
+
+	for (int i = 0; i < postEffects_.size(); ++i) {
+		if (i + 1 == postEffects_.size()) {
+			tempTexture.reset();
+		}
+
+		postEffects_[i]->OnRenderImage(mainTexture, tempTexture);
+		mainTexture.swap(tempTexture);
+	}
+
+	/*int read = 0;
 	glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &read);
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, fbDepth_->GetNativePointer());
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 	int w = fbRenderTexture_->GetWidth(), h = fbRenderTexture_->GetHeight();
 	glBlitFramebuffer(0, 0, w, h, 0, 0, w, h, GL_COLOR_BUFFER_BIT, GL_LINEAR);
-	if (bindRenderFramebuffer) {
+	*/
+	if (renderToTexture) {
 		fbRenderTexture_->Unbind();
 	}
 
@@ -121,7 +144,7 @@ void CameraInternal::RenderDepthPass(std::vector<Sprite>& sprites) {
 
 	for (int i = 0; i < sprites.size(); ++i) {
 		Sprite sprite = sprites[i];
-		RenderSprite(sprite);
+		RenderSprite(sprite, sprite->GetRenderer());
 	}
 
 	fbDepth_->Unbind();
@@ -131,7 +154,7 @@ int CameraInternal::RenderOpaquePass(std::vector<Sprite>& sprites, int from) {
 	pass_ = RenderPassOpaque;
 	for (int i = 0; i < sprites.size(); ++i) {
 		Sprite sprite = sprites[i];
-		RenderSprite(sprite);
+		RenderSprite(sprite, sprite->GetRenderer());
 	}
 
 	return 0;
@@ -164,14 +187,13 @@ void CameraInternal::SortRenderableSprites(std::vector<Sprite>& sprites) {
 	sprites.erase(sprites.begin() + p, sprites.end());
 }
 
-void CameraInternal::RenderSprite(Sprite sprite) {
+void CameraInternal::RenderSprite(Sprite sprite, Renderer renderer) {
 	Surface surface = sprite->GetSurface();
 	if (!surface) {
 		Debug::LogError("No surface to render");
 		return;
 	}
 
-	Renderer renderer = sprite->GetRenderer();
 	Material material = renderer->GetMaterial(0);
 	glm::mat4 matrix = projection_ * GetWorldToLocalMatrix() * sprite->GetLocalToWorldMatrix();
 	material->SetMatrix(Variables::modelToClipSpaceMatrix, matrix);

@@ -61,7 +61,7 @@ void RendererInternal::DrawMesh(Mesh mesh, Material material) {
 	}
 
 	if (textures.diffuse) {
-		material->SetTexture(Variables::diffuseTexture, textures.diffuse);
+		material->SetTexture(Variables::mainTexture, textures.diffuse);
 	}
 
 	if (textures.specular) {

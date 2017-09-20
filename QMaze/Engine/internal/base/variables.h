@@ -6,8 +6,8 @@ namespace Variables {
 	static const char* vertexNormal = "c_normal";
 	static const char* vertexTangent = "c_tangent";
 
+	static const char* mainTexture = "c_mainTexture";
 	static const char* normalTexture = "c_normalTexture";
-	static const char* diffuseTexture = "c_diffuseTexture";
 	static const char* specularTexture = "c_specularTexture";
 
 	static const char* modelToClipSpaceMatrix = "c_modelToClipSpaceMatrix";

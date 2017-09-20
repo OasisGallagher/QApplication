@@ -20,7 +20,7 @@ out vec4 color;
 
 in vec3 UV;
 
-uniform samplerCube c_diffuseTexture;
+uniform samplerCube c_mainTexture;
 
 uniform bool test = false;
 
@@ -29,7 +29,7 @@ void main() {
 		color = vec4(1, 0, 0, 1);
 	}
 	else {
-		color = texture(c_diffuseTexture, UV);
+		color = texture(c_mainTexture, UV);
 	}
 }
 

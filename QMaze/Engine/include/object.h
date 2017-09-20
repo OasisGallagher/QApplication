@@ -14,9 +14,13 @@ enum ObjectType {
 	ObjectTypeTextureCube,
 	ObjectTypeRenderTexture,
 
+	// Sprites.
 	ObjectTypeSprite,
 	ObjectTypeCamera,
 	ObjectTypeSkybox,
+	ObjectTypeSpotLight,
+	ObjectTypePointLight,
+	ObjectTypeDirectionalLight,
 
 	ObjectTypeCount,
 };

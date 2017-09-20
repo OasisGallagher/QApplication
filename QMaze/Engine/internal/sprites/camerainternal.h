@@ -3,6 +3,7 @@
 
 #include "camera.h"
 #include "skybox.h"
+#include "posteffect.h"
 #include "internal/base/objectinternal.h"
 #include "internal/sprites/spriteinternal.h"
 
@@ -56,7 +57,7 @@ private:
 	int RenderOpaquePass(std::vector<Sprite>& sprites, int from);
 	int RenderTransparentPass(std::vector<Sprite>& sprites, int from);
 
-	void RenderSprite(Sprite sprite);
+	void RenderSprite(Sprite sprite, Renderer renderer);
 	void SortRenderableSprites(std::vector<Sprite>& sprites);
 
 private:
@@ -67,11 +68,13 @@ private:
 
 	Framebuffer* fbDepth_;
 	Framebuffer* fbRenderTexture_;
+	RenderTexture renderTexture_;
+	RenderTexture tempRenderTexture_;
+
+	std::vector<PostEffect*> postEffects_;
 
 	RenderPass pass_;
 
 	Skybox skybox_;
 	ClearType clearType_;
-
-	RenderTexture renderTexture_;
 };

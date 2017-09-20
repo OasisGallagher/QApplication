@@ -115,7 +115,7 @@ void GLWidget::createScene() {
 	RenderTexture renderTexture = dynamic_sp_cast<RenderTexture>(world->Create("RenderTexture"));
 
 	renderTexture->Load(RenderTextureFormatRgba, width(), height());
-	camera->SetRenderTexture(renderTexture);
+	//camera->SetRenderTexture(renderTexture);
 	//camera->SetClearColor(glm::vec3(0.0f, 0.0f, 0.4f));
 
 	Sprite sprite = dynamic_sp_cast<Sprite>(world->Create("Sprite"));

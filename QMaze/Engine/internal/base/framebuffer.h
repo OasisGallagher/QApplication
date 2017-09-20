@@ -18,9 +18,15 @@ public:
 	int GetWidth() const { return width_; }
 	int GetHeight() const { return height_; }
 
+	unsigned GetNativePointer() const { return fbo_; }
+
 	void SetDepthTexture(RenderTexture texture);
+#ifdef MRT
 	void AddRenderTexture(RenderTexture texture);
 	void RemoveRenderTexture(RenderTexture texture);
+#else
+	void SetRenderTexture(RenderTexture texture);
+#endif
 
 	void CreateDepthRenderBuffer();
 
