@@ -2,7 +2,7 @@
 #include "renderoptions.h"
 #include "rendererinternal.h"
 
-RendererInternal::RendererInternal() : ObjectInternal(ObjectTypeRenderer), queue_(RenderQueueGeometry) {
+RendererInternal::RendererInternal() : ObjectInternal(ObjectTypeRenderer), queue_(Geometry) {
 }
 
 RendererInternal::~RendererInternal() {
@@ -16,18 +16,18 @@ void RendererInternal::Render(Surface surface) {
 }
 
 void RendererInternal::AddOption(RenderCapacity cap, RenderParameter parameter0, RenderParameter parameter1) {
-	RenderOption* option = nullptr;
+	RenderState* option = nullptr;
 	switch (cap) {
-		case RC_Cull:
+		case Cull:
 			option = Memory::Create<Cull>(parameter0);
 			break;
-		case RC_DepthTest:
+		case DepthTest:
 			option = Memory::Create<DepthTest>(parameter0);
 			break;
-		case RC_Blend:
+		case Blend:
 			option = Memory::Create<Blend>(parameter0, parameter1);
 			break;
-		case RC_DepthWrite:
+		case DepthWrite:
 			option = Memory::Create<DepthWrite>(parameter0);
 			break;
 		default:

@@ -1,8 +1,8 @@
 #include <cstdarg>
 #include "tools/debug.h"
-#include "renderoptions.h"
+#include "renderstate.h"
 
-Cull::Cull(RenderParameter parameter) {
+Cull::Cull(RenderStateParameter parameter) {
 	AssertX(IsValidParamter(parameter, 3,
 		Front, Back, Off
 	), "invalid paramter for 'Cull'.");
@@ -24,7 +24,7 @@ void Cull::Unbind() {
 	glCullFace(oldMode_);
 }
 
-DepthTest::DepthTest(RenderParameter parameter) {
+DepthTest::DepthTest(RenderStateParameter parameter) {
 	AssertX(IsValidParamter(parameter, 8,
 		Never, Less, LessEqual, Equal, Greater, NotEqual, GreaterEqual, Always
 	), "invalid parameter for 'DepthTest'.");
@@ -45,7 +45,7 @@ void DepthTest::Unbind() {
 	glDepthFunc(oldMode_);
 }
 
-DepthWrite::DepthWrite(RenderParameter parameter) {
+DepthWrite::DepthWrite(RenderStateParameter parameter) {
 	AssertX(IsValidParamter(parameter, 2,
 		On, Off
 	), "invalid paramter for 'DepthWrite'.");
@@ -61,7 +61,7 @@ void DepthWrite::Unbind() {
 	glDepthMask(oldMask_);
 }
 
-Blend::Blend(RenderParameter src, RenderParameter dest) {
+Blend::Blend(RenderStateParameter src, RenderStateParameter dest) {
 	AssertX(IsValidParamter(src, 9,
 		Off, Zero, One, SrcColor, OneMinusSrcColor, SrcAlpha, OneMinusSrcAlpha, DestAlpha, OneMinusDestAlpha
 	), "invalid paramter for 'Blend'.");
@@ -88,18 +88,18 @@ void Blend::Unbind() {
 	glBlendFunc(oldSrc_, oldDest_);
 }
 
-void RenderOption::Enable(GLenum cap, GLboolean enable) {
+void RenderState::Enable(GLenum cap, GLboolean enable) {
 	if (enable) { glEnable(cap); }
 	else { glDisable(cap); }
 }
 
-bool RenderOption::IsValidParamter(RenderParameter parameter, int count, ...) {
+bool RenderState::IsValidParamter(RenderStateParameter parameter, int count, ...) {
 	va_list vl;
 	va_start(vl, count);
 
 	int i = 0;
 	for (; i < count; ++i) {
-		if (parameter == va_arg(vl, RenderParameter)) {
+		if (parameter == va_arg(vl, RenderStateParameter)) {
 			break;
 		}
 	}
@@ -109,7 +109,7 @@ bool RenderOption::IsValidParamter(RenderParameter parameter, int count, ...) {
 	return (i < count);
 }
 
-GLenum RenderOption::RenderParamterToGLEnum(RenderParameter parameter) {
+GLenum RenderState::RenderParamterToGLEnum(RenderStateParameter parameter) {
 	GLenum value = GL_NONE;
 	switch (parameter) {
 		case Front:

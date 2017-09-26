@@ -5,19 +5,19 @@
 #include "material.h"
 
 enum RenderQueue {
-	RenderQueueBackground = 1000,
-	RenderQueueGeometry = 2000,
-	RenderQueueTransparent = 4000,
+	Background = 1000,
+	Geometry = 2000,
+	Transparent = 4000,
 };
 
-enum RenderCapacity {
-	RC_Cull,
-	RC_Blend,
-	RC_DepthTest,
-	RC_DepthWrite,
+enum RenderStateType {
+	Cull,
+	Blend,
+	DepthTest,
+	DepthWrite,
 };
 
-enum RenderParameter {
+enum RenderStateParameter {
 	None,
 	Front,
 	Back,
@@ -55,7 +55,7 @@ public:
 	virtual void SetRenderQueue(int value) = 0;
 	virtual int GetRenderQueue() const = 0;
 
-	virtual void AddOption(RenderCapacity cap, RenderParameter parameter0, RenderParameter parameter1 = (RenderParameter)None) = 0;
+	virtual void AddOption(RenderStateType type, RenderStateParameter parameter0, RenderStateParameter parameter1 = (RenderStateParameter)None) = 0;
 };
 
 typedef smart_ptr<IRenderer> Renderer;

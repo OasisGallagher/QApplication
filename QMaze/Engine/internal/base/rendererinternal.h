@@ -2,7 +2,7 @@
 #include "renderer.h"
 #include "internal/base/objectinternal.h"
 
-class RenderOption;
+class RenderState;
 
 class RendererInternal : public IRenderer, public ObjectInternal {
 	DEFINE_FACTORY_METHOD(Renderer)
@@ -35,5 +35,5 @@ private:
 private:
 	int queue_;
 	std::vector<Material> materials_;
-	std::vector<RenderOption*> options_;
+	std::vector<RenderState*> options_;
 };
