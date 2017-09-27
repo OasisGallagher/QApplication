@@ -84,5 +84,8 @@
     <ClInclude Include="include\cameracontroller.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="include\console.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

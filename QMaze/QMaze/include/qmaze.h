@@ -12,6 +12,14 @@ public:
 	QMaze(QWidget *parent = 0);
 	~QMaze();
 
+public:
+	// TODO: Console class.
+	static QMaze* get() { return instance_; }
+	void addConsoleMessage(const QString& message);
+
+private:
+	static QMaze* instance_;
+
 private:
     Ui::QMaze ui;
 };

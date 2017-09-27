@@ -148,13 +148,13 @@ std::pair<GLenum, GLenum> RenderTextureInternal::RenderTextureFormatToGLEnum(Ren
 	GLenum format = GL_RGBA;
 
 	switch (renderTextureFormat) {
-		case  RenderTextureFormatRgba:
+		case  Rgba:
 			internalFormat = GL_RGBA;
 			break;
-		case RenderTextureFormatRgbaHdr:
+		case RgbaHdr:
 			internalFormat = GL_RGBA32F;
 			break;
-		case RenderTextureFormatDepth:
+		case Depth:
 			internalFormat = GL_DEPTH_COMPONENT24;
 			format = GL_DEPTH_COMPONENT;
 			break;

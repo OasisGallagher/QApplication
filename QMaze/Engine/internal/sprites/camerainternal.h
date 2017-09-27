@@ -26,17 +26,24 @@ public:
 	~CameraInternal();
 
 public:
-	virtual void SetClearType(ClearType value);
-	virtual ClearType GetClearType();
+	virtual void SetDepth(int value) { depth_ = value; }
+	virtual int GetDepth() const { return depth_;  }
 
-	virtual void SetSkybox(Skybox value);
-	virtual Skybox GetSkybox();
+	virtual void SetClearType(ClearType value) { clearType_ = value; }
+	virtual ClearType GetClearType() { return clearType_; }
 
-	virtual void SetClearColor(const glm::vec3& value);
+	virtual void SetSkybox(Skybox value) { skybox_ = value; }
+	virtual Skybox GetSkybox() { return skybox_; }
+
+	virtual void SetClearColor(const glm::vec3& value) { clearColor_ = value; }
+	virtual glm::vec3 GetClearColor() const { return clearColor_; }
+
 	virtual void SetRenderTexture(RenderTexture value);
+	virtual RenderTexture GetRenderTexture() { return renderTexture_; }
 
 public:
 	virtual void Update();
+	virtual void Render(std::vector<Sprite>& sprites);
 
 public:
 	virtual void SetAspect(float value) { aspect_ = value; }
@@ -61,9 +68,12 @@ private:
 	void SortRenderableSprites(std::vector<Sprite>& sprites);
 
 private:
+	int depth_;
+
 	float aspect_;
 	float near_, far_;
 	float fieldOfView_;
+	glm::vec3 clearColor_;
 	glm::mat4 projection_;
 
 	Framebuffer* fbDepth_;

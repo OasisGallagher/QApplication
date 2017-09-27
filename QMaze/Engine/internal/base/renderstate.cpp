@@ -2,14 +2,14 @@
 #include "tools/debug.h"
 #include "renderstate.h"
 
-Cull::Cull(RenderStateParameter parameter) {
+CullState::CullState(RenderStateParameter parameter) {
 	AssertX(IsValidParamter(parameter, 3,
 		Front, Back, Off
 	), "invalid paramter for 'Cull'.");
 	parameter_ = parameter;
 }
 
-void Cull::Bind() {
+void CullState::Bind() {
 	oldEnabled_ = glIsEnabled(GL_CULL_FACE);
 	glGetIntegerv(GL_CULL_FACE_MODE, &oldMode_);
 
@@ -19,12 +19,12 @@ void Cull::Bind() {
 	}
 }
 
-void Cull::Unbind() {
+void CullState::Unbind() {
 	Enable(GL_CULL_FACE, oldEnabled_);
 	glCullFace(oldMode_);
 }
 
-DepthTest::DepthTest(RenderStateParameter parameter) {
+DepthTestState::DepthTestState(RenderStateParameter parameter) {
 	AssertX(IsValidParamter(parameter, 8,
 		Never, Less, LessEqual, Equal, Greater, NotEqual, GreaterEqual, Always
 	), "invalid parameter for 'DepthTest'.");
@@ -32,7 +32,7 @@ DepthTest::DepthTest(RenderStateParameter parameter) {
 	parameter_ = parameter;
 }
 
-void DepthTest::Bind() {
+void DepthTestState::Bind() {
 	oldEnabled_ = glIsEnabled(GL_DEPTH_TEST);
 	glGetIntegerv(GL_DEPTH_FUNC, &oldMode_);
 
@@ -40,28 +40,28 @@ void DepthTest::Bind() {
 	glDepthFunc(RenderParamterToGLEnum(parameter_));
 }
 
-void DepthTest::Unbind() {
+void DepthTestState::Unbind() {
 	Enable(GL_DEPTH_TEST, oldEnabled_);
 	glDepthFunc(oldMode_);
 }
 
-DepthWrite::DepthWrite(RenderStateParameter parameter) {
+DepthWriteState::DepthWriteState(RenderStateParameter parameter) {
 	AssertX(IsValidParamter(parameter, 2,
 		On, Off
 	), "invalid paramter for 'DepthWrite'.");
 	parameter_ = parameter;
 }
 
-void DepthWrite::Bind() {
+void DepthWriteState::Bind() {
 	glGetIntegerv(GL_DEPTH_WRITEMASK, &oldMask_);
 	glDepthMask(parameter_ == On);
 }
 
-void DepthWrite::Unbind() {
+void DepthWriteState::Unbind() {
 	glDepthMask(oldMask_);
 }
 
-Blend::Blend(RenderStateParameter src, RenderStateParameter dest) {
+BlendState::BlendState(RenderStateParameter src, RenderStateParameter dest) {
 	AssertX(IsValidParamter(src, 9,
 		Off, Zero, One, SrcColor, OneMinusSrcColor, SrcAlpha, OneMinusSrcAlpha, DestAlpha, OneMinusDestAlpha
 	), "invalid paramter for 'Blend'.");
@@ -74,7 +74,7 @@ Blend::Blend(RenderStateParameter src, RenderStateParameter dest) {
 	dest_ = dest;
 }
 
-void Blend::Bind() {
+void BlendState::Bind() {
 	oldEnabled_ = glIsEnabled(GL_BLEND);
 	glGetIntegerv(GL_BLEND_SRC, &oldSrc_);
 	glGetIntegerv(GL_BLEND_DST, &oldDest_);
@@ -83,7 +83,7 @@ void Blend::Bind() {
 	glBlendFunc(RenderParamterToGLEnum(src_), RenderParamterToGLEnum(dest_));
 }
 
-void Blend::Unbind() {
+void BlendState::Unbind() {
 	Enable(GL_BLEND, oldEnabled_);
 	glBlendFunc(oldSrc_, oldDest_);
 }

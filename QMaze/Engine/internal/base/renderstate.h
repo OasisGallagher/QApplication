@@ -15,9 +15,9 @@ protected:
 	bool IsValidParamter(RenderStateParameter parameter, int count, ...);
 };
 
-class Cull : public RenderState {
+class CullState : public RenderState {
 public:
-	Cull(RenderStateParameter parameter);
+	CullState(RenderStateParameter parameter);
 
 	virtual void Bind();
 	virtual void Unbind();
@@ -28,9 +28,9 @@ private:
 	RenderStateParameter parameter_;
 };
 
-class DepthTest : public RenderState {
+class DepthTestState : public RenderState {
 public:
-	DepthTest(RenderStateParameter parameter);
+	DepthTestState(RenderStateParameter parameter);
 
 	virtual void Bind();
 	virtual void Unbind();
@@ -41,9 +41,9 @@ private:
 	RenderStateParameter parameter_;
 };
 
-class DepthWrite : public RenderState {
+class DepthWriteState : public RenderState {
 public:
-	DepthWrite(RenderStateParameter parameter);
+	DepthWriteState(RenderStateParameter parameter);
 
 	virtual void Bind();
 	virtual void Unbind();
@@ -53,9 +53,9 @@ private:
 	RenderStateParameter parameter_;
 };
 
-class Blend : public RenderState {
+class BlendState : public RenderState {
 public:
-	Blend(RenderStateParameter src, RenderStateParameter dest);
+	BlendState(RenderStateParameter src, RenderStateParameter dest);
 
 	virtual void Bind();
 	virtual void Unbind();

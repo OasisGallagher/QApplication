@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QTextBrowser>
 #include <QtOpenGL/QGLWidget>
 
 class CameraController;

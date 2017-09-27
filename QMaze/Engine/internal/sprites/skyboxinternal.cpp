@@ -38,8 +38,8 @@ bool SkyboxInternal::Load(const std::string(&textures)[6]) {
 	Renderer renderer = Factory::Create<RendererInternal>();
 	renderer->SetRenderQueue(Background);
 
-	renderer->AddOption(Cull, Front);
-	renderer->AddOption(DepthTest, LessEqual);
+	renderer->SetRenderState(Cull, Front);
+	renderer->SetRenderState(DepthTest, LessEqual);
 
 	Material material = Factory::Create<MaterialInternal>();
 	material->SetShader(shader);

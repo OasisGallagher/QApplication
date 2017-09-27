@@ -2,6 +2,7 @@
 #include <set>
 
 #include "world.h"
+#include "light.h"
 #include "camera.h"
 #include "sprite.h"
 #include "internal/base/objectinternal.h"
@@ -14,15 +15,21 @@ public:
 
 public:
 	virtual void Update();
-	virtual Object Create(const std::string& type);
-	virtual bool CollectSprites(std::vector<Sprite>* sprites, float fieldOfView, float aspect, float nearClipPlane, float farClipPlane);
+	virtual Object Create(ObjectType type);
+
+	virtual void GetSprites(ObjectType type, std::vector<Sprite>& sprites);
 
 private:
-	struct SpriteComparer {
-		bool operator () (Sprite lhs, Sprite rhs) const;
-	};
+	struct LightComparer { bool operator() (Light& lhs, Light& rhs) const; };
+	struct SpriteComparer { bool operator() (Sprite& lhs, Sprite& rhs) const; };
+	struct CameraComparer { bool operator() (Camera& lhs, Camera& rhs) const; };
 
-	typedef std::set<Sprite, SpriteComparer> SpriteContainer;
+	typedef std::vector<Sprite> SpriteContainer;
+	typedef std::set<Light, LightComparer> LightContainer;
+	typedef std::set<Camera, CameraComparer> CameraContainer;
 
+private:
+	LightContainer lights_;
 	SpriteContainer sprites_;
+	CameraContainer cameras_;
 };

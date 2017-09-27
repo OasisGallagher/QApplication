@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <glm/glm.hpp>
 
 template<class _CountofType, size_t _SizeOfArray>
 inline char(*__countof_helper(_CountofType(&_Array)[_SizeOfArray]))[_SizeOfArray] {
@@ -17,6 +18,7 @@ public:
 
 	static bool Approximately(float x, float y = 0.f);
 
+	static float Luminance(const glm::vec3& color);
 private:
 	Mathf();
 };
@@ -28,6 +30,10 @@ inline int Mathf::Loword(int dword) {
 inline bool Mathf::Approximately(float x, float y) {
 	const float E = 0.000001f;
 	return fabs(x - y) < E;
+}
+
+inline float Mathf::Luminance(const glm::vec3& color) {
+	return 0.299f * color.r + 0.587f * color.g + 0.114f * color.b;
 }
 
 inline int Mathf::Highword(int dword) {

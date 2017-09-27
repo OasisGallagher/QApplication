@@ -20,26 +20,14 @@ void Debug::SetLogCallback(LogCallback cb) {
 }
 
 void Debug::Log(const std::string& text) {
-	//OS::SetConsoleColor(White);
 	if (fnptr_ != nullptr) { fnptr_(LogLevelDebug, text.c_str()); }
-	//std::cout << text << "\n";
-	//debug << text << "\n";
 }
 
 void Debug::LogWarning(const std::string& text) {
-	//OS::SetConsoleColor(Yellow);
-	//std::cout << "[W] " << text << "\n";
-	//debug << "[W] " << text << "\n";
-	//OS::SetConsoleColor(White);
 	if (fnptr_ != nullptr) { fnptr_(LogLevelWarning, text.c_str()); }
 }
 
 void Debug::LogError(const std::string& text) {
-	//OS::SetConsoleColor(Red);
-	//std::cout << "[E] " << text << "\n";
-	//debug << "[E] " << text << "\n";
-	//OS::SetConsoleColor(White);
-	//OS::Break(text.c_str());
 	if (fnptr_ != nullptr) { fnptr_(LogLevelError, text.c_str()); }
 }
 
@@ -55,9 +43,6 @@ void Debug::Break(const std::string& expression, const char* file, int line) {
 	oss << "at " << file << ":" << line;
 	__debugbreak();
 	if (fnptr_ != nullptr) { fnptr_(LogLevelFatal, oss.str().c_str()); }
-	//Debug::LogError(oss.str());
-
-	//OS::Break(oss.str().c_str());
 }
 
 void Debug::Break(const std::string& expression, const std::string& message, const char* file, int line) {
@@ -66,8 +51,6 @@ void Debug::Break(const std::string& expression, const std::string& message, con
 	oss << "at " << file << ":" << line;
 	__debugbreak();
 	if (fnptr_ != nullptr) { fnptr_(LogLevelFatal, oss.str().c_str()); }
-	//Debug::LogError(oss.str());
-	//OS::Break(oss.str().c_str());
 }
 
 void Debug::EnableMemoryLeakCheck() {

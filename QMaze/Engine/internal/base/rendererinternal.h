@@ -22,7 +22,7 @@ public:
 	virtual int GetRenderQueue() const { return queue_; }
 	virtual void SetRenderQueue(int value) { queue_ = value; }
 
-	virtual void AddOption(RenderCapacity cap, RenderParameter parameter0, RenderParameter parameter1);
+	virtual void SetRenderState(RenderStateType type, RenderStateParameter parameter0, RenderStateParameter parameter1);
 
 private:
 	void DrawCall(Surface surface);
@@ -34,6 +34,6 @@ private:
 
 private:
 	int queue_;
+	RenderState** states_;
 	std::vector<Material> materials_;
-	std::vector<RenderState*> options_;
 };

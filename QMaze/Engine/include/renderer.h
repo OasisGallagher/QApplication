@@ -15,6 +15,7 @@ enum RenderStateType {
 	Blend,
 	DepthTest,
 	DepthWrite,
+	RenderStateCount,
 };
 
 enum RenderStateParameter {
@@ -55,7 +56,7 @@ public:
 	virtual void SetRenderQueue(int value) = 0;
 	virtual int GetRenderQueue() const = 0;
 
-	virtual void AddOption(RenderStateType type, RenderStateParameter parameter0, RenderStateParameter parameter1 = (RenderStateParameter)None) = 0;
+	virtual void SetRenderState(RenderStateType type, RenderStateParameter parameter0, RenderStateParameter parameter1 = (RenderStateParameter)None) = 0;
 };
 
 typedef smart_ptr<IRenderer> Renderer;

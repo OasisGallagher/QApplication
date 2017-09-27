@@ -4,8 +4,16 @@
 
 #include "sprite.h"
 
+enum LightImportance {
+	NotImportant,
+	Important,
+};
+
 class ILight : virtual public ISprite {
 public:
+	virtual void SetImportance(LightImportance value) = 0;
+	virtual LightImportance GetImportance() const = 0;
+
 	virtual void SetColor(const glm::vec3& value) = 0;
 	virtual glm::vec3 GetColor() const = 0;
 

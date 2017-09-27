@@ -14,16 +14,28 @@
 #include "glwidget.h"
 #include "cameracontroller.h"
 
+// TODO: console class.
+#include "qmaze.h"
+
 static void OnEngineLogReceived(int level, const char* message) {
 	switch (level) {
 	case LogLevelDebug:
+		QMaze::get()->addConsoleMessage(QString("%1: <font color='#000000'>%2</font>").arg(message));
 		qDebug() << message;
 		break;
+
 	case LogLevelWarning:
+		QMaze::get()->addConsoleMessage(QString("%1: <font color='#ff9912'>%2</font>").arg(message));
 		qWarning() << message;
 		break;
+
 	case LogLevelError:
+		QMaze::get()->addConsoleMessage(QString("%1: <font color='#FF0000'>%2</font>").arg(message));
+		qCritical() << message;
+		break;
+
 	case LogLevelFatal:
+		QMaze::get()->addConsoleMessage(QString("%1: <font color='#FF0000'>%2</font>").arg(message));
 		qFatal(message);
 		break;
 	}
@@ -93,12 +105,12 @@ void GLWidget::keyPressEvent(QKeyEvent* event) {
 
 void GLWidget::createScene() {
 	World world = Engine::get()->world();
-	Camera camera = dynamic_sp_cast<Camera>(world->Create("Camera"));
+	Camera camera = dynamic_sp_cast<Camera>(world->Create(ObjectTypeCamera));
 	controller_->setCamera(camera);
 
 	camera->SetClearType(ClearTypeSkybox);
 
-	Skybox skybox = dynamic_sp_cast<Skybox>(world->Create("Skybox"));
+	Skybox skybox = dynamic_sp_cast<Skybox>(world->Create(ObjectTypeSkybox));
 	std::string faces[] = {
 		"textures/lake_skybox/right.jpg",
 		"textures/lake_skybox/left.jpg",
@@ -112,16 +124,16 @@ void GLWidget::createScene() {
 
 	camera->SetSkybox(skybox);
 
-	RenderTexture renderTexture = dynamic_sp_cast<RenderTexture>(world->Create("RenderTexture"));
+	RenderTexture renderTexture = dynamic_sp_cast<RenderTexture>(world->Create(ObjectTypeRenderTexture));
 
 	renderTexture->Load(RenderTextureFormatRgba, width(), height());
 	//camera->SetRenderTexture(renderTexture);
 	//camera->SetClearColor(glm::vec3(0.0f, 0.0f, 0.4f));
 
-	Sprite sprite = dynamic_sp_cast<Sprite>(world->Create("Sprite"));
+	Sprite sprite = dynamic_sp_cast<Sprite>(world->Create(ObjectTypeSprite));
 	sprite->SetPosition(glm::vec3(4, 1, -9));
 
-	Surface surface = dynamic_sp_cast<Surface>(world->Create("Surface"));
+	Surface surface = dynamic_sp_cast<Surface>(world->Create(ObjectTypeSurface));
 	/* Mesh.
 	Mesh mesh = dynamic_ptr_cast<Mesh>(world->Create("Mesh"));
 	SurfaceAttribute attribute;
@@ -139,7 +151,7 @@ void GLWidget::createScene() {
 
 	surface->Load("models/suzanne.obj");
 	MaterialTextures textures = surface->GetMesh(0)->GetMaterialTextures();
-	Texture2D diffuse = dynamic_sp_cast<Texture2D>(world->Create("Texture2D"));
+	Texture2D diffuse = dynamic_sp_cast<Texture2D>(world->Create(ObjectTypeTexture2D));
 	diffuse->Load("textures/suzanne_uvmap.dds");
 	textures.diffuse = diffuse;
 
@@ -147,14 +159,14 @@ void GLWidget::createScene() {
 
 	sprite->SetSurface(surface);
 
-	Renderer renderer = dynamic_sp_cast<Renderer>(world->Create("Renderer"));
-	renderer->AddOption(RC_Cull, Back);
-	renderer->AddOption(RC_DepthTest, Less);
+	Renderer renderer = dynamic_sp_cast<Renderer>(world->Create(ObjectTypeRenderer));
+	renderer->SetRenderState(Cull, Back);
+	renderer->SetRenderState(DepthTest, Less);
 
-	Shader shader = dynamic_sp_cast<Shader>(world->Create("Shader"));
+	Shader shader = dynamic_sp_cast<Shader>(world->Create(ObjectTypeShader));
 	shader->Load("buildin/shaders/texture");
 
-	Material material = dynamic_sp_cast<Material>(world->Create("Material"));
+	Material material = dynamic_sp_cast<Material>(world->Create(ObjectTypeMaterial));
 	material->SetShader(shader);
 	renderer->AddMaterial(material);
 

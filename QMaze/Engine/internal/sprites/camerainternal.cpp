@@ -15,27 +15,26 @@
 
 CameraInternal::CameraInternal() 
 	: SpriteInternal(ObjectTypeCamera), clearType_(ClearTypeColor)
-	, aspect_(1.3f), near_(1.f), far_(100.f), fieldOfView_(3.141592f / 3.f)
-	, projection_(glm::perspective(fieldOfView_, aspect_, near_, far_))
+	, depth_(0), aspect_(1.3f), near_(1.f), far_(100.f)
+	, fieldOfView_(3.141592f / 3.f), projection_(glm::perspective(fieldOfView_, aspect_, near_, far_))
 	, pass_(RenderPassNone), fbRenderTexture_(nullptr) {
 
 	fbDepth_ = Memory::Create<Framebuffer>();
-
 	int w = Engine::get()->contextWidth();
 	int h = Engine::get()->contextHeight();
 	fbDepth_->Create(w, h);
 	RenderTexture depthTexture = Factory::Create<RenderTextureInternal>();
-	depthTexture->Load(RenderTextureFormatDepth, w, h);
+	depthTexture->Load(Depth, w, h);
 	fbDepth_->SetDepthTexture(depthTexture);
 
 	fbRenderTexture_ = Memory::Create<Framebuffer>();
 	fbRenderTexture_->Create(w, h);
 	renderTexture_ = Factory::Create<RenderTextureInternal>();
-	renderTexture_->Load(RenderTextureFormatRgba, w, h);
+	renderTexture_->Load(Rgba, w, h);
 	fbRenderTexture_->SetRenderTexture(renderTexture_);
 
 	tempRenderTexture_ = Factory::Create<RenderTextureInternal>();
-	tempRenderTexture_->Load(RenderTextureFormatRgba, w, h);
+	tempRenderTexture_->Load(Rgba, w, h);
 
 	glClearDepth(1);
 }
@@ -43,26 +42,6 @@ CameraInternal::CameraInternal()
 CameraInternal::~CameraInternal() {
 	Memory::Release(fbDepth_);
 	Memory::Release(fbRenderTexture_);
-}
-
-void CameraInternal::SetClearType(ClearType value) {
-	clearType_ = value;
-}
-
-ClearType CameraInternal::GetClearType() {
-	return clearType_;
-}
-
-void CameraInternal::SetSkybox(Skybox value) {
-	skybox_ = value;
-}
-
-Skybox CameraInternal::GetSkybox() {
-	return skybox_;
-}
-
-void CameraInternal::SetClearColor(const glm::vec3& value) {
-	glClearColor(value.r, value.g, value.b, 1);
 }
 
 void CameraInternal::SetRenderTexture(RenderTexture value) {
@@ -75,17 +54,16 @@ void CameraInternal::SetRenderTexture(RenderTexture value) {
 }
 
 void CameraInternal::Update() {
-	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-
 	if (clearType_ == ClearTypeSkybox && skybox_) {
 		skybox_->SetPosition(GetPosition());
 	}
+}
+
+void CameraInternal::Render(std::vector<Sprite>& sprites) {
+	glClearColor(clearColor_.r, clearColor_.g, clearColor_.b, 1);
+	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
 	World world = Engine::get()->world();
-	std::vector<Sprite> sprites;
-	if (!world->CollectSprites(&sprites, fieldOfView_, aspect_, near_, far_)) {
-		return;
-	}
 
 	SortRenderableSprites(sprites);
 
@@ -118,13 +96,6 @@ void CameraInternal::Update() {
 		mainTexture.swap(tempTexture);
 	}
 
-	/*int read = 0;
-	glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &read);
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, fbDepth_->GetNativePointer());
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-	int w = fbRenderTexture_->GetWidth(), h = fbRenderTexture_->GetHeight();
-	glBlitFramebuffer(0, 0, w, h, 0, 0, w, h, GL_COLOR_BUFFER_BIT, GL_LINEAR);
-	*/
 	if (renderToTexture) {
 		fbRenderTexture_->Unbind();
 	}

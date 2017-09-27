@@ -26,6 +26,16 @@ public:
 	virtual glm::quat GetRotation() const = 0;
 	virtual glm::vec3 GetEulerAngles() const = 0;
 
+	virtual void SetLocalScale(const glm::vec3& value) = 0;
+	virtual void SetLocalPosition(const glm::vec3& value) = 0;
+	virtual void SetLocalRotation(const glm::quat& value) = 0;
+	virtual void SetLocalEulerAngles(const glm::vec3& value) = 0;
+
+	virtual glm::vec3 GetLocalScale() const = 0;
+	virtual glm::vec3 GetLocalPosition() const = 0;
+	virtual glm::quat GetLocalRotation() const = 0;
+	virtual glm::vec3 GetLocalEulerAngles() const = 0;
+
 	virtual glm::mat4 GetLocalToWorldMatrix() = 0;
 	virtual glm::mat4 GetWorldToLocalMatrix() = 0;
 

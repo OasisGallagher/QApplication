@@ -1,12 +1,18 @@
 #include "variables.h"
-#include "renderoptions.h"
+#include "renderstate.h"
 #include "rendererinternal.h"
 
 RendererInternal::RendererInternal() : ObjectInternal(ObjectTypeRenderer), queue_(Geometry) {
+	states_ = Memory::CreateArray<RenderState*>(RenderStateCount);
+	std::fill(states_, states_ + RenderStateCount, nullptr);
 }
 
 RendererInternal::~RendererInternal() {
-	ClearRenderOptions();
+	for (int i = 0; i < RenderStateCount; ++i) {
+		Memory::Release(states_[i]);
+	}
+
+	Memory::ReleaseArray(states_);
 }
 
 void RendererInternal::Render(Surface surface) {
@@ -15,29 +21,28 @@ void RendererInternal::Render(Surface surface) {
 	UnbindRenderOptions();
 }
 
-void RendererInternal::AddOption(RenderCapacity cap, RenderParameter parameter0, RenderParameter parameter1) {
-	RenderState* option = nullptr;
-	switch (cap) {
+void RendererInternal::SetRenderState(RenderStateType type, RenderStateParameter parameter0, RenderStateParameter parameter1) {
+	RenderState* state = nullptr;
+	switch (type) {
 		case Cull:
-			option = Memory::Create<Cull>(parameter0);
+			state = Memory::Create<CullState>(parameter0);
 			break;
 		case DepthTest:
-			option = Memory::Create<DepthTest>(parameter0);
+			state = Memory::Create<DepthTestState>(parameter0);
 			break;
 		case Blend:
-			option = Memory::Create<Blend>(parameter0, parameter1);
+			state = Memory::Create<BlendState>(parameter0, parameter1);
 			break;
 		case DepthWrite:
-			option = Memory::Create<DepthWrite>(parameter0);
+			state = Memory::Create<DepthWriteState>(parameter0);
 			break;
 		default:
-			Debug::LogError("invalid render capacity " + std::to_string(cap));
+			Debug::LogError("invalid render capacity " + std::to_string(type));
 			break;
 	}
 
-	if (option != nullptr) {
-		options_.push_back(option);
-	}
+	Memory::Release(states_[type]);
+	states_[type] = state;
 }
 
 void RendererInternal::DrawCall(Surface surface) {
@@ -76,22 +81,18 @@ void RendererInternal::DrawMesh(Mesh mesh, Material material) {
 	material->Unbind();
 }
 
-void RendererInternal::ClearRenderOptions() {
-	for (int i = 0; i < options_.size(); ++i) {
-		Memory::Release(options_[i]);
-	}
-
-	options_.clear();
-}
-
 void RendererInternal::BindRenderOptions() {
-	for (int i = 0; i < options_.size(); ++i) {
-		options_[i]->Bind();
+	for (int i = 0; i < RenderStateCount; ++i) {
+		if (states_[i] != nullptr) {
+			states_[i]->Bind();
+		}
 	}
 }
 
 void RendererInternal::UnbindRenderOptions() {
-	for (int i = 0; i < options_.size(); ++i) {
-		options_[i]->Unbind();
+	for (int i = 0; i < RenderStateCount; ++i) {
+		if (states_[i] != nullptr) {
+			states_[i]->Unbind();
+		}
 	}
 }

@@ -37,7 +37,7 @@ bool Engine::initialize() {
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
 	}
 
-	world_ = dynamic_sp_cast<World>(Factory::Create("World"));
+	world_ = dynamic_sp_cast<World>(Factory::Create(ObjectTypeWorld));
 
 	time_ = Memory::Create<Time>();
 	screen_ = Memory::Create<Screen>();
