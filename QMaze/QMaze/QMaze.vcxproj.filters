@@ -33,6 +33,12 @@
       <UniqueIdentifier>{99349809-55BA-4b9d-BF79-8FDBB0286EB3}</UniqueIdentifier>
       <Extensions>ui</Extensions>
     </Filter>
+    <Filter Include="resources\buildin">
+      <UniqueIdentifier>{ef71728c-0118-4a07-ba75-c636b628828c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="resources\buildin\shaders">
+      <UniqueIdentifier>{7799e13f-e719-497a-b633-ff8c543af3e9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GeneratedFiles\qrc_qmaze.cpp">
@@ -64,9 +70,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="qmaze.qrc">
-      <Filter>resources</Filter>
-    </CustomBuild>
     <CustomBuild Include="include\glwidget.h">
       <Filter>include</Filter>
     </CustomBuild>
@@ -75,6 +78,9 @@
     </CustomBuild>
     <CustomBuild Include="ui\qmaze.ui">
       <Filter>ui</Filter>
+    </CustomBuild>
+    <CustomBuild Include="qmaze.qrc">
+      <Filter>resources</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
@@ -87,5 +93,16 @@
     <ClInclude Include="include\console.h">
       <Filter>include</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="resources\buildin\shaders\depth.glsl">
+      <Filter>resources\buildin\shaders</Filter>
+    </None>
+    <None Include="resources\buildin\shaders\skybox.glsl">
+      <Filter>resources\buildin\shaders</Filter>
+    </None>
+    <None Include="resources\buildin\shaders\texture.glsl">
+      <Filter>resources\buildin\shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -23,6 +23,8 @@ enum ObjectType {
 	ObjectTypeDirectionalLight,
 
 	ObjectTypeCount,
+
+	ObjectTypeLight,
 };
 
 class ENGINE_EXPORT IObject {

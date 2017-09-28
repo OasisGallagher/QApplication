@@ -32,8 +32,8 @@ private:
 	static unsigned ObjectIDContainer[ObjectTypeCount];
 };
 
-#define DEFINE_FACTORY_METHOD(Name) \
+#define DEFINE_FACTORY_METHOD(name) \
 	public: \
-		typedef Name Interface; \
-		static Object Create() { return Factory::Create<Name ## Internal>(); } \
+		typedef name Interface; \
+		static Object Create() { return Factory::Create<name ## Internal>(); } \
 	private:

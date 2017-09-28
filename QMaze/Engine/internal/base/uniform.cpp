@@ -1,6 +1,20 @@
 #include "uniform.h"
 #include "tools/debug.h"
 
+std::string UniformVariable::UniformTypeToName(UniformType type) {
+	static const char* uniformTypeName[] {
+		"null",
+		"int",
+		"bool",
+		"float",
+		"mat4",
+		"vec3",
+		"sampler",
+	};
+
+	return uniformTypeName[type];
+}
+
 int UniformVariable::GetInt() {
 	AssertX(type_ == UniformInt, "invalid uniform type.");
 	return intValue_;
@@ -16,9 +30,14 @@ float UniformVariable::GetFloat() {
 	return floatValue_;
 }
 
-glm::mat4 UniformVariable::GetMat4() {
-	AssertX(type_ == UniformMat4, "invalid uniform type.");
+glm::mat4 UniformVariable::GetMatrix4() {
+	AssertX(type_ == UniformMatrix4, "invalid uniform type.");
 	return mat4Value_;
+}
+
+glm::vec3 UniformVariable::GetVector3() {
+	AssertX(type_ == UniformVector3, "invalid uniform type.");
+	return vector3Value_;
 }
 
 Texture UniformVariable::GetTexture() {
@@ -46,9 +65,14 @@ void UniformVariable::SetFloat(float value) {
 	floatValue_ = value;
 }
 
-void UniformVariable::SetMat4(const glm::mat4& value) {
-	type_ = UniformMat4;
+void UniformVariable::SetMatrix4(const glm::mat4& value) {
+	type_ = UniformMatrix4;
 	mat4Value_ = value;
+}
+
+void UniformVariable::SetVector3(const glm::vec3& value) {
+	type_ = UniformVector3;
+	vector3Value_ = value;
 }
 
 void UniformVariable::SetTexture(Texture value) {

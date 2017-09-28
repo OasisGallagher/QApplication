@@ -5,11 +5,11 @@
 #include "internal/misc/loader.h"
 
 ShaderDescription ShaderInternal::descriptions_[] =  {
-	GL_VERTEX_SHADER, "VertexShader", "vert",
-	GL_TESS_CONTROL_SHADER, "TessellationControlShader", "tesc",
-	GL_TESS_EVALUATION_SHADER, "TessellationEvaluationShader", "tese",
-	GL_GEOMETRY_SHADER, "GeometryShader", "geom",
-	GL_FRAGMENT_SHADER, "FragmentShader", "frag"
+	GL_VERTEX_SHADER, "VertexShader", "vertex",
+	GL_TESS_CONTROL_SHADER, "TessellationControlShader", "tess_control",
+	GL_TESS_EVALUATION_SHADER, "TessellationEvaluationShader", "tess_evaluation",
+	GL_GEOMETRY_SHADER, "GeometryShader", "geometry",
+	GL_FRAGMENT_SHADER, "FragmentShader", "fragment"
 };
 
 ShaderInternal::ShaderInternal() : ObjectInternal(ObjectTypeShader) {

@@ -238,6 +238,12 @@
     <ClInclude Include="internal\sprites\lightinternal.h">
       <Filter>internal\sprites\include</Filter>
     </ClInclude>
+    <ClInclude Include="include\environment.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="internal\world\environmentinternal.h">
+      <Filter>internal\world\include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="internal\base\objectinternal.cpp">
@@ -329,6 +335,9 @@
     </ClCompile>
     <ClCompile Include="internal\sprites\lightinternal.cpp">
       <Filter>internal\sprites\src</Filter>
+    </ClCompile>
+    <ClCompile Include="internal\world\environmentinternal.cpp">
+      <Filter>internal\world\src</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

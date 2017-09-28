@@ -41,7 +41,6 @@ void Debug::Break(const std::string& expression, const char* file, int line) {
 	std::ostringstream oss;
 	oss << expression << "\n";
 	oss << "at " << file << ":" << line;
-	__debugbreak();
 	if (fnptr_ != nullptr) { fnptr_(LogLevelFatal, oss.str().c_str()); }
 }
 
@@ -49,7 +48,6 @@ void Debug::Break(const std::string& expression, const std::string& message, con
 	std::ostringstream oss;
 	oss << expression + ":\n" + message << "\n";
 	oss << "at " << file << ":" << line;
-	__debugbreak();
 	if (fnptr_ != nullptr) { fnptr_(LogLevelFatal, oss.str().c_str()); }
 }
 

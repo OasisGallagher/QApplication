@@ -1,6 +1,4 @@
-#version 330
-
-#shader vert
+#shader vertex
 
 in vec3 c_position;
 
@@ -10,7 +8,7 @@ void main() {
 	gl_Position = c_cc * vec4(c_position, 1);
 }
 
-#shader frag
+#shader fragment
 
 out float depth;
 

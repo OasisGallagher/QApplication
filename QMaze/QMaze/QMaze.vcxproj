@@ -252,6 +252,11 @@
     <ClInclude Include="include\cameracontroller.h" />
     <ClInclude Include="include\console.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="resources\buildin\shaders\depth.glsl" />
+    <None Include="resources\buildin\shaders\skybox.glsl" />
+    <None Include="resources\buildin\shaders\texture.glsl" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

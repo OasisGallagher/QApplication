@@ -36,7 +36,7 @@ public:
 	virtual float GetFarClipPlane() const = 0;
 	virtual float GetFieldOfView() const = 0;
 
-	virtual void Render(std::vector<Sprite>& sprites) = 0;
+	virtual void Render() = 0;
 
 	virtual const glm::mat4& GetProjectionMatrix() = 0;
 };

@@ -5,6 +5,7 @@
 #include "light.h"
 #include "camera.h"
 #include "sprite.h"
+#include "environment.h"
 #include "internal/base/objectinternal.h"
 
 class WorldInternal : public ObjectInternal, public IWorld {
@@ -17,12 +18,13 @@ public:
 	virtual void Update();
 	virtual Object Create(ObjectType type);
 
-	virtual void GetSprites(ObjectType type, std::vector<Sprite>& sprites);
+	virtual bool GetSprites(ObjectType type, std::vector<Sprite>& sprites);
+	virtual Environment GetEnvironment() { return environment_; }
 
 private:
-	struct LightComparer { bool operator() (Light& lhs, Light& rhs) const; };
-	struct SpriteComparer { bool operator() (Sprite& lhs, Sprite& rhs) const; };
-	struct CameraComparer { bool operator() (Camera& lhs, Camera& rhs) const; };
+	struct LightComparer { bool operator() (const Light& lhs, const Light& rhs) const; };
+	struct SpriteComparer { bool operator() (const Sprite& lhs, const Sprite& rhs) const; };
+	struct CameraComparer { bool operator() (const Camera& lhs, const Camera& rhs) const; };
 
 	typedef std::vector<Sprite> SpriteContainer;
 	typedef std::set<Light, LightComparer> LightContainer;
@@ -32,4 +34,6 @@ private:
 	LightContainer lights_;
 	SpriteContainer sprites_;
 	CameraContainer cameras_;
+
+	Environment environment_;
 };

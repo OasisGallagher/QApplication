@@ -1,14 +1,27 @@
 #pragma once
+#define DEFINE_VARIABLE(name)	static const char* name = "c_" #name
 
 namespace Variables {
-	static const char* vertexPosition = "c_position";
-	static const char* vertexTexCoord = "c_texCoord";
-	static const char* vertexNormal = "c_normal";
-	static const char* vertexTangent = "c_tangent";
+	DEFINE_VARIABLE(position);
+	DEFINE_VARIABLE(texCoord);
+	DEFINE_VARIABLE(normal);
+	DEFINE_VARIABLE(tangent);
 
-	static const char* mainTexture = "c_mainTexture";
-	static const char* normalTexture = "c_normalTexture";
-	static const char* specularTexture = "c_specularTexture";
+	DEFINE_VARIABLE(fragColor);
 
-	static const char* modelToClipSpaceMatrix = "c_modelToClipSpaceMatrix";
+	DEFINE_VARIABLE(mainTexture);
+	DEFINE_VARIABLE(normalTexture);
+	DEFINE_VARIABLE(specularTexture);
+
+	DEFINE_VARIABLE(ambientLightColor);
+
+	DEFINE_VARIABLE(lightColor);
+	DEFINE_VARIABLE(lightDirection);
+
+	DEFINE_VARIABLE(cameraPosition);
+
+	DEFINE_VARIABLE(localToClipSpaceMatrix);
+	DEFINE_VARIABLE(localToWorldSpaceMatrix);
 };
+
+#undef DEFINE_VARIABLE

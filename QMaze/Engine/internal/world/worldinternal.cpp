@@ -1,8 +1,15 @@
 #include "tools/mathf.h"
 #include "worldinternal.h"
 #include "internal/memory/factory.h"
+#include "internal/world/environmentinternal.h"
 
-bool WorldInternal::LightComparer::operator()(Light & lhs, Light & rhs) const {
+bool WorldInternal::LightComparer::operator()(const Light & lhs, const Light & rhs) const {
+	// Directional light > Importance > Luminance.
+	ObjectType lt = lhs->GetType(), rt = rhs->GetType();
+	if (lt != rt && (lt == ObjectTypeDirectionalLight || rt == ObjectTypeDirectionalLight)) {
+		return lt == ObjectTypeDirectionalLight;
+	}
+
 	LightImportance lli = lhs->GetImportance(), rli = rhs->GetImportance();
 	if (lli != rli) {
 		return lli > rli;
@@ -11,15 +18,15 @@ bool WorldInternal::LightComparer::operator()(Light & lhs, Light & rhs) const {
 	return Mathf::Luminance(lhs->GetColor()) > Mathf::Luminance(rhs->GetColor());
 }
 
-bool WorldInternal::CameraComparer::operator() (Camera& lhs, Camera& rhs) const {
+bool WorldInternal::CameraComparer::operator() (const Camera& lhs, const Camera& rhs) const {
 	return lhs->GetDepth() < rhs->GetDepth();
 }
 
-bool WorldInternal::SpriteComparer::operator() (Sprite& lhs, Sprite& rhs) const {
+bool WorldInternal::SpriteComparer::operator() (const Sprite& lhs, const Sprite& rhs) const {
 	return lhs->GetInstanceID() < rhs->GetInstanceID();
 }
 
-WorldInternal::WorldInternal() : ObjectInternal(ObjectTypeWorld) {
+WorldInternal::WorldInternal() : ObjectInternal(ObjectTypeWorld), environment_(Memory::Create<EnvironmentInternal>()) {
 }
 
 Object WorldInternal::Create(ObjectType type) {
@@ -39,7 +46,7 @@ Object WorldInternal::Create(ObjectType type) {
 	return object;
 }
 
-void WorldInternal::GetSprites(ObjectType type, std::vector<Sprite>& sprites) {
+bool WorldInternal::GetSprites(ObjectType type, std::vector<Sprite>& sprites) {
 	AssertX(type >= ObjectTypeSprite, "invalid sprite type");
 	if (type == ObjectTypeSprite) {
 		sprites.assign(sprites_.begin(), sprites_.end());
@@ -47,7 +54,7 @@ void WorldInternal::GetSprites(ObjectType type, std::vector<Sprite>& sprites) {
 	else if (type == ObjectTypeCamera) {
 		sprites.assign(cameras_.begin(), cameras_.end());
 	}
-	else if (type >= ObjectTypeSpotLight && type <= ObjectTypeDirectionalLight) {
+	else if (type == ObjectTypeLight) {
 		sprites.assign(lights_.begin(), lights_.end());
 	}
 	else {
@@ -57,6 +64,8 @@ void WorldInternal::GetSprites(ObjectType type, std::vector<Sprite>& sprites) {
 			}
 		}
 	}
+
+	return !sprites.empty();
 }
 
 void WorldInternal::Update() {
@@ -65,6 +74,6 @@ void WorldInternal::Update() {
 	}
 
 	for (CameraContainer::iterator ite = cameras_.begin(); ite != cameras_.end(); ++ite) {
-		(*ite)->Render(sprites_);
+		(*ite)->Render();
 	}
 }

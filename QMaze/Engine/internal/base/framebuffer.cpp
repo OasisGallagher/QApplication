@@ -5,7 +5,52 @@
 #include "internal/memory/factory.h"
 #include "internal/base/textureinternal.h"
 
-Framebuffer::Framebuffer() : oldFramebuffer_(0), depthRenderbuffer_(0){
+Framebuffer0::Framebuffer0() : oldFramebuffer_(0) {
+	std::fill(oldViewport_, oldViewport_ + 4, 0);
+}
+
+void Framebuffer0::Create(int width, int height) {
+	width_ = width, height_ = height;
+	fbo_ = 0;
+}
+
+void Framebuffer0::Bind() {
+	PushFramebuffer();
+	PushViewport(0, 0, GetWidth(), GetHeight());
+}
+
+void Framebuffer0::Unbind() {
+	PopFramebuffer();
+	PopViewport();
+}
+
+void Framebuffer0::PushFramebuffer() {
+	glGetIntegerv(GL_FRAMEBUFFER_BINDING, &oldFramebuffer_);
+	glBindFramebuffer(GL_FRAMEBUFFER, fbo_);
+}
+
+void Framebuffer0::PopFramebuffer() {
+	glBindFramebuffer(GL_FRAMEBUFFER, oldFramebuffer_);
+	oldFramebuffer_ = 0;
+}
+
+void Framebuffer0::PushViewport(int x, int y, int w, int h) {
+	glGetIntegerv(GL_VIEWPORT, oldViewport_);
+	glViewport(x, y, w, h);
+}
+
+void Framebuffer0::PopViewport() {
+	glViewport(oldViewport_[0], oldViewport_[1], oldViewport_[2], oldViewport_[3]);
+	std::fill(oldViewport_, oldViewport_ + 4, 0);
+}
+
+void Framebuffer0::Clear(int buffers) {
+	PushFramebuffer();
+	glClear(buffers);
+	PopFramebuffer();
+}
+
+Framebuffer::Framebuffer() : depthRenderbuffer_(0){
 }
 
 Framebuffer::~Framebuffer() {
@@ -18,8 +63,9 @@ Framebuffer::~Framebuffer() {
 	}
 }
 
-void Framebuffer::Create(GLsizei width, GLsizei height) {
-	width_ = width, height_ = height;
+void Framebuffer::Create(int width, int height) {
+	Framebuffer0::Create(width, height);
+
 	attachedRenderTextureCount_ = 0;
 
 	glGenFramebuffers(1, &fbo_);
@@ -32,22 +78,10 @@ void Framebuffer::Create(GLsizei width, GLsizei height) {
 }
 
 void Framebuffer::Bind() {
-	PushFramebuffer();
-	PushViewport(0, 0, width_, height_);
+	Framebuffer0::Bind();
 
 	int count = UpdateAttachments();
 	glDrawBuffers(count, attachments_);
-}
-
-void Framebuffer::Unbind() {
-	PopFramebuffer();
-	PopViewport();
-}
-
-void Framebuffer::Clear(GLbitfield buffers) {
-	PushFramebuffer();
-	glClear(buffers);
-	PopFramebuffer();
 }
 
 int Framebuffer::UpdateAttachments() {
@@ -72,7 +106,7 @@ void Framebuffer::CreateDepthRenderBuffer() {
 
 	glGenRenderbuffers(1, &depthRenderbuffer_);
 	glBindRenderbuffer(GL_RENDERBUFFER, depthRenderbuffer_);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width_, height_);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, GetWidth(), GetHeight());
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthRenderbuffer_);
 
 	PopFramebuffer();
@@ -148,24 +182,4 @@ int Framebuffer::FindAttachmentIndex() {
 	}
 
 	return -1;
-}
-
-void Framebuffer::PushFramebuffer() {
-	glGetIntegerv(GL_FRAMEBUFFER_BINDING, &oldFramebuffer_);
-	glBindFramebuffer(GL_FRAMEBUFFER, fbo_);
-}
-
-void Framebuffer::PopFramebuffer() {
-	glBindFramebuffer(GL_FRAMEBUFFER, oldFramebuffer_);
-	oldFramebuffer_ = 0;
-}
-
-void Framebuffer::PushViewport(int x, int y, int w, int h) {
-	glGetIntegerv(GL_VIEWPORT, oldViewport_);
-	glViewport(x, y, w, h);
-}
-
-void Framebuffer::PopViewport() {
-	glViewport(oldViewport_[0], oldViewport_[1], oldViewport_[2], oldViewport_[3]);
-	std::fill(oldViewport_, oldViewport_ + 4, 0);
 }

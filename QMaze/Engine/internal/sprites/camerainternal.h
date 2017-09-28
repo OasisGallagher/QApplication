@@ -8,6 +8,7 @@
 #include "internal/sprites/spriteinternal.h"
 
 class Framebuffer;
+class Framebuffer0;
 
 class CameraInternal : public ICamera, public SpriteInternal {
 	DEFINE_FACTORY_METHOD(Camera)
@@ -43,7 +44,7 @@ public:
 
 public:
 	virtual void Update();
-	virtual void Render(std::vector<Sprite>& sprites);
+	virtual void Render();
 
 public:
 	virtual void SetAspect(float value) { aspect_ = value; }
@@ -59,13 +60,26 @@ public:
 	virtual const glm::mat4& GetProjectionMatrix();
 
 private:
+	void CreateFramebuffers();
+	Framebuffer0* GetActiveFramebuffer();
+
 	void RenderDepthPass(std::vector<Sprite>& sprites);
 	int RenderBackgroundPass(std::vector<Sprite>& sprites, int from);
 	int RenderOpaquePass(std::vector<Sprite>& sprites, int from);
 	int RenderTransparentPass(std::vector<Sprite>& sprites, int from);
 
+	bool IsRenderable(Sprite sprite);
+
 	void RenderSprite(Sprite sprite, Renderer renderer);
-	void SortRenderableSprites(std::vector<Sprite>& sprites);
+	bool GetRenderableSprites(std::vector<Sprite>& sprites);
+
+	void SetForwardBaseLightParameter(std::vector<Sprite>& sprites, Light light);
+
+	void RenderForwardBase(std::vector<Sprite>& sprites, Light light);
+	void RenderForwardAdd(std::vector<Sprite>& sprites, std::vector<Light>& lights);
+
+	void OnPostRender();
+	void GetLights(Light& forwardBase, std::vector<Light>& forwardAdd);
 
 private:
 	int depth_;
@@ -76,6 +90,7 @@ private:
 	glm::vec3 clearColor_;
 	glm::mat4 projection_;
 
+	Framebuffer0* fb0_;
 	Framebuffer* fbDepth_;
 	Framebuffer* fbRenderTexture_;
 	RenderTexture renderTexture_;

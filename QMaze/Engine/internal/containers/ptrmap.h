@@ -18,6 +18,16 @@ public:
 	bool contains(const std::string& name) {
 		return cont_.find(name) != cont_.end();
 	}
+
+	bool get(const std::string& name, value_type& value) {
+		iterator ite = cont_.find(name);
+		if (ite == cont_.end()) {
+			return false;
+		}
+
+		value = ite->second;
+		return true;
+	}
 	
 	void clear() {
 		for (iterator ite = cont_.begin(); ite != cont_.end(); ++ite){

@@ -10,7 +10,8 @@ enum UniformType {
 	UniformInt,
 	UniformBool,
 	UniformFloat,
-	UniformMat4,
+	UniformMatrix4,
+	UniformVector3,
 	UniformTexture,
 };
 
@@ -19,10 +20,14 @@ public:
 	UniformVariable():type_(UniformNone) {}
 
 public:
+	static std::string UniformTypeToName(UniformType type);
+
+public:
 	int GetInt();
 	bool GetBool();
 	float GetFloat();
-	glm::mat4 GetMat4();
+	glm::mat4 GetMatrix4();
+	glm::vec3 GetVector3();
 	Texture GetTexture();
 	int GetTextureIndex();
 
@@ -31,7 +36,8 @@ public:
 	void SetInt(int value);
 	void SetBool(bool value);
 	void SetFloat(float value);
-	void SetMat4(const glm::mat4& value);
+	void SetMatrix4(const glm::mat4& value);
+	void SetVector3(const glm::vec3& value);
 	void SetTexture(Texture value);
 	void SetTextureLocation(GLenum value);
 
@@ -41,6 +47,7 @@ private:
 		bool boolValue_;
 		float floatValue_;
 		glm::mat4 mat4Value_;
+		glm::vec3 vector3Value_;
 		int textureIndex_;
 	};
 

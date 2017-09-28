@@ -2,25 +2,54 @@
 #include <gl/glew.h>
 #include "texture.h"
 
-class Framebuffer {
+class Framebuffer0 {
+public:
+	Framebuffer0();
+	virtual ~Framebuffer0() {}
+
+public:
+	virtual void Create(int width, int height);
+
+	virtual void Bind();
+	virtual void Unbind();
+
+public:
+	int GetWidth() const { return width_; }
+	int GetHeight() const { return height_; }
+	void Clear(int buffers);
+
+	unsigned GetNativePointer() const { return fbo_; }
+
+protected:
+	void PushFramebuffer();
+	void PopFramebuffer();
+
+	void PushViewport(int x, int y, int w, int h);
+	void PopViewport();
+
+protected:
+	GLuint fbo_;
+
+private:
+	GLsizei width_;
+	GLsizei height_;
+
+	GLint oldFramebuffer_;
+	GLint oldViewport_[4];
+};
+
+class Framebuffer : public Framebuffer0 {
 public:
 	Framebuffer();
 	~Framebuffer();
 
 public:
-	void Create(GLsizei width, GLsizei height);
+	virtual void Create(int width, int height);
+	virtual void Bind();
 
-	void Bind();
-	void Unbind();
-
-	void Clear(GLbitfield buffers);
-
-	int GetWidth() const { return width_; }
-	int GetHeight() const { return height_; }
-
-	unsigned GetNativePointer() const { return fbo_; }
-
+public:
 	void SetDepthTexture(RenderTexture texture);
+
 #ifdef MRT
 	void AddRenderTexture(RenderTexture texture);
 	void RemoveRenderTexture(RenderTexture texture);
@@ -35,17 +64,10 @@ public:
 	RenderTexture GetRenderTexture(int index);
 
 private:
-	void PushFramebuffer();
-	void PopFramebuffer();
-
-	void PushViewport(int x, int y, int w, int h);
-	void PopViewport();
-
 	int UpdateAttachments();
 	int FindAttachmentIndex();
 
 private:
-	GLuint fbo_;
 	GLuint depthRenderbuffer_;
 
 	int attachedRenderTextureCount_;
@@ -53,10 +75,4 @@ private:
 	GLenum* attachments_;
 	RenderTexture* renderTextures_;
 	RenderTexture depthTexture_;
-
-	GLint oldFramebuffer_;
-	GLint oldViewport_[4];
-
-	GLsizei width_;
-	GLsizei height_;
 };

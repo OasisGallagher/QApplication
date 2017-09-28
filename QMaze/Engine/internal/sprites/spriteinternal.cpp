@@ -13,7 +13,7 @@ SpriteInternal::SpriteInternal(ObjectType spriteType) : ObjectInternal(spriteTyp
 	dirtyFlags_.set();
 }
 
-void SpriteInternal::SetScale(const glm::vec3 & value) {
+void SpriteInternal::SetScale(const glm::vec3& value) {
 	glm::vec3 scale = value;
 	for (ISprite* parent; (parent = GetParent().get()) != nullptr; ) {
 		scale /= parent->GetLocalScale();
@@ -22,7 +22,7 @@ void SpriteInternal::SetScale(const glm::vec3 & value) {
 	SetLocalScale(scale);
 }
 
-void SpriteInternal::SetPosition(const glm::vec3 & value) {
+void SpriteInternal::SetPosition(const glm::vec3& value) {
 	glm::vec3 position = value;
 	for (ISprite* parent; (parent = GetParent().get()) != nullptr; ) {
 		position -= parent->GetLocalPosition();
@@ -31,7 +31,7 @@ void SpriteInternal::SetPosition(const glm::vec3 & value) {
 	SetLocalPosition(position);
 }
 
-void SpriteInternal::SetRotation(const glm::quat & value) {
+void SpriteInternal::SetRotation(const glm::quat& value) {
 	glm::quat rotation = value;
 	for (ISprite* parent; (parent = GetParent().get()) != nullptr; ) {
 		rotation *= glm::inverse(parent->GetLocalRotation());
@@ -40,8 +40,8 @@ void SpriteInternal::SetRotation(const glm::quat & value) {
 	SetLocalRotation(rotation);
 }
 
-void SpriteInternal::SetEulerAngles(const glm::vec3 & value) {
-	SetLocalRotation(glm::quat(value));
+void SpriteInternal::SetEulerAngles(const glm::vec3& value) {
+	SetLocalRotation(glm::quat(glm::vec3(Mathf::Radians(value.x), Mathf::Radians(value.y), Mathf::Radians(value.z))));
 }
 
 glm::vec3 SpriteInternal::GetScale() const {
@@ -72,7 +72,8 @@ glm::quat SpriteInternal::GetRotation() const {
 }
 
 glm::vec3 SpriteInternal::GetEulerAngles() const {
-	return glm::eulerAngles(GetRotation());
+	glm::vec3 angles = glm::eulerAngles(GetRotation());
+	return glm::vec3(Mathf::Degrees(angles.x), Mathf::Degrees(angles.y), Mathf::Degrees(angles.z));
 }
 
 void SpriteInternal::SetLocalScale(const glm::vec3& value) {

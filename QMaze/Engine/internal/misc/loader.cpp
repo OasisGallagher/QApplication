@@ -6,6 +6,7 @@
 
 static const char* SHADER = "shader";
 static const char* INCLUDE = "include";
+static const char* GLSL_VERSION = "#version 330\n";
 
 bool TextLoader::Load(const std::string& file, std::string& text) {
 	std::ifstream ifs(file, std::ios::in);
@@ -72,6 +73,7 @@ void ShaderParser::Clear() {
 }
 
 bool ShaderParser::ParseShaderSource(std::vector<std::string>& lines) {
+	globals_ = GLSL_VERSION;
 	ReadShaderSource(lines);
 
 	AssertX(type_ != ShaderTypeCount, "invalid shader file");
@@ -128,7 +130,7 @@ bool ShaderParser::PreprocessShader(std::string parameter) {
 
 	if (newType != type_) {
 		if (type_ == ShaderTypeCount) {
-			globals_ = source_;
+			globals_ += source_;
 		}
 		else {
 			if (!answer_[type_].empty()) {

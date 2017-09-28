@@ -7,14 +7,15 @@
 #include "internal/base/textureinternal.h"
 #include "internal/base/rendererinternal.h"
 #include "internal/base/materialinternal.h"
+#include "internal/sprites/lightinternal.h"
 #include "internal/sprites/skyboxinternal.h"
 #include "internal/sprites/camerainternal.h"
 
 Factory Factory::instance;
 
-#define ADD_FACTROY_METHOD(Name) \
-	AddFactoryMethod(#Name, Name ## Internal::Create);  \
-	AddFactoryMethod(ObjectType ## Name, Name ## Internal::Create)
+#define ADD_FACTROY_METHOD(name) \
+	AddFactoryMethod(#name, name ## Internal::Create);  \
+	AddFactoryMethod(ObjectType ## name, name ## Internal::Create)
 
 Factory::Factory() {
 	std::fill(methodArray_, methodArray_ + ObjectTypeCount, nullptr);
@@ -31,4 +32,8 @@ Factory::Factory() {
 	ADD_FACTROY_METHOD(Texture2D);
 	ADD_FACTROY_METHOD(TextureCube);
 	ADD_FACTROY_METHOD(RenderTexture);
+
+	ADD_FACTROY_METHOD(SpotLight);
+	ADD_FACTROY_METHOD(PointLight);
+	ADD_FACTROY_METHOD(DirectionalLight);
 }

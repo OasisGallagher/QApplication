@@ -175,6 +175,7 @@ copy $(TargetDir)$(TargetName).dll $(SolutionDir)$(SolutionName)\bin</Command>
     <ClCompile Include="internal\sprites\lightinternal.cpp" />
     <ClCompile Include="internal\sprites\skyboxinternal.cpp" />
     <ClCompile Include="internal\sprites\spriteinternal.cpp" />
+    <ClCompile Include="internal\world\environmentinternal.cpp" />
     <ClCompile Include="internal\world\worldinternal.cpp" />
     <ClCompile Include="src\engine.cpp" />
     <ClCompile Include="src\math\matrix4x4.cpp" />
@@ -189,6 +190,7 @@ copy $(TargetDir)$(TargetName).dll $(SolutionDir)$(SolutionName)\bin</Command>
     <ClInclude Include="include\camera.h" />
     <ClInclude Include="include\defines.h" />
     <ClInclude Include="include\engine.h" />
+    <ClInclude Include="include\environment.h" />
     <ClInclude Include="include\light.h" />
     <ClInclude Include="include\material.h" />
     <ClInclude Include="include\math\matrix4x4.h" />
@@ -231,6 +233,7 @@ copy $(TargetDir)$(TargetName).dll $(SolutionDir)$(SolutionName)\bin</Command>
     <ClInclude Include="internal\sprites\lightinternal.h" />
     <ClInclude Include="internal\sprites\skyboxinternal.h" />
     <ClInclude Include="internal\sprites\spriteinternal.h" />
+    <ClInclude Include="internal\world\environmentinternal.h" />
     <ClInclude Include="internal\world\worldinternal.h" />
     <ClInclude Include="tools\debug.h" />
     <ClInclude Include="tools\mathf.h" />

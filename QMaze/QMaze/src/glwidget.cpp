@@ -4,6 +4,7 @@
 #include <QtGui/QWheelEvent>
 #include <gl/glew.h>
 
+#include "light.h"
 #include "skybox.h"
 #include "camera.h"
 #include "shader.h"
@@ -16,21 +17,29 @@
 
 // TODO: console class.
 #include "qmaze.h"
+#include <set>
 
 static void OnEngineLogReceived(int level, const char* message) {
+	static std::set<std::string> logs;
+	if (logs.find(std::to_string(level) + message) != logs.end()) {
+		return;
+	}
+
+	logs.insert(std::to_string(level) + message);
+
 	switch (level) {
 	case LogLevelDebug:
-		QMaze::get()->addConsoleMessage(QString("%1: <font color='#000000'>%2</font>").arg(message));
+		QMaze::get()->addConsoleMessage(QString("<font color='#000000'>%1</font>").arg(message));
 		qDebug() << message;
 		break;
 
 	case LogLevelWarning:
-		QMaze::get()->addConsoleMessage(QString("%1: <font color='#ff9912'>%2</font>").arg(message));
+		QMaze::get()->addConsoleMessage(QString("<font color='#ff9912'>%1</font>").arg(message));
 		qWarning() << message;
 		break;
 
 	case LogLevelError:
-		QMaze::get()->addConsoleMessage(QString("%1: <font color='#FF0000'>%2</font>").arg(message));
+		QMaze::get()->addConsoleMessage(QString("<font color='#FF0000'>%1</font>").arg(message));
 		qCritical() << message;
 		break;
 
@@ -105,12 +114,19 @@ void GLWidget::keyPressEvent(QKeyEvent* event) {
 
 void GLWidget::createScene() {
 	World world = Engine::get()->world();
+
+	world->GetEnvironment()->SetAmbientColor(glm::vec3(0.15f));
+	DirectionalLight light = dynamic_sp_cast<DirectionalLight>(world->Create(ObjectTypeDirectionalLight));
+	light->SetColor(glm::vec3(0.8f));
+	light->SetPosition(glm::vec3(0));
+
 	Camera camera = dynamic_sp_cast<Camera>(world->Create(ObjectTypeCamera));
 	controller_->setCamera(camera);
 
-	camera->SetClearType(ClearTypeSkybox);
+	camera->SetClearType(ClearTypeColor);
+	camera->SetClearColor(glm::vec3(0, 0, 0.4f));
 
-	Skybox skybox = dynamic_sp_cast<Skybox>(world->Create(ObjectTypeSkybox));
+	/*Skybox skybox = dynamic_sp_cast<Skybox>(world->Create(ObjectTypeSkybox));
 	std::string faces[] = {
 		"textures/lake_skybox/right.jpg",
 		"textures/lake_skybox/left.jpg",
@@ -121,17 +137,18 @@ void GLWidget::createScene() {
 	};
 
 	skybox->Load(faces);
-
 	camera->SetSkybox(skybox);
+	*/
 
 	RenderTexture renderTexture = dynamic_sp_cast<RenderTexture>(world->Create(ObjectTypeRenderTexture));
 
-	renderTexture->Load(RenderTextureFormatRgba, width(), height());
+	renderTexture->Load(Rgba, width(), height());
 	//camera->SetRenderTexture(renderTexture);
 	//camera->SetClearColor(glm::vec3(0.0f, 0.0f, 0.4f));
 
 	Sprite sprite = dynamic_sp_cast<Sprite>(world->Create(ObjectTypeSprite));
-	sprite->SetPosition(glm::vec3(4, 1, -9));
+	sprite->SetPosition(glm::vec3(0, 0, -4));
+	sprite->SetEulerAngles(glm::vec3(0, 30, 0));
 
 	Surface surface = dynamic_sp_cast<Surface>(world->Create(ObjectTypeSurface));
 	/* Mesh.

@@ -30,8 +30,8 @@ void CameraController::onMouseMove(const QPoint& pos) {
 		QPoint delta = pos - rpos_;
 		rpos_ = pos;
 		glm::vec3 euler = camera_->GetEulerAngles();
-		euler.x += 0.005f * delta.y();
-		euler.y += 0.005f * delta.x();
+		euler.x += 0.05f * delta.y();
+		euler.y += 0.05f * delta.x();
 		camera_->SetEulerAngles(euler);
 	}
 }
