@@ -4,8 +4,7 @@
 #include <QtWidgets/QMainWindow>
 #include "ui_qmaze.h"
 
-class QMaze : public QMainWindow
-{
+class QMaze : public QMainWindow {
 	Q_OBJECT
 
 public:
@@ -21,7 +20,7 @@ private:
 	static QMaze* instance_;
 
 private:
-    Ui::QMaze ui;
+	Ui::QMaze ui;
 };
 
 #endif // QMAZE_H

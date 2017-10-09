@@ -20,6 +20,7 @@
 #include <set>
 
 static void OnEngineLogReceived(int level, const char* message) {
+	// TODO: log tags/filters.
 	static std::set<std::string> logs;
 	if (logs.find(std::to_string(level) + message) != logs.end()) {
 		return;
@@ -30,17 +31,17 @@ static void OnEngineLogReceived(int level, const char* message) {
 	switch (level) {
 	case LogLevelDebug:
 		QMaze::get()->addConsoleMessage(QString("<font color='#000000'>%1</font>").arg(message));
-		qDebug() << message;
+		qDebug(message);
 		break;
 
 	case LogLevelWarning:
 		QMaze::get()->addConsoleMessage(QString("<font color='#ff9912'>%1</font>").arg(message));
-		qWarning() << message;
+		qWarning(message);
 		break;
 
 	case LogLevelError:
 		QMaze::get()->addConsoleMessage(QString("<font color='#FF0000'>%1</font>").arg(message));
-		qCritical() << message;
+		qCritical(message);
 		break;
 
 	case LogLevelFatal:
@@ -117,8 +118,9 @@ void GLWidget::createScene() {
 
 	world->GetEnvironment()->SetAmbientColor(glm::vec3(0.15f));
 	DirectionalLight light = dynamic_sp_cast<DirectionalLight>(world->Create(ObjectTypeDirectionalLight));
-	light->SetColor(glm::vec3(0.8f));
+	light->SetColor(glm::vec3(0.7f));
 	light->SetPosition(glm::vec3(0));
+	/*light->SetEulerAngles()*/
 
 	Camera camera = dynamic_sp_cast<Camera>(world->Create(ObjectTypeCamera));
 	controller_->setCamera(camera);
