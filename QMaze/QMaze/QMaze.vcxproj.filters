@@ -21,14 +21,6 @@
       <Extensions>qrc;*</Extensions>
       <ParseFiles>false</ParseFiles>
     </Filter>
-    <Filter Include="include">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h</Extensions>
-    </Filter>
-    <Filter Include="src">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;cxx;c;def</Extensions>
-    </Filter>
     <Filter Include="ui">
       <UniqueIdentifier>{99349809-55BA-4b9d-BF79-8FDBB0286EB3}</UniqueIdentifier>
       <Extensions>ui</Extensions>
@@ -39,16 +31,49 @@
     <Filter Include="resources\buildin\shaders">
       <UniqueIdentifier>{7799e13f-e719-497a-b633-ff8c543af3e9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="windows">
+      <UniqueIdentifier>{b2387caa-cad8-41c5-b0b7-574d52dbdb14}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="scripts">
+      <UniqueIdentifier>{d9d38ab5-25a0-4526-8735-dbceb209adba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="windows\include">
+      <UniqueIdentifier>{a8b8c673-6a4b-4d6f-ad47-694561ff1ff6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="windows\src">
+      <UniqueIdentifier>{b3748fa1-e9cd-4486-a2ca-fee7ab76f9af}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="scripts\include">
+      <UniqueIdentifier>{82c9ccf8-a40a-49f9-bdf3-b19e9dbf76ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="scripts\src">
+      <UniqueIdentifier>{dfce4a84-8832-4749-b332-0fdd5a01e4e8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GeneratedFiles\qrc_qmaze.cpp">
       <Filter>Generated Files</Filter>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_glwidget.cpp">
+    <ClCompile Include="windows\canvas.cpp">
+      <Filter>windows\src</Filter>
+    </ClCompile>
+    <ClCompile Include="windows\console.cpp">
+      <Filter>windows\src</Filter>
+    </ClCompile>
+    <ClCompile Include="windows\qmaze.cpp">
+      <Filter>windows\src</Filter>
+    </ClCompile>
+    <ClCompile Include="scripts\cameracontroller.cpp">
+      <Filter>scripts\src</Filter>
+    </ClCompile>
+    <ClCompile Include="scripts\main.cpp">
+      <Filter>scripts\src</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_canvas.cpp">
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_glwidget.cpp">
-      <Filter>Generated Files\Release</Filter>
+    <ClCompile Include="GeneratedFiles\Debug\moc_console.cpp">
+      <Filter>Generated Files\Debug</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_qmaze.cpp">
       <Filter>Generated Files\Debug</Filter>
@@ -56,42 +81,42 @@
     <ClCompile Include="GeneratedFiles\Release\moc_qmaze.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
-    <ClCompile Include="src\glwidget.cpp">
-      <Filter>src</Filter>
+    <ClCompile Include="windows\hierarchy.cpp">
+      <Filter>windows\src</Filter>
     </ClCompile>
-    <ClCompile Include="src\main.cpp">
-      <Filter>src</Filter>
+    <ClCompile Include="GeneratedFiles\Debug\moc_hierarchy.cpp">
+      <Filter>Generated Files\Debug</Filter>
     </ClCompile>
-    <ClCompile Include="src\qmaze.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\cameracontroller.cpp">
-      <Filter>src</Filter>
+    <ClCompile Include="GeneratedFiles\Release\moc_hierarchy.cpp">
+      <Filter>Generated Files\Release</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="include\glwidget.h">
-      <Filter>include</Filter>
-    </CustomBuild>
-    <CustomBuild Include="include\qmaze.h">
-      <Filter>include</Filter>
-    </CustomBuild>
     <CustomBuild Include="ui\qmaze.ui">
       <Filter>ui</Filter>
     </CustomBuild>
     <CustomBuild Include="qmaze.qrc">
       <Filter>resources</Filter>
     </CustomBuild>
+    <CustomBuild Include="windows\qmaze.h">
+      <Filter>windows\include</Filter>
+    </CustomBuild>
+    <CustomBuild Include="windows\canvas.h">
+      <Filter>windows\include</Filter>
+    </CustomBuild>
+    <CustomBuild Include="windows\console.h">
+      <Filter>windows\include</Filter>
+    </CustomBuild>
+    <CustomBuild Include="windows\hierarchy.h">
+      <Filter>windows\include</Filter>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GeneratedFiles\ui_qmaze.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\cameracontroller.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\console.h">
-      <Filter>include</Filter>
+    <ClInclude Include="scripts\cameracontroller.h">
+      <Filter>scripts\include</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

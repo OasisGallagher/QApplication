@@ -34,9 +34,6 @@ public:
 public:
 	virtual unsigned GetInstanceID() const = 0;
 	virtual ObjectType GetType() const = 0;
-
-	virtual std::string GetName() const = 0;
-	virtual void SetName(const std::string& value) = 0;
 };
 
 typedef smart_ptr<IObject> Object;

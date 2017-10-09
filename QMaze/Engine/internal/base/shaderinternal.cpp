@@ -3,6 +3,7 @@
 #include "tools/debug.h"
 #include "tools/string.h"
 #include "internal/misc/loader.h"
+#include "internal/base/glsldefines.h"
 
 ShaderDescription ShaderInternal::descriptions_[] =  {
 	GL_VERTEX_SHADER, "VertexShader", "vertex",
@@ -25,7 +26,7 @@ ShaderInternal::~ShaderInternal() {
 bool ShaderInternal::Load(const std::string& path) {
 	ShaderParser parser;
 	std::string sources[ShaderTypeCount];
-	if (!parser.Parse(path + ".glsl", sources)) {
+	if (!parser.Parse(path + GLSL_POSTFIX, sources)) {
 		return false;
 	}
 
@@ -49,10 +50,8 @@ bool ShaderInternal::GetErrorMessage(GLuint shaderObj, std::string& answer) {
 	GLint length = 0, writen = 0;
 	glGetShaderiv(shaderObj, GL_INFO_LOG_LENGTH, &length);
 	if (length > 1) {
-		char* log = new char[length];
-		glGetShaderInfoLog(shaderObj, length, &writen, log);
-		answer = log;
-		delete[] log;
+		answer.resize(length);
+		glGetShaderInfoLog(shaderObj, length, &writen, &answer[0]);
 		return true;
 	}
 

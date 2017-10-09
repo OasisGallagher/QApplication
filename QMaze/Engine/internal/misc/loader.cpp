@@ -3,10 +3,10 @@
 #include "loader.h"
 #include "tools/debug.h"
 #include "tools/string.h"
+#include "internal/base/glsldefines.h"
 
 static const char* SHADER = "shader";
 static const char* INCLUDE = "include";
-static const char* GLSL_VERSION = "#version 330\n";
 
 bool TextLoader::Load(const std::string& file, std::string& text) {
 	std::ifstream ifs(file, std::ios::in);
@@ -73,7 +73,7 @@ void ShaderParser::Clear() {
 }
 
 bool ShaderParser::ParseShaderSource(std::vector<std::string>& lines) {
-	globals_ = GLSL_VERSION;
+	globals_ = "#version " GLSL_VERSION "\n";
 	ReadShaderSource(lines);
 
 	AssertX(type_ != ShaderTypeCount, "invalid shader file");

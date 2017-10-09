@@ -1,21 +1,26 @@
 #pragma once
+#include "engine.h"
 
 #include <QTextBrowser>
 #include <QtOpenGL/QGLWidget>
 
 class CameraController;
 
-class GLWidget : public QGLWidget {
+class Canvas : public QGLWidget, public ILogCallback {
 	Q_OBJECT
 public:
-	GLWidget(QWidget *parent = NULL);
-	~GLWidget();
+	Canvas(QWidget *parent = NULL);
+	~Canvas();
+
+public:
+	virtual void OnEngineLogMessage(int level, const char * message);
 
 protected:
 	void initializeGL();
 	void resizeGL(int w, int h);
 	void paintGL();
 
+	void timerEvent(QTimerEvent *event);
 	void wheelEvent(QWheelEvent* event);
 	void mousePressEvent(QMouseEvent *event);
 	void mouseMoveEvent(QMouseEvent *event);
@@ -25,7 +30,11 @@ protected:
 private:
 	void createScene();
 
+signals:
+	void onEngineLogReceived(int level, const char* message);
+
 private:
+	int timer_;
 	bool sceneCreated_;
 	CameraController* controller_;
 };

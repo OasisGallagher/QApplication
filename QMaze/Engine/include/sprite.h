@@ -10,6 +10,9 @@ typedef smart_ptr<ISprite> Sprite;
 
 class ENGINE_EXPORT ISprite : virtual public IObject {
 public:
+	virtual std::string GetName() const = 0;
+	virtual void SetName(const std::string& value) = 0;
+
 	virtual void SetParent(Sprite value) = 0;
 	virtual Sprite GetParent() const = 0;
 

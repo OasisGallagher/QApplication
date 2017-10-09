@@ -13,6 +13,8 @@ namespace Variables {
 	DEFINE_VARIABLE(normalTexture);
 	DEFINE_VARIABLE(specularTexture);
 
+	DEFINE_VARIABLE(gloss);
+
 	DEFINE_VARIABLE(ambientLightColor);
 
 	DEFINE_VARIABLE(lightColor);

@@ -209,6 +209,7 @@ copy $(TargetDir)$(TargetName).dll $(SolutionDir)$(SolutionName)\bin</Command>
     <ClInclude Include="include\texture.h" />
     <ClInclude Include="include\world.h" />
     <ClInclude Include="internal\base\framebuffer.h" />
+    <ClInclude Include="internal\base\glsldefines.h" />
     <ClInclude Include="internal\base\materialinternal.h" />
     <ClInclude Include="internal\base\meshinternal.h" />
     <ClInclude Include="internal\base\objectinternal.h" />

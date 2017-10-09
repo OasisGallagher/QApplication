@@ -81,7 +81,7 @@ int SurfaceInternal::GetMeshCount() const {
 bool SurfaceInternal::Load(const std::string& path) {
 	Bind();
 	Assimp::Importer importer;
-	unsigned flags = aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_CalcTangentSpace;
+	unsigned flags = aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_CalcTangentSpace;
 	std::string fpath = "resources/" + path;
 	const aiScene* scene = importer.ReadFile(fpath.c_str(), flags);
 

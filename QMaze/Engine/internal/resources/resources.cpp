@@ -1,5 +1,6 @@
 #include "resources.h"
 #include "internal/memory/factory.h"
+#include "internal/base/glsldefines.h"
 #include "internal/base/shaderinternal.h"
 
 Resources::ShaderContainer Resources::shaders_;
@@ -12,7 +13,7 @@ Shader Resources::FindShader(const std::string& path) {
 
 	Shader shader = Factory::Create<ShaderInternal>();
 	shaders_.insert(std::make_pair(path, shader));
-	if (shader->Load(path + ".glsl")) {
+	if (shader->Load(path + GLSL_POSTFIX)) {
 		return shader;
 	}
 

@@ -29,6 +29,7 @@ bool Engine::initialize() {
 	glewExperimental = true;
 
 	if (glewInit() != GLEW_OK) {
+		AssertX(false, "failed to initialize glew.");
 		return false;
 	}
 
@@ -51,7 +52,7 @@ void Engine::release() {
 	world_.reset();
 }
 
-void Engine::setDebugCallback(LogCallback callback) {
+void Engine::setDebugCallback(ILogCallback* callback) {
 	Debug::SetLogCallback(callback);
 }
 

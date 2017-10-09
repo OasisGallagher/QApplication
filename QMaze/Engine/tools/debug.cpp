@@ -6,29 +6,30 @@
 #include <gl/glew.h>
 
 #include "debug.h"
+#include "engine.h"
 #include "tools/mathf.h"
 #include "tools/string.h"
 
 int Debug::length_ = 0;
 std::stack<std::string> Debug::samples_;
-LogCallback Debug::fnptr_ = nullptr;
+ILogCallback* Debug::callback_;
 
 std::ofstream debug("main/debug/debug.txt");
 
-void Debug::SetLogCallback(LogCallback cb) {
-	fnptr_ = cb;
+void Debug::SetLogCallback(ILogCallback* cb) {
+	callback_ = cb;
 }
 
 void Debug::Log(const std::string& text) {
-	if (fnptr_ != nullptr) { fnptr_(LogLevelDebug, text.c_str()); }
+	if (callback_ != nullptr) { callback_->OnEngineLogMessage(LogLevelDebug, text.c_str()); }
 }
 
 void Debug::LogWarning(const std::string& text) {
-	if (fnptr_ != nullptr) { fnptr_(LogLevelWarning, text.c_str()); }
+	if (callback_ != nullptr) { callback_->OnEngineLogMessage(LogLevelWarning, text.c_str()); }
 }
 
 void Debug::LogError(const std::string& text) {
-	if (fnptr_ != nullptr) { fnptr_(LogLevelError, text.c_str()); }
+	if (callback_ != nullptr) { callback_->OnEngineLogMessage(LogLevelError, text.c_str()); }
 }
 
 std::string Debug::Now() {
@@ -41,14 +42,14 @@ void Debug::Break(const std::string& expression, const char* file, int line) {
 	std::ostringstream oss;
 	oss << expression << "\n";
 	oss << "at " << file << ":" << line;
-	if (fnptr_ != nullptr) { fnptr_(LogLevelFatal, oss.str().c_str()); }
+	if (callback_ != nullptr) { callback_->OnEngineLogMessage(LogLevelFatal, oss.str().c_str()); }
 }
 
 void Debug::Break(const std::string& expression, const std::string& message, const char* file, int line) {
 	std::ostringstream oss;
 	oss << expression + ":\n" + message << "\n";
 	oss << "at " << file << ":" << line;
-	if (fnptr_ != nullptr) { fnptr_(LogLevelFatal, oss.str().c_str()); }
+	if (callback_ != nullptr) { callback_->OnEngineLogMessage(LogLevelFatal, oss.str().c_str()); }
 }
 
 void Debug::EnableMemoryLeakCheck() {

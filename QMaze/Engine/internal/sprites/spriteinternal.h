@@ -12,6 +12,9 @@ public:
 	SpriteInternal();
 
 public:
+	virtual std::string GetName() const { return name_; }
+	virtual void SetName(const std::string& value) { name_ = value; }
+
 	virtual void SetParent(Sprite value) { parent_ = value; }
 	virtual Sprite GetParent() const { return parent_; }
 
@@ -71,7 +74,11 @@ private:
 	bool IsDirty(DirtyFlag bit) const { return dirtyFlags_.test(bit); }
 	void SetDiry(DirtyFlag bit, bool value) { dirtyFlags_.set(bit, value); }
 
+	const char* SpriteTypeToString(ObjectType type);
+
 private:
+	std::string name_;
+
 	Sprite parent_;
 	Surface surface_;
 	Renderer renderer_;

@@ -15,44 +15,9 @@
 #include "engine.h"
 #include "texture.h"
 #include "surface.h"
-#include "glwidget.h"
-#include "cameracontroller.h"
+#include "canvas.h"
 
-// TODO: console class.
-#include "qmaze.h"
-#include <set>
-
-static void OnEngineLogReceived(int level, const char* message) {
-	// TODO: log tags/filters.
-	static std::set<std::string> logs;
-	if (logs.find(std::to_string(level) + message) != logs.end()) {
-		return;
-	}
-
-	logs.insert(std::to_string(level) + message);
-
-	switch (level) {
-	case LogLevelDebug:
-		QMaze::get()->addConsoleMessage(QString("<font color='#000000'>%1</font>").arg(message));
-		qDebug(message);
-		break;
-
-	case LogLevelWarning:
-		QMaze::get()->addConsoleMessage(QString("<font color='#ff9912'>%1</font>").arg(message));
-		qWarning(message);
-		break;
-
-	case LogLevelError:
-		QMaze::get()->addConsoleMessage(QString("<font color='#FF0000'>%1</font>").arg(message));
-		qCritical(message);
-		break;
-
-	case LogLevelFatal:
-		QMaze::get()->addConsoleMessage(QString("%1: <font color='#FF0000'>%2</font>").arg(message));
-		qFatal(message);
-		break;
-	}
-}
+#include "scripts/cameracontroller.h"
 
 // https://github.com/opengl-tutorials/ogl/blob/master/common/quaternion_utils.cpp
 glm::quat RotationBetweenVectors(glm::vec3 start, glm::vec3 dest) {
@@ -87,58 +52,67 @@ glm::quat RotationBetweenVectors(glm::vec3 start, glm::vec3 dest) {
 	);
 }
 
-GLWidget::GLWidget(QWidget *parent) 
+Canvas::Canvas(QWidget *parent) 
 	: QGLWidget(parent), sceneCreated_(false) {
 	setMouseTracking(true);
 	setFocusPolicy(Qt::StrongFocus);
 	controller_ = new CameraController;
+
+	timer_ = startTimer(10);
 }
 
-GLWidget::~GLWidget() {
+Canvas::~Canvas() {
+	killTimer(timer_);
 	delete controller_;
 	Engine::get()->release();
 }
 
-void GLWidget::initializeGL() { 
+void Canvas::initializeGL() { 
 	// TODO: make debug context.
 	Engine::get()->initialize();
-	Engine::get()->setDebugCallback(OnEngineLogReceived);
+	Engine::get()->setDebugCallback(this);
 }
 
-void GLWidget::resizeGL(int w, int h) {
+void Canvas::resizeGL(int w, int h) {
 	Engine::get()->onResize(w, h);
 }
 
-void GLWidget::paintGL() {
+void Canvas::paintGL() {
 	if (!sceneCreated_) {
 		createScene();
 		sceneCreated_ = true;
 	}
 
 	Engine::get()->update();
-	QMetaObject::invokeMethod(this, "updateGL", Qt::QueuedConnection);
+	//QMetaObject::invokeMethod(this, "updateGL", Qt::QueuedConnection);
 }
 
-void GLWidget::wheelEvent(QWheelEvent* event) {
+void Canvas::timerEvent(QTimerEvent *event) {
+	if (event->timerId() == timer_) {
+		update();
+	}
+}
+
+void Canvas::wheelEvent(QWheelEvent* event) {
 	controller_->onMouseWheel(event->delta());
 }
 
-void GLWidget::mousePressEvent(QMouseEvent *event) {
+void Canvas::mousePressEvent(QMouseEvent *event) {
 	controller_->onMousePress(event->button(), event->pos());
 	QGLWidget::mousePressEvent(event);
 }
 
-void GLWidget::mouseReleaseEvent(QMouseEvent* event) {
+void Canvas::mouseReleaseEvent(QMouseEvent* event) {
 	controller_->onMouseRelease(event->button());
 	QGLWidget::mouseReleaseEvent(event);
 }
 
-void GLWidget::mouseMoveEvent(QMouseEvent *event) {
+void Canvas::mouseMoveEvent(QMouseEvent *event) {
 	controller_->onMouseMove(event->pos());
 	QGLWidget::mouseMoveEvent(event);
 }
 
-void GLWidget::keyPressEvent(QKeyEvent* event) {
+void Canvas::keyPressEvent(QKeyEvent* event) {
 	switch (event->key()) {
 	case Qt::Key_Escape:
 		qApp->quit();
@@ -149,7 +123,11 @@ void GLWidget::keyPressEvent(QKeyEvent* event) {
 	}
 }
 
-void GLWidget::createScene() {
+void Canvas::OnEngineLogMessage(int level, const char* message) {
+	emit onEngineLogReceived(level, message);
+}
+
+void Canvas::createScene() {
 	World world = Engine::get()->world();
 
 	world->GetEnvironment()->SetAmbientColor(glm::vec3(0.15f));

@@ -2,15 +2,18 @@
 #include <glm/gtx/quaternion.hpp>
 
 #include "tools/mathf.h"
+#include "tools/string.h"
 #include "internal/sprites/spriteinternal.h"
 
 SpriteInternal::SpriteInternal() : ObjectInternal(ObjectTypeSprite), scale_(1) {
 	dirtyFlags_.set();
+	name_ = String::Format("%s (%u)", SpriteTypeToString(GetType()), GetInstanceID());
 }
 
 SpriteInternal::SpriteInternal(ObjectType spriteType) : ObjectInternal(spriteType), scale_(1) {
-	AssertX(spriteType > ObjectTypeSprite, "invalid sprite type " + std::to_string(spriteType));
+	AssertX(spriteType > ObjectTypeSprite && spriteType < ObjectTypeCount, "invalid sprite type " + std::to_string(spriteType));
 	dirtyFlags_.set();
+	name_ = String::Format("%s (%u)", SpriteTypeToString(GetType()), GetInstanceID());
 }
 
 void SpriteInternal::SetScale(const glm::vec3& value) {
@@ -146,4 +149,30 @@ glm::vec3 SpriteInternal::GetForward() const {
 
 void SpriteInternal::Update() {
 
+}
+
+const char* SpriteInternal::SpriteTypeToString(ObjectType type) {
+	const char* name = "";
+	switch (type) {
+		case ObjectTypeSprite:
+			name = "Sprite";
+			break;
+		case ObjectTypeCamera:
+			name = "Camera";
+			break;
+		case ObjectTypeSkybox:
+			name = "Skybox";
+			break;
+		case ObjectTypeSpotLight:
+			name = "SpotLight";
+			break;
+		case ObjectTypePointLight:
+			name = "PointLight";
+			break;
+		case ObjectTypeDirectionalLight:
+			name = "DirectionalLight";
+			break;
+	}
+
+	return name;
 }
