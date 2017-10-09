@@ -36,7 +36,7 @@ public:
 private:
 	enum {
 		VBOPositions,
-		VBOUVs,
+		VBOTexCoords,
 		VBONormals,
 		VBOTangents,
 		VBOIndices,

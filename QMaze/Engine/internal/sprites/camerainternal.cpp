@@ -105,7 +105,7 @@ void CameraInternal::CreateFramebuffers() {
 	renderTexture_ = Factory::Create<RenderTextureInternal>();
 	renderTexture_->Load(Rgba, w, h);
 	fbRenderTexture_->SetRenderTexture(renderTexture_);
-
+	
 	tempRenderTexture_ = Factory::Create<RenderTextureInternal>();
 	tempRenderTexture_->Load(Rgba, w, h);
 }

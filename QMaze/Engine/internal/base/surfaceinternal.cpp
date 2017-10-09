@@ -131,7 +131,7 @@ void SurfaceInternal::InitMeshAttributes(const aiScene* scene, unsigned numVerti
 	SurfaceAttribute attribute;
 	attribute.positions.reserve(numVertices);
 	attribute.normals.reserve(numVertices);
-	attribute.uvs.reserve(numVertices);
+	attribute.texCoords.reserve(numVertices);
 	attribute.tangents.reserve(numVertices);
 	attribute.indices.reserve(numIndices);
 
@@ -152,7 +152,7 @@ void SurfaceInternal::InitAttribute(const aiMesh* mesh, SurfaceAttribute& attrib
 
 		attribute.positions.push_back(glm::vec3(pos->x, pos->y, pos->z));
 		attribute.normals.push_back(glm::vec3(normal->x, normal->y, normal->z));
-		attribute.uvs.push_back(glm::vec2(texCoord->x, texCoord->y));
+		attribute.texCoords.push_back(glm::vec2(texCoord->x, texCoord->y));
 		attribute.tangents.push_back(glm::vec3(tangent->x, tangent->y, tangent->z));
 	}
 
@@ -210,11 +210,11 @@ void SurfaceInternal::UpdateGLBuffers(const SurfaceAttribute& attribute) {
 		glVertexAttribPointer(VBOPositions, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 	}
 
-	if (!attribute.uvs.empty()) {
-		glBindBuffer(GL_ARRAY_BUFFER, vbos_[VBOUVs]);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2) * attribute.uvs.size(), &attribute.uvs[0], GL_STATIC_DRAW);
-		glEnableVertexAttribArray(VBOUVs);
-		glVertexAttribPointer(VBOUVs, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
+	if (!attribute.texCoords.empty()) {
+		glBindBuffer(GL_ARRAY_BUFFER, vbos_[VBOTexCoords]);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2) * attribute.texCoords.size(), &attribute.texCoords[0], GL_STATIC_DRAW);
+		glEnableVertexAttribArray(VBOTexCoords);
+		glVertexAttribPointer(VBOTexCoords, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
 	}
 
 	if (!attribute.normals.empty()) {

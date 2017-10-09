@@ -4,6 +4,9 @@
 #include <QtGui/QWheelEvent>
 #include <gl/glew.h>
 
+#include <glm/gtx/quaternion.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
 #include "light.h"
 #include "skybox.h"
 #include "camera.h"
@@ -49,6 +52,39 @@ static void OnEngineLogReceived(int level, const char* message) {
 		qFatal(message);
 		break;
 	}
+}
+
+// https://github.com/opengl-tutorials/ogl/blob/master/common/quaternion_utils.cpp
+glm::quat RotationBetweenVectors(glm::vec3 start, glm::vec3 dest) {
+	start = glm::normalize(start);
+	dest = glm::normalize(dest);
+
+	float cosTheta = glm::dot(start, dest);
+	glm::vec3 rotationAxis;
+
+	if (cosTheta < -1 + 0.001f) {
+		// special case when vectors in opposite directions:
+		// there is no "ideal" rotation axis
+		// So guess one; any will do as long as it's perpendicular to start
+		rotationAxis = glm::cross(glm::vec3(0.0f, 0.0f, 1.0f), start);
+		if (glm::length2(rotationAxis) < 0.01) // bad luck, they were parallel, try again!
+			rotationAxis = glm::cross(glm::vec3(1.0f, 0.0f, 0.0f), start);
+
+		rotationAxis = normalize(rotationAxis);
+		return glm::angleAxis(glm::radians(180.0f), rotationAxis);
+	}
+
+	rotationAxis = cross(start, dest);
+
+	float s = sqrt((1 + cosTheta) * 2);
+	float invs = 1 / s;
+
+	return glm::quat(
+		s * 0.5f,
+		rotationAxis.x * invs,
+		rotationAxis.y * invs,
+		rotationAxis.z * invs
+	);
 }
 
 GLWidget::GLWidget(QWidget *parent) 
@@ -119,11 +155,16 @@ void GLWidget::createScene() {
 	world->GetEnvironment()->SetAmbientColor(glm::vec3(0.15f));
 	DirectionalLight light = dynamic_sp_cast<DirectionalLight>(world->Create(ObjectTypeDirectionalLight));
 	light->SetColor(glm::vec3(0.7f));
-	light->SetPosition(glm::vec3(0));
-	/*light->SetEulerAngles()*/
+	light->SetPosition(glm::vec3(0, 7, 5));
+	//glm::quat cq(-glm::lookAt(glm::vec3(0, 7, 5), glm::vec3(0), glm::vec3(0, 1, 0)));
+	//light->SetRotation(cq);
 
 	Camera camera = dynamic_sp_cast<Camera>(world->Create(ObjectTypeCamera));
 	controller_->setCamera(camera);
+	//camera->SetPosition(glm::vec3(0, 1, 5));
+	
+	//glm::quat q(glm::lookAt(glm::vec3(0, 1, 5), glm::vec3(0), glm::vec3(0, 1, 0)));
+	//camera->SetRotation(q);
 
 	camera->SetClearType(ClearTypeColor);
 	camera->SetClearColor(glm::vec3(0, 0, 0.4f));
@@ -150,7 +191,7 @@ void GLWidget::createScene() {
 
 	Sprite sprite = dynamic_sp_cast<Sprite>(world->Create(ObjectTypeSprite));
 	sprite->SetPosition(glm::vec3(0, 0, -4));
-	sprite->SetEulerAngles(glm::vec3(0, 30, 0));
+	//sprite->SetEulerAngles(glm::vec3(0, 180, 0));
 
 	Surface surface = dynamic_sp_cast<Surface>(world->Create(ObjectTypeSurface));
 	/* Mesh.
@@ -179,7 +220,7 @@ void GLWidget::createScene() {
 	sprite->SetSurface(surface);
 
 	Renderer renderer = dynamic_sp_cast<Renderer>(world->Create(ObjectTypeRenderer));
-	renderer->SetRenderState(Cull, Back);
+	renderer->SetRenderState(Cull, Off);
 	renderer->SetRenderState(DepthTest, Less);
 
 	Shader shader = dynamic_sp_cast<Shader>(world->Create(ObjectTypeShader));

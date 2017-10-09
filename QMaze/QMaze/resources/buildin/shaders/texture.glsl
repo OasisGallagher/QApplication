@@ -4,8 +4,8 @@ in vec2 c_texCoord;
 in vec3 c_normal;
 
 out vec2 texCoord;
-out vec3 normal;
 out vec3 worldPos;
+out vec3 normal;
 
 uniform mat4 c_localToClipSpaceMatrix;
 uniform mat4 c_localToWorldSpaceMatrix;
@@ -20,7 +20,7 @@ void main() {
 }
 
 #shader fragment
-out vec3 c_fragColor;
+out vec4 c_fragColor;
 
 in vec2 texCoord;
 in vec3 normal;
@@ -33,21 +33,22 @@ uniform vec3 c_cameraPosition;
 uniform vec3 c_lightColor;
 uniform vec3 c_lightDirection;
 
-void main() {
-	const float gloss = 3;
-	vec3 normal0 = normalize(normal);
-	vec3 albedo = texture(c_mainTexture, texCoord).rgb;
-
-	vec3 ambient = c_ambientLightColor * albedo;
+vec3 calculateDirectionalLight(vec3 worldPos, vec3 worldNormal) {
+	vec3 ambient = vec3(c_ambientLightColor);
 	
-	float factor = clamp(dot(normal0, -c_lightDirection), 0, 1);
-	vec3 diffuse = c_lightColor * factor * albedo;
+	float factor = clamp(dot(worldNormal, -c_lightDirection), 0, 1);
+	vec3 diffuse = vec3(c_lightColor * factor);
 
 	vec3 toEye = normalize(c_cameraPosition - worldPos);
-	vec3 reflectDir = normalize(reflect(c_lightDirection, normal0));
+	vec3 reflectDir = normalize(reflect(c_lightDirection, worldNormal));
 	factor = clamp(dot(toEye, reflectDir), 0, 1);
-	factor = pow(factor, gloss);
-	vec3 specular = c_lightColor * factor * albedo;
-	
-	c_fragColor = ambient + diffuse + specular;
+	factor = pow(factor, 20);
+	vec3 specular = vec3(c_lightColor * 9 * factor);
+
+	return ambient + diffuse + specular;
+}
+
+void main() {
+	vec4 albedo = texture(c_mainTexture, vec2(texCoord.x, 1 - texCoord.y));
+	c_fragColor = albedo * vec4(calculateDirectionalLight(worldPos, normalize(normal)), 1);
 }
