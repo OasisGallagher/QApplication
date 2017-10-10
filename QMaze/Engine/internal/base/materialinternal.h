@@ -8,7 +8,7 @@ class MaterialInternal : public IMaterial, public ObjectInternal {
 	DEFINE_FACTORY_METHOD(Material)
 
 public:
-	MaterialInternal(Shader shader = Shader());
+	MaterialInternal();
 	~MaterialInternal() {}
 
 public:
@@ -17,6 +17,9 @@ public:
 
 	virtual void Bind();
 	virtual void Unbind();
+
+	virtual void Define(const std::string& name);
+	virtual void Undefine(const std::string& name);
 
 	virtual void SetInt(const std::string& name, int value);
 	virtual void SetFloat(const std::string& name, float value);
@@ -30,8 +33,6 @@ public:
 	virtual glm::mat4 GetMatrix4(const std::string& name);
 	virtual glm::vec3 GetVector3(const std::string& name);
 
-	//virtual void SetBlock(const std::string& name, const void* value);
-
 private:
 	bool IsSampler(int type);
 
@@ -40,7 +41,6 @@ private:
 	void UpdateFragmentAttributes();
 	
 	void AddAllUniforms();
-	void AddAllUniformBlocks();
 	
 	void BindTextures();
 	void UnbindTextures();
@@ -59,5 +59,4 @@ private:
 	int maxTextureUnits_;
 	int textureUnitIndex_;
 	UniformContainer uniforms_;
-	UniformBlockContainer blocks_;
 };

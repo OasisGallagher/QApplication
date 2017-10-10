@@ -12,11 +12,11 @@
 
 int Debug::length_ = 0;
 std::stack<std::string> Debug::samples_;
-ILogCallback* Debug::callback_;
+EngineLogCallback* Debug::callback_;
 
 std::ofstream debug("main/debug/debug.txt");
 
-void Debug::SetLogCallback(ILogCallback* cb) {
+void Debug::SetLogCallback(EngineLogCallback* cb) {
 	callback_ = cb;
 }
 

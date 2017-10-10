@@ -9,14 +9,14 @@ enum {
 	LogLevelFatal,
 };
 
-class ILogCallback {
+class EngineLogCallback {
 public:
 	virtual void OnEngineLogMessage(int level, const char* message) = 0;
 };
 
 class Time;
 class Screen;
-class ILogCallback;
+class EngineLogCallback;
 
 class ENGINE_EXPORT Engine {
 public:
@@ -33,7 +33,7 @@ public:
 	/**
 	 * make debug context !!!
 	 */
-	void setDebugCallback(ILogCallback* callback);
+	void setDebugCallback(EngineLogCallback* callback);
 
 	void update();
 	void onResize(int w, int h);

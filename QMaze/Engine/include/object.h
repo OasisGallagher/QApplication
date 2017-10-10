@@ -24,7 +24,7 @@ enum ObjectType {
 
 	ObjectTypeCount,
 
-	ObjectTypeLight,
+	ObjectTypeLights,
 };
 
 class ENGINE_EXPORT IObject {
@@ -32,8 +32,8 @@ public:
 	virtual ~IObject() {}
 
 public:
-	virtual unsigned GetInstanceID() const = 0;
 	virtual ObjectType GetType() const = 0;
+	virtual unsigned GetInstanceID() const = 0;
 };
 
 typedef smart_ptr<IObject> Object;

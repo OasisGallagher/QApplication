@@ -9,6 +9,8 @@ enum ClearType {
 	ClearTypeSkybox,
 };
 
+class PostEffect;
+
 class ENGINE_EXPORT ICamera : virtual public ISprite {
 public:
 	virtual void SetDepth(int value) = 0;
@@ -36,9 +38,12 @@ public:
 	virtual float GetFarClipPlane() const = 0;
 	virtual float GetFieldOfView() const = 0;
 
-	virtual void Render() = 0;
-
 	virtual const glm::mat4& GetProjectionMatrix() = 0;
+
+	virtual void AddPostEffect(PostEffect* effect) = 0;
+
+	// TODO: internal method.
+	virtual void Render() = 0;
 };
 
 typedef smart_ptr<ICamera> Camera;

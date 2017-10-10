@@ -177,7 +177,7 @@ void SurfaceInternal::InitTextures(const aiScene* scene, const std::string& path
 			if (mat->GetTexture(aiTextureType_NORMALS, 0, &dpath) == AI_SUCCESS) {
 				Texture2D texture = Factory::Create<Texture2DInternal>();
 				if (texture->Load(prefix + dpath.data)) {
-					textures[i].normal = texture;
+					textures[i].bump = texture;
 				}
 			}
 		}
@@ -186,7 +186,7 @@ void SurfaceInternal::InitTextures(const aiScene* scene, const std::string& path
 			if (mat->GetTexture(aiTextureType_DIFFUSE, 0, &dpath) == AI_SUCCESS) {
 				Texture2D texture = Factory::Create<Texture2DInternal>();
 				if (texture->Load(prefix + dpath.data)) {
-					textures[i].diffuse = texture;
+					textures[i].albedo = texture;
 				}
 			}
 		}

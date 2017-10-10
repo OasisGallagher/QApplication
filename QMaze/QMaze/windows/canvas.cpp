@@ -7,6 +7,7 @@
 #include <glm/gtx/quaternion.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "canvas.h"
 #include "light.h"
 #include "skybox.h"
 #include "camera.h"
@@ -15,8 +16,8 @@
 #include "engine.h"
 #include "texture.h"
 #include "surface.h"
-#include "canvas.h"
 
+#include "scripts/grayscale.h"
 #include "scripts/cameracontroller.h"
 
 // https://github.com/opengl-tutorials/ogl/blob/master/common/quaternion_utils.cpp
@@ -56,13 +57,14 @@ Canvas::Canvas(QWidget *parent)
 	: QGLWidget(parent), sceneCreated_(false) {
 	setMouseTracking(true);
 	setFocusPolicy(Qt::StrongFocus);
+	grayscale_ = new Grayscale;
 	controller_ = new CameraController;
-
 	timer_ = startTimer(10);
 }
 
 Canvas::~Canvas() {
 	killTimer(timer_);
+	delete grayscale_;
 	delete controller_;
 	Engine::get()->release();
 }
@@ -139,6 +141,7 @@ void Canvas::createScene() {
 
 	Camera camera = dynamic_sp_cast<Camera>(world->Create(ObjectTypeCamera));
 	controller_->setCamera(camera);
+	camera->AddPostEffect(grayscale_);
 	//camera->SetPosition(glm::vec3(0, 1, 5));
 	
 	//glm::quat q(glm::lookAt(glm::vec3(0, 1, 5), glm::vec3(0), glm::vec3(0, 1, 0)));
@@ -188,12 +191,11 @@ void Canvas::createScene() {
 	*/
 
 	surface->Load("models/suzanne.obj");
-	MaterialTextures textures = surface->GetMesh(0)->GetMaterialTextures();
-	Texture2D diffuse = dynamic_sp_cast<Texture2D>(world->Create(ObjectTypeTexture2D));
-	diffuse->Load("textures/suzanne_uvmap.dds");
-	textures.diffuse = diffuse;
+	Texture2D albedo = dynamic_sp_cast<Texture2D>(world->Create(ObjectTypeTexture2D));
+	albedo->Load("textures/suzanne_uvmap.dds");
 
-	surface->GetMesh(0)->SetMaterialTextures(textures);
+	MaterialTextures& textures = surface->GetMesh(0)->GetMaterialTextures();
+	textures.albedo = albedo;
 
 	sprite->SetSurface(surface);
 

@@ -2,11 +2,11 @@
 #include <stack>
 #include <string>
 
-class ILogCallback;
+class EngineLogCallback;
 
 class Debug {
 public:
-	static void SetLogCallback(ILogCallback* cb);
+	static void SetLogCallback(EngineLogCallback* cb);
 
 	static void Log(const std::string& text);
 	static void LogWarning(const std::string& text);
@@ -29,13 +29,13 @@ private:
 private:
 	static int length_;
 	static std::stack<std::string> samples_;
-	static ILogCallback* callback_;
+	static EngineLogCallback* callback_;
 };
 
 #define Verify(expression) \
 	(void)((!!(expression)) || (Debug::Break(#expression,  __FILE__, __LINE__), 0))
 
-#define VerifyX(expression, message)	\
+#define VerifyX(expression, message) \
 	(void)((!!(expression)) || (Debug::Break(#expression, message,  __FILE__, __LINE__), 0))
 
 #if _DEBUG

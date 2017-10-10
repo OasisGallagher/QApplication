@@ -56,6 +56,13 @@ public:
 	virtual void SetRenderQueue(int value) = 0;
 	virtual int GetRenderQueue() const = 0;
 
+	/**
+	 * @param Cull: Front, Back, Off
+	 * @param DepthTest: Never, Less, LessEqual, Equal, Greater, NotEqual, GreaterEqual, Always
+	 * @param DepthWrite: On, Off
+	 * @param Blend0: Off, Zero, One, SrcColor, OneMinusSrcColor, SrcAlpha, OneMinusSrcAlpha, DestAlpha, OneMinusDestAlpha
+	 * @param Blend1: None, Zero, One, SrcColor, OneMinusSrcColor, SrcAlpha, OneMinusSrcAlpha, DestAlpha, OneMinusDestAlpha
+	 */
 	virtual void SetRenderState(RenderStateType type, RenderStateParameter parameter0, RenderStateParameter parameter1 = (RenderStateParameter)None) = 0;
 };
 

@@ -1,4 +1,5 @@
 #pragma once
+#include <bitset>
 #include <glm/gtc/quaternion.hpp>
 
 #include "sprite.h"

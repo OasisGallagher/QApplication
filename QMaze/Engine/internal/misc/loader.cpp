@@ -5,9 +5,6 @@
 #include "tools/string.h"
 #include "internal/base/glsldefines.h"
 
-static const char* SHADER = "shader";
-static const char* INCLUDE = "include";
-
 bool TextLoader::Load(const std::string& file, std::string& text) {
 	std::ifstream ifs(file, std::ios::in);
 	if (!ifs) {
@@ -53,7 +50,7 @@ bool TextLoader::Load(const std::string& file, std::vector<std::string>& lines) 
 	return true;
 }
 
-bool ShaderParser::Parse(const std::string& path, std::string* answer) {
+bool ShaderParser::Parse(const std::string& path, std::string(&answer)[ShaderTypeCount]) {
 	std::vector<std::string> lines;
 	if (!TextLoader::Load("resources/" + path, lines)) {
 		return false;
@@ -62,6 +59,7 @@ bool ShaderParser::Parse(const std::string& path, std::string* answer) {
 	Clear();
 
 	answer_ = answer;
+	path_ = path;
 	return ParseShaderSource(lines);
 }
 
@@ -72,8 +70,9 @@ void ShaderParser::Clear() {
 	answer_ = nullptr;
 }
 
-bool ShaderParser::ParseShaderSource(std::vector<std::string>& lines) {
+bool ShaderParser::ParseShaderSource(const std::vector<std::string>& lines) {
 	globals_ = "#version " GLSL_VERSION "\n";
+	//globals_ += FormatDefines(defines);
 	ReadShaderSource(lines);
 
 	AssertX(type_ != ShaderTypeCount, "invalid shader file");
@@ -82,21 +81,57 @@ bool ShaderParser::ParseShaderSource(std::vector<std::string>& lines) {
 	return true;
 }
 
+std::string ShaderParser::FormatDefines(const std::string& defines) {
+	std::vector<std::string> container;
+	String::Split(defines, '|', container);
+
+	std::string ans;
+	for (int i = 0; i < container.size(); ++i) {
+		ans += "#define " + container[i] + "\n";
+	}
+
+	return ans;
+}
+
 bool ShaderParser::Preprocess(const std::string& line) {
 	size_t pos = line.find(' ');
-	AssertX(pos > 1, "unable to preprocess" + line);
 	std::string cmd = line.substr(1, pos - 1);
-	std::string parameter = String::Trim(line.substr(pos));
+	std::string parameter;
+	if (pos != std::string::npos) {
+		parameter = String::Trim(line.substr(pos));
+	}
 
-	if (cmd == SHADER) {
+	if (cmd == GLSL_TAG_SHADER) {
 		return PreprocessShader(parameter);
 	}
-	else if (cmd == INCLUDE) {
-		return PreprocessInclude(parameter);
+
+	if (cmd == GLSL_TAG_INCLUDE) {
+		std::string old = path_;
+		bool status = PreprocessInclude(parameter);
+		path_ = old;
+		return status;
 	}
 
 	source_ += line + '\n';
 	return true;
+}
+
+void ShaderParser::CalculateDefinesPermutations(std::vector<std::string>& anwser) {
+	std::vector<std::string> defines_;
+	int max = 1 << 0; defines_.size();
+	for (int i = 0; i < max; ++i) {
+		std::string perm;
+		const char* sep = "";
+		for (int j = 0; j < defines_.size(); ++j) {
+			if (((1 << j) & i) != 0) {
+				perm += sep;
+				sep = "|";
+				perm += defines_[j];
+			}
+		}
+
+		anwser.push_back(perm);
+	}
 }
 
 ShaderType ShaderParser::ParseShaderType(const std::string& tag) {
@@ -110,7 +145,7 @@ ShaderType ShaderParser::ParseShaderType(const std::string& tag) {
 	return ShaderTypeCount;
 }
 
-bool ShaderParser::ReadShaderSource(std::vector<std::string> &lines) {
+bool ShaderParser::ReadShaderSource(const std::vector<std::string> &lines) {
 	for (size_t i = 0; i < lines.size(); ++i) {
 		const std::string& line = lines[i];
 		if (line.front() == '#' && !Preprocess(line)) {
@@ -125,7 +160,7 @@ bool ShaderParser::ReadShaderSource(std::vector<std::string> &lines) {
 	return true;
 }
 
-bool ShaderParser::PreprocessShader(std::string parameter) {
+bool ShaderParser::PreprocessShader(const std::string& parameter) {
 	ShaderType newType = ParseShaderType(parameter);
 
 	if (newType != type_) {
@@ -134,7 +169,7 @@ bool ShaderParser::PreprocessShader(std::string parameter) {
 		}
 		else {
 			if (!answer_[type_].empty()) {
-				Debug::LogError(std::string(ShaderInternal::Description(type_).name) + " already exists");
+				Debug::LogError(std::string(ShaderInternal::Description(type_).name) + " already exists.");
 				return false;
 			}
 
@@ -149,11 +184,14 @@ bool ShaderParser::PreprocessShader(std::string parameter) {
 	return true;
 }
 
-bool ShaderParser::PreprocessInclude(std::string &parameter) {
+bool ShaderParser::PreprocessInclude(const std::string& parameter) {
 	std::vector<std::string> lines;
-	if (!TextLoader::Load("shaders/" + parameter.substr(1, parameter.length() - 2), lines)) {
+	std::string path = parameter.substr(1, parameter.length() - 2);
+	if (!TextLoader::Load("resources/" + path, lines)) {
 		return false;
 	}
+
+	path_ = path;
 
 	return ReadShaderSource(lines);
 }

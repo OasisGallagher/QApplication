@@ -28,12 +28,12 @@ void QMaze::setupUI() {
 
 	vs->addWidget(ui.canvas);
 	vs->addWidget(console());
-	vs->setStretchFactor(0, 9);
+	vs->setStretchFactor(0, 20);
 	vs->setStretchFactor(1, 1);
 
 	hs->addWidget(vs);
 	hs->addWidget(ui.hierarchy);
-	hs->setStretchFactor(0, 9);
+	hs->setStretchFactor(0, 10);
 	hs->setStretchFactor(1, 1);
 
 	setCentralWidget(hs);

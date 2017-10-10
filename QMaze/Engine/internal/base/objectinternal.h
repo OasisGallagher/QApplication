@@ -1,7 +1,4 @@
 #pragma once
-#include <vector>
-#include <bitset>
-#include <glm/glm.hpp>
 
 #include "object.h"
 #include "internal/memory/factory.h"
@@ -12,8 +9,8 @@ public:
 	virtual ~ObjectInternal() {}
 
 public:
-	virtual unsigned GetInstanceID() const { return id_; }
 	virtual ObjectType GetType() const { return type_; }
+	virtual unsigned GetInstanceID() const { return id_; }
 
 public:
 	static void DecodeInstanceID(unsigned value, ObjectType* type, unsigned* id);

@@ -36,8 +36,8 @@ public:
 	virtual void SetSkybox(Skybox value) { skybox_ = value; }
 	virtual Skybox GetSkybox() { return skybox_; }
 
-	virtual void SetClearColor(const glm::vec3& value) { clearColor_ = value; }
-	virtual glm::vec3 GetClearColor() const { return clearColor_; }
+	virtual void SetClearColor(const glm::vec3& value);
+	virtual glm::vec3 GetClearColor() const;
 
 	virtual void SetRenderTexture(RenderTexture value);
 	virtual RenderTexture GetRenderTexture() { return renderTexture_; }
@@ -59,8 +59,12 @@ public:
 
 	virtual const glm::mat4& GetProjectionMatrix();
 
+public:
+	virtual void AddPostEffect(PostEffect* effect) { postEffects_.push_back(effect); }
+
 private:
 	void CreateFramebuffers();
+	void CreateDepthRenderer();
 	Framebuffer0* GetActiveFramebuffer();
 
 	void RenderDepthPass(std::vector<Sprite>& sprites);
@@ -87,14 +91,18 @@ private:
 	float aspect_;
 	float near_, far_;
 	float fieldOfView_;
-	glm::vec3 clearColor_;
 	glm::mat4 projection_;
 
 	Framebuffer0* fb0_;
 	Framebuffer* fbDepth_;
 	Framebuffer* fbRenderTexture_;
+	Framebuffer* fbRenderTexture2_;
+
+	// TODO: Common renderer.
+	Renderer depthRenderer_;
+
 	RenderTexture renderTexture_;
-	RenderTexture tempRenderTexture_;
+	RenderTexture renderTexture2_;
 
 	std::vector<PostEffect*> postEffects_;
 

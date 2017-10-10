@@ -54,7 +54,7 @@ bool WorldInternal::GetSprites(ObjectType type, std::vector<Sprite>& sprites) {
 	else if (type == ObjectTypeCamera) {
 		sprites.assign(cameras_.begin(), cameras_.end());
 	}
-	else if (type == ObjectTypeLight) {
+	else if (type == ObjectTypeLights) {
 		sprites.assign(lights_.begin(), lights_.end());
 	}
 	else {

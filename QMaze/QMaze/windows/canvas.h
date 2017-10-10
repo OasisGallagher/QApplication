@@ -4,9 +4,10 @@
 #include <QTextBrowser>
 #include <QtOpenGL/QGLWidget>
 
+class PostEffect;
 class CameraController;
 
-class Canvas : public QGLWidget, public ILogCallback {
+class Canvas : public QGLWidget, public EngineLogCallback {
 	Q_OBJECT
 public:
 	Canvas(QWidget *parent = NULL);
@@ -36,5 +37,6 @@ signals:
 private:
 	int timer_;
 	bool sceneCreated_;
+	PostEffect* grayscale_;
 	CameraController* controller_;
 };

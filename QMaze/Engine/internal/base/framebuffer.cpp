@@ -15,6 +15,7 @@ void Framebuffer0::Create(int width, int height) {
 }
 
 void Framebuffer0::Bind() {
+	Clear();
 	PushFramebuffer();
 	PushViewport(0, 0, GetWidth(), GetHeight());
 }
@@ -46,6 +47,7 @@ void Framebuffer0::PopViewport() {
 
 void Framebuffer0::Clear(int buffers) {
 	PushFramebuffer();
+	glClearColor(clearColor_.r, clearColor_.g, clearColor_.b, 1);
 	glClear(buffers);
 	PopFramebuffer();
 }

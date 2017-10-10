@@ -13,6 +13,9 @@ public:
 	virtual void SetShader(Shader shader) = 0;
 	virtual Shader GetShader() = 0;
 
+	virtual void Define(const std::string& name) = 0;
+	virtual void Undefine(const std::string& name) = 0;
+
 	virtual void SetInt(const std::string& name, int value) = 0;
 	virtual void SetFloat(const std::string& name, float value) = 0;
 	virtual void SetTexture(const std::string& name, Texture value) = 0;
@@ -24,15 +27,6 @@ public:
 	virtual Texture GetTexture(const std::string& name) = 0;
 	virtual glm::mat4 GetMatrix4(const std::string& name) = 0;
 	virtual glm::vec3 GetVector3(const std::string& name) = 0;
-
-	//virtual void SetBlock(const std::string& name, const void* value) = 0;
-
-	/*virtual void SetBlockUniform(const std::string& blockName,
-		const std::string& uniformName, const void* value) = 0;
-
-	virtual void SetBlockUniformArrayElement(const std::string& blockName,
-		const std::string& uniformName, GLint index, const void* value) = 0;
-	*/
 };
 
 typedef smart_ptr<IMaterial> Material;

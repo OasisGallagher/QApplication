@@ -64,12 +64,3 @@ struct Uniform {
 };
 
 typedef PtrMap<Uniform> UniformContainer;
-
-struct UniformBlock {
-	~UniformBlock();
-
-	GLuint size, buffer, binding;
-	UniformContainer uniforms;
-};
-
-typedef PtrMap<UniformBlock> UniformBlockContainer;

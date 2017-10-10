@@ -12,17 +12,8 @@ public:
 	virtual void SetColor(const glm::vec3 & value) { color_ = value; }
 	virtual glm::vec3 GetColor() const { return color_; }
 
-	virtual void SetAmbientIntensity(float value) { ambiemtIntensity_ = value; }
-	virtual float GetAmbientIntensity() { return ambiemtIntensity_; }
-
-	virtual void SetDiffuseIntensity(float value) { diffuseIntensity_ = value; }
-	virtual float GetDiffuseIntensity() { return diffuseIntensity_; }
-
 private:
 	glm::vec3 color_;
-	float ambiemtIntensity_;
-	float diffuseIntensity_;
-
 	LightImportance importance_;
 };
 

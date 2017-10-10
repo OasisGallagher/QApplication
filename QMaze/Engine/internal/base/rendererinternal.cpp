@@ -16,9 +16,9 @@ RendererInternal::~RendererInternal() {
 }
 
 void RendererInternal::Render(Surface surface) {
-	BindRenderOptions();
+	BindRenderStates();
 	DrawCall(surface);
-	UnbindRenderOptions();
+	UnbindRenderStates();
 }
 
 void RendererInternal::SetRenderState(RenderStateType type, RenderStateParameter parameter0, RenderStateParameter parameter1) {
@@ -59,14 +59,14 @@ void RendererInternal::DrawCall(Surface surface) {
 }
 
 void RendererInternal::DrawMesh(Mesh mesh, Material material) {
-	MaterialTextures textures = mesh->GetMaterialTextures();
+	MaterialTextures& textures = mesh->GetMaterialTextures();
 
-	if (textures.normal) {
-		material->SetTexture(Variables::normalTexture, textures.normal);
+	if (textures.bump) {
+		material->SetTexture(Variables::bumpTexture, textures.bump);
 	}
 
-	if (textures.diffuse) {
-		material->SetTexture(Variables::mainTexture, textures.diffuse);
+	if (textures.albedo) {
+		material->SetTexture(Variables::mainTexture, textures.albedo);
 	}
 
 	if (textures.specular) {
@@ -81,7 +81,7 @@ void RendererInternal::DrawMesh(Mesh mesh, Material material) {
 	material->Unbind();
 }
 
-void RendererInternal::BindRenderOptions() {
+void RendererInternal::BindRenderStates() {
 	for (int i = 0; i < RenderStateCount; ++i) {
 		if (states_[i] != nullptr) {
 			states_[i]->Bind();
@@ -89,7 +89,7 @@ void RendererInternal::BindRenderOptions() {
 	}
 }
 
-void RendererInternal::UnbindRenderOptions() {
+void RendererInternal::UnbindRenderStates() {
 	for (int i = 0; i < RenderStateCount; ++i) {
 		if (states_[i] != nullptr) {
 			states_[i]->Unbind();

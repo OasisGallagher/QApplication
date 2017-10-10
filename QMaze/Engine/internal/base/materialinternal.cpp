@@ -3,8 +3,8 @@
 #include "tools/string.h"
 #include "materialinternal.h"
 
-MaterialInternal::MaterialInternal(Shader shader)
-	: ObjectInternal(ObjectTypeMaterial), shader_(shader)
+MaterialInternal::MaterialInternal()
+	: ObjectInternal(ObjectTypeMaterial)
 	, textureUnitIndex_(0), maxTextureUnits_(0), oldProgram_(0) {
 	glGetIntegerv(GL_MAX_TEXTURE_UNITS, &maxTextureUnits_);
 }
@@ -56,17 +56,6 @@ void MaterialInternal::SetMatrix4(const std::string& name, const glm::mat4& valu
 		SetUniform(u, &value);
 	}
 }
-
-/*
-void MaterialInternal::SetBlock(const std::string& name, const void* value) {
-	AssertX(blocks_.contains(name), "invalid block name " + name + ".");
-
-	UniformBlock* block = blocks_[name];
-	glBindBuffer(GL_UNIFORM_BUFFER, block->buffer);
-	glBufferSubData(GL_UNIFORM_BUFFER, 0, block->size, value);
-	glBindBuffer(GL_UNIFORM_BUFFER, 0);
-}
-*/
 
 int MaterialInternal::GetInt(const std::string& name) {
 	Uniform* u = GetUniform(name, UniformInt);
@@ -125,15 +114,21 @@ void MaterialInternal::Unbind() {
 	oldProgram_ = 0;
 }
 
+void MaterialInternal::Define(const std::string& name) {
+}
+
+void MaterialInternal::Undefine(const std::string& name) {
+}
+
 Uniform* MaterialInternal::GetUniform(const std::string& name, UniformType type) {
 	Uniform* ans = nullptr;
 	if (!uniforms_.get(name, ans)) {
-		Debug::LogError("Uniform " + name + " does not exist.");
+		Debug::LogWarning("uniform " + name + " does not exist.");
 		return false;
 	}
 
 	if (ans->value.GetType() != type) {
-		Debug::LogError("Uniform " + name + "does not defined as " + UniformVariable::UniformTypeToName(type));
+		Debug::LogError("uniform " + name + "does not defined as " + UniformVariable::UniformTypeToName(type));
 		return false;
 	}
 
@@ -143,7 +138,6 @@ Uniform* MaterialInternal::GetUniform(const std::string& name, UniformType type)
 void MaterialInternal::UpdateVariables() {
 	// http://www.lighthouse3d.com/tutorials/glsl-tutorial/uniform-blocks/
 	AddAllUniforms();
-	AddAllUniformBlocks();
 }
 
 void MaterialInternal::UpdateVertexAttributes() {
@@ -156,7 +150,8 @@ void MaterialInternal::UpdateVertexAttributes() {
 
 void MaterialInternal::UpdateFragmentAttributes() {
 	GLuint program = shader_->GetNativePointer();
-	glBindFragDataLocation(program, 0, Variables::fragColor);
+	//glBindFragDataLocation(program, 0, Variables::fragColor);
+	glBindFragDataLocation(program, 0, Variables::depth);
 }
 
 void MaterialInternal::BindTextures() {
@@ -281,83 +276,6 @@ void MaterialInternal::AddAllUniforms() {
 	}
 
 	delete[] name;
-}
-
-void MaterialInternal::AddAllUniformBlocks() {
-	blocks_.clear();
-
-	GLsizei nameWritten;
-	GLint blockCount, uniformCount, blockNameLength, uniformNameLength, dataSize;
-	GLint uniformType, uniformSize, uniformOffset, uniformMatrixStride, uniformArrayStride;
-
-	GLuint buffer;
-	std::string blockName, uniformName;
-
-	GLuint program = shader_->GetNativePointer();
-
-	glGetProgramiv(program, GL_ACTIVE_UNIFORM_BLOCKS, &blockCount);
-	for (GLint i = 0; i < blockCount; ++i) {
-		glGetActiveUniformBlockiv(program, i, GL_UNIFORM_BLOCK_NAME_LENGTH, &blockNameLength);
-
-		blockName.resize(blockNameLength);
-		glGetActiveUniformBlockName(program, i, blockNameLength, &nameWritten, &blockName[0]);
-		blockName.resize(nameWritten);
-
-		if (blocks_.contains(blockName)) {
-			glUniformBlockBinding(program, i, blocks_[blockName]->binding);
-			continue;
-		}
-
-		UniformBlock* block = blocks_[blockName];
-
-		glGetActiveUniformBlockiv(program, i, GL_UNIFORM_BLOCK_DATA_SIZE, &dataSize);
-
-		glGenBuffers(1, &buffer);
-		glBindBuffer(GL_UNIFORM_BUFFER, buffer);
-		glBufferData(GL_UNIFORM_BUFFER, dataSize, NULL, GL_DYNAMIC_DRAW);
-
-		static GLuint bindingIndex = 0;
-		++bindingIndex;
-
-		glUniformBlockBinding(program, i, bindingIndex);
-		glBindBufferRange(GL_UNIFORM_BUFFER, bindingIndex, buffer, 0, dataSize);
-
-		glGetActiveUniformBlockiv(program, i, GL_UNIFORM_BLOCK_ACTIVE_UNIFORMS, &uniformCount);
-
-		GLuint* indices = new GLuint[uniformCount];
-		glGetActiveUniformBlockiv(program, i, GL_UNIFORM_BLOCK_ACTIVE_UNIFORM_INDICES, (GLint*)indices);
-
-		glGetProgramiv(program, GL_ACTIVE_UNIFORM_MAX_LENGTH, &uniformNameLength);
-		uniformName.resize(uniformNameLength);
-
-		for (GLint j = 0; j < uniformCount; ++j) {
-			glGetActiveUniformName(program, indices[j], uniformNameLength, &nameWritten, &uniformName[0]);
-			uniformName.resize(nameWritten);
-
-			Uniform* uniform = block->uniforms[uniformName];
-
-			// for uniform Matrices { mat4 m };
-			// uniformSize = 1, uniformMatrixStride = 16, uniformArrayStride = 0.
-			// for uniform Matrices { mat4 m[2] }:
-			// uniformSize = 2, uniformMatrixStride = 16, uniformArrayStride = 64.
-			// for uniform Matrices { float m[4] }:
-			// uniformSize = 4, uniformMatrixStride = 0, uniformArrayStride = 4.
-			glGetActiveUniformsiv(program, 1, &indices[j], GL_UNIFORM_TYPE, &uniformType);
-			glGetActiveUniformsiv(program, 1, &indices[j], GL_UNIFORM_SIZE, &uniformSize);
-			glGetActiveUniformsiv(program, 1, &indices[j], GL_UNIFORM_OFFSET, &uniformOffset);
-			glGetActiveUniformsiv(program, 1, &indices[j], GL_UNIFORM_MATRIX_STRIDE, &uniformMatrixStride);
-			glGetActiveUniformsiv(program, 1, &indices[j], GL_UNIFORM_ARRAY_STRIDE, &uniformArrayStride);
-
-			uniform->offset = uniformOffset;
-			uniform->type = uniformType;
-			uniform->size = GetUniformSize(uniformType, uniformSize, uniformOffset, uniformMatrixStride, uniformArrayStride);
-			uniform->stride = uniformArrayStride;
-		}
-
-		block->size = dataSize;
-		block->binding = bindingIndex;
-		block->buffer = buffer;
-	}
 }
 
 GLuint MaterialInternal::GetUniformSize(GLint uniformType, GLint uniformSize,

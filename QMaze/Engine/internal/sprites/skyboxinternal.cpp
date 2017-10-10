@@ -29,9 +29,8 @@ bool SkyboxInternal::Load(const std::string(&textures)[6]) {
 		return false;
 	}
 
-	MaterialTextures materialTextures = surface->GetMesh(0)->GetMaterialTextures();
-	materialTextures.diffuse = texture;
-	surface->GetMesh(0)->SetMaterialTextures(materialTextures);
+	MaterialTextures& materialTextures = surface->GetMesh(0)->GetMaterialTextures();
+	materialTextures.albedo = texture;
 
 	SetSurface(surface);
 

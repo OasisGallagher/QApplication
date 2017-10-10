@@ -16,12 +16,6 @@ public:
 
 	virtual void SetColor(const glm::vec3& value) = 0;
 	virtual glm::vec3 GetColor() const = 0;
-
-	virtual void SetAmbientIntensity(float value) = 0;
-	virtual float GetAmbientIntensity() = 0;
-
-	virtual void SetDiffuseIntensity(float value) = 0;
-	virtual float GetDiffuseIntensity() = 0;
 };
 
 class ISpotLight : virtual public ILight {

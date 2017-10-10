@@ -85,8 +85,3 @@ void UniformVariable::SetTextureLocation(GLenum value) {
 	textureIndex_ = value;
 }
 
-UniformBlock::~UniformBlock() {
-	if (buffer != 0) {
-		glDeleteBuffers(1, &buffer);
-	}
-}

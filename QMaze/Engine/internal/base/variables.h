@@ -8,9 +8,10 @@ namespace Variables {
 	DEFINE_VARIABLE(tangent);
 
 	DEFINE_VARIABLE(fragColor);
+	DEFINE_VARIABLE(depth);
 
 	DEFINE_VARIABLE(mainTexture);
-	DEFINE_VARIABLE(normalTexture);
+	DEFINE_VARIABLE(bumpTexture);
 	DEFINE_VARIABLE(specularTexture);
 
 	DEFINE_VARIABLE(gloss);
@@ -18,6 +19,7 @@ namespace Variables {
 	DEFINE_VARIABLE(ambientLightColor);
 
 	DEFINE_VARIABLE(lightColor);
+	DEFINE_VARIABLE(lightPosition);
 	DEFINE_VARIABLE(lightDirection);
 
 	DEFINE_VARIABLE(cameraPosition);

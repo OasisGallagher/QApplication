@@ -10,7 +10,7 @@ public:
 	MeshInternal();
 
 	virtual void SetMaterialTextures(const MaterialTextures& value) { textures_ = value; }
-	virtual MaterialTextures GetMaterialTextures() { return textures_; }
+	virtual MaterialTextures& GetMaterialTextures() { return textures_; }
 
 	virtual void SetTriangles(unsigned vertexCount, unsigned baseVertex, unsigned baseIndex);
 	virtual void GetTriangles(unsigned& vertexCount, unsigned& baseVertex, unsigned& baseIndex);

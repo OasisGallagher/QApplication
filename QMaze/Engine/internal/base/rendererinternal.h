@@ -28,9 +28,8 @@ private:
 	void DrawCall(Surface surface);
 	void DrawMesh(Mesh mesh, Material material);
 
-	void ClearRenderOptions();
-	void BindRenderOptions();
-	void UnbindRenderOptions();
+	void BindRenderStates();
+	void UnbindRenderStates();
 
 private:
 	int queue_;

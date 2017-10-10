@@ -75,7 +75,7 @@ bool Texture2DInternal::Load(const std::string& path) {
 	return true;
 }
 
-TextureCubeInternal::TextureCubeInternal() : TextureInternal(ObjectTypeTexture2D) {
+TextureCubeInternal::TextureCubeInternal() : TextureInternal(ObjectTypeTextureCube) {
 }
 
 TextureCubeInternal::~TextureCubeInternal() {
@@ -137,6 +137,8 @@ bool RenderTextureInternal::Load(RenderTextureFormat format, int width, int heig
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
 
 	glBindTexture(GL_TEXTURE_2D, oldBindingTexture);
 

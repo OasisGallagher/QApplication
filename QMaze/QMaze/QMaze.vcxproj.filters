@@ -49,6 +49,9 @@
     <Filter Include="scripts\src">
       <UniqueIdentifier>{dfce4a84-8832-4749-b332-0fdd5a01e4e8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="resources\buildin\shaders\include">
+      <UniqueIdentifier>{d4b000e9-5adc-4391-a49a-d9fb0bfbc95b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GeneratedFiles\qrc_qmaze.cpp">
@@ -90,6 +93,9 @@
     <ClCompile Include="GeneratedFiles\Release\moc_hierarchy.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="scripts\grayscale.cpp">
+      <Filter>scripts\src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="ui\qmaze.ui">
@@ -118,6 +124,12 @@
     <ClInclude Include="scripts\cameracontroller.h">
       <Filter>scripts\include</Filter>
     </ClInclude>
+    <ClInclude Include="resources\buildin\shaders\include\light.inc">
+      <Filter>resources\buildin\shaders\include</Filter>
+    </ClInclude>
+    <ClInclude Include="scripts\grayscale.h">
+      <Filter>scripts\include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\buildin\shaders\depth.glsl">
@@ -127,6 +139,9 @@
       <Filter>resources\buildin\shaders</Filter>
     </None>
     <None Include="resources\buildin\shaders\texture.glsl">
+      <Filter>resources\buildin\shaders</Filter>
+    </None>
+    <None Include="resources\buildin\shaders\blit.glsl">
       <Filter>resources\buildin\shaders</Filter>
     </None>
   </ItemGroup>

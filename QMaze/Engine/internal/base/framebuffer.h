@@ -1,5 +1,7 @@
 #pragma once
 #include <gl/glew.h>
+#include <glm/glm.hpp>
+
 #include "texture.h"
 
 class Framebuffer0 {
@@ -16,7 +18,11 @@ public:
 public:
 	int GetWidth() const { return width_; }
 	int GetHeight() const { return height_; }
-	void Clear(int buffers);
+
+	void SetClearColor(const glm::vec3& value) { clearColor_ = value; }
+	glm::vec3 GetClearColor() const { return clearColor_; }
+
+	void Clear(int buffers = GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	unsigned GetNativePointer() const { return fbo_; }
 
@@ -33,6 +39,8 @@ protected:
 private:
 	GLsizei width_;
 	GLsizei height_;
+
+	glm::vec3 clearColor_;
 
 	GLint oldFramebuffer_;
 	GLint oldViewport_[4];

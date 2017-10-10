@@ -20,6 +20,7 @@ CameraInternal::CameraInternal()
 	, fieldOfView_(3.141592f / 3.f), projection_(glm::perspective(fieldOfView_, aspect_, near_, far_))
 	, pass_(RenderPassNone), fbRenderTexture_(nullptr) {
 	CreateFramebuffers();
+	CreateDepthRenderer();
 	glClearDepth(1);
 }
 
@@ -27,6 +28,14 @@ CameraInternal::~CameraInternal() {
 	Memory::Release(fb0_);
 	Memory::Release(fbDepth_);
 	Memory::Release(fbRenderTexture_);
+}
+
+void CameraInternal::SetClearColor(const glm::vec3 & value) {
+	fb0_->SetClearColor(value);
+}
+
+glm::vec3 CameraInternal::GetClearColor() const {
+	return fb0_->GetClearColor();
 }
 
 void CameraInternal::SetRenderTexture(RenderTexture value) {
@@ -46,7 +55,7 @@ void CameraInternal::Update() {
 		}
 
 		if (!skybox) {
-			Debug::LogWarning("no skybox found");
+			Debug::LogWarning("skybox does not exist.");
 			return;
 		}
 
@@ -55,9 +64,6 @@ void CameraInternal::Update() {
 }
 
 void CameraInternal::Render() {
-	glClearColor(clearColor_.r, clearColor_.g, clearColor_.b, 1);
-	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-
 	std::vector<Sprite> sprites;
 	if (!GetRenderableSprites(sprites)) {
 		return;
@@ -106,15 +112,30 @@ void CameraInternal::CreateFramebuffers() {
 	renderTexture_->Load(Rgba, w, h);
 	fbRenderTexture_->SetRenderTexture(renderTexture_);
 	
-	tempRenderTexture_ = Factory::Create<RenderTextureInternal>();
-	tempRenderTexture_->Load(Rgba, w, h);
+	fbRenderTexture2_ = Memory::Create<Framebuffer>();
+	fbRenderTexture2_->Create(w, h);
+	renderTexture2_ = Factory::Create<RenderTextureInternal>();
+	renderTexture2_->Load(Rgba, w, h);
+	fbRenderTexture2_->SetRenderTexture(renderTexture2_);
+}
+
+void CameraInternal::CreateDepthRenderer() {
+	depthRenderer_ = Factory::Create<RendererInternal>();
+	Shader shader = Factory::Create<ShaderInternal>();
+	shader->Load("buildin/shaders/depth");
+
+	Material material = Factory::Create<MaterialInternal>();
+	material->SetShader(shader);
+
+	depthRenderer_->AddMaterial(material);
+	depthRenderer_->SetRenderState(DepthWrite, On);
+	depthRenderer_->SetRenderState(DepthTest, Less);
 }
 
 Framebuffer0* CameraInternal::GetActiveFramebuffer() {
 	Framebuffer0* active = nullptr;
 	if (fbRenderTexture_->GetRenderTexture(0) != renderTexture_ || !postEffects_.empty()) {
 		active = fbRenderTexture_;
-		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 	}
 	else {
 		active = fb0_;
@@ -133,6 +154,7 @@ void CameraInternal::SetForwardBaseLightParameter(std::vector<Sprite>& sprites, 
 			material->SetVector3(Variables::cameraPosition, GetPosition());
 			material->SetVector3(Variables::ambientLightColor, Engine::get()->world()->GetEnvironment()->GetAmbientColor());
 			material->SetVector3(Variables::lightColor, light->GetColor());
+			material->SetVector3(Variables::lightPosition, light->GetPosition());
 			material->SetVector3(Variables::lightDirection, light->GetRotation() * glm::vec3(0, 0, -1));
 		}
 	}
@@ -157,18 +179,16 @@ int CameraInternal::RenderBackgroundPass(std::vector<Sprite>& sprites, int from)
 }
 
 void CameraInternal::RenderDepthPass(std::vector<Sprite>& sprites) {
-	// TODO: depth shader.
 	pass_ = RenderPassDepth;
-	/*
+	
 	fbDepth_->Bind();
 
 	for (int i = 0; i < sprites.size(); ++i) {
 		Sprite sprite = sprites[i];
-		RenderSprite(sprite, sprite->GetRenderer());
+		RenderSprite(sprite, depthRenderer_);
 	}
 
 	fbDepth_->Unbind();
-	*/
 }
 
 int CameraInternal::RenderOpaquePass(std::vector<Sprite>& sprites, int from) {
@@ -189,7 +209,7 @@ int CameraInternal::RenderTransparentPass(std::vector<Sprite>& sprites, int from
 void CameraInternal::GetLights(Light& forwardBase, std::vector<Light>& forwardAdd) {
 	World world = Engine::get()->world();
 	std::vector<Sprite> lights;
-	if (!world->GetSprites(ObjectTypeLight, lights)) {
+	if (!world->GetSprites(ObjectTypeLights, lights)) {
 		return;
 	}
 
@@ -202,17 +222,23 @@ void CameraInternal::GetLights(Light& forwardBase, std::vector<Light>& forwardAd
 void CameraInternal::OnPostRender() {
 	if (postEffects_.empty()) { return; }
 
-	RenderTexture mainTexture = fbRenderTexture_->GetRenderTexture(0);
-	RenderTexture tempTexture = tempRenderTexture_;
+	Framebuffer* framebuffers[] = { fbRenderTexture_, fbRenderTexture2_ };
+	RenderTexture textures[] = { fbRenderTexture_->GetRenderTexture(0), renderTexture2_ };
 
+	int index = 1;
 	for (int i = 0; i < postEffects_.size(); ++i) {
+		framebuffers[index]->Bind();
+
 		if (i + 1 == postEffects_.size()) {
-			tempTexture.reset();
+			textures[index].reset();
+			fb0_->Bind();
 		}
 
-		postEffects_[i]->OnRenderImage(mainTexture, tempTexture);
-		mainTexture.swap(tempTexture);
+		postEffects_[i]->OnRenderImage(textures[1 - index], textures[index]);
+		index = 1 - index;
 	}
+
+	fb0_->Unbind();
 }
 
 bool CameraInternal::IsRenderable(Sprite sprite) {
@@ -247,6 +273,7 @@ bool CameraInternal::GetRenderableSprites(std::vector<Sprite>& sprites) {
 
 void CameraInternal::RenderSprite(Sprite sprite, Renderer renderer) {
 	Surface surface = sprite->GetSurface();
+	
 	Material material = renderer->GetMaterial(0);
 	glm::mat4 localToWorldMatrix = sprite->GetLocalToWorldMatrix();
 	glm::mat4 localToClipSpaceMatrix = projection_ * GetWorldToLocalMatrix() * localToWorldMatrix;

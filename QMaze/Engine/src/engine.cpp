@@ -52,7 +52,7 @@ void Engine::release() {
 	world_.reset();
 }
 
-void Engine::setDebugCallback(ILogCallback* callback) {
+void Engine::setDebugCallback(EngineLogCallback* callback) {
 	Debug::SetLogCallback(callback);
 }
 
