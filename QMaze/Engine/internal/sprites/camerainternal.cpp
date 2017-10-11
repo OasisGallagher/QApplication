@@ -3,8 +3,8 @@
 #include "light.h"
 #include "engine.h"
 #include "camera.h"
+#include "variables.h"
 #include "tools/debug.h"
-#include "internal/base/variables.h"
 #include "internal/memory/factory.h"
 #include "internal/base/framebuffer.h"
 #include "internal/resources/resources.h"
@@ -94,8 +94,8 @@ void CameraInternal::Render() {
 }
 
 void CameraInternal::CreateFramebuffers() {
-	int w = Engine::get()->contextWidth();
-	int h = Engine::get()->contextHeight();
+	int w = Engine::get()->screen()->GetContextWidth();
+	int h = Engine::get()->screen()->GetContextHeight();
 
 	fb0_ = Memory::Create<Framebuffer0>();
 	fb0_->Create(w, h);

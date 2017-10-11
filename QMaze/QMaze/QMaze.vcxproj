@@ -303,6 +303,8 @@
     <None Include="resources\buildin\shaders\depth.glsl" />
     <None Include="resources\buildin\shaders\skybox.glsl" />
     <None Include="resources\buildin\shaders\texture.glsl" />
+    <None Include="resources\shaders\grayscale.glsl" />
+    <None Include="resources\shaders\include\posteffectvertexshader.inc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

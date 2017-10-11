@@ -1,6 +1,9 @@
 #pragma once
+#include <QSet>
 #include <QWidget>
-#include <QTableWidget>
+
+class QTableWidget;
+class QTextBrowser;
 
 class Console : public QWidget {
 	Q_OBJECT

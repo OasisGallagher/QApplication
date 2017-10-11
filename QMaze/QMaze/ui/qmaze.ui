@@ -29,8 +29,8 @@
      <rect>
       <x>9</x>
       <y>55</y>
-      <width>256</width>
-      <height>162</height>
+      <width>274</width>
+      <height>210</height>
      </rect>
     </property>
     <property name="sizePolicy">
@@ -52,18 +52,6 @@
      </size>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout">
-     <property name="leftMargin">
-      <number>0</number>
-     </property>
-     <property name="topMargin">
-      <number>0</number>
-     </property>
-     <property name="rightMargin">
-      <number>0</number>
-     </property>
-     <property name="bottomMargin">
-      <number>0</number>
-     </property>
      <item>
       <widget class="QTableWidget" name="view">
        <property name="sizePolicy">

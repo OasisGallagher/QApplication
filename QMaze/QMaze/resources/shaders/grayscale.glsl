@@ -9,5 +9,7 @@ in vec2 texCoord;
 uniform sampler2D c_mainTexture;
 
 void main() {
-	c_fragColor = texture(c_mainTexture, texCoord);
+	vec3 scale = vec3(0.2126, 0.7152, 0.0722);
+	float average = dot(scale, texture(c_mainTexture, texCoord).rgb);
+	c_fragColor = vec4(average, average, average, 1);
 }

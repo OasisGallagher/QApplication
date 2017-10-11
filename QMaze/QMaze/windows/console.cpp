@@ -1,5 +1,8 @@
 #include "console.h"
+#include <QSplitter>
 #include <QHeaderView>
+#include <QTableWidget>
+#include <QTextBrowser>
 
 Console::Console(QWidget* parent) : QWidget(parent) {
 }

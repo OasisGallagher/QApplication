@@ -8,7 +8,6 @@ QMaze::QMaze(QWidget *parent)
 	: QMainWindow(parent) {
 	setupUI();
 
-	console()->initialize();
 	connect(canvas(), SIGNAL(onEngineLogReceived(int, const char*)), this, SLOT(OnEngineLogReceived(int, const char*)));
 
 	timer_ = startTimer(1);
@@ -22,6 +21,8 @@ void QMaze::setupUI() {
 
 	QWidget* cw = takeCentralWidget();
 	cw->deleteLater();
+
+	console()->initialize();
 
 	QSplitter* hs = new QSplitter(Qt::Horizontal, this);
 	QSplitter* vs = new QSplitter(Qt::Vertical, this);

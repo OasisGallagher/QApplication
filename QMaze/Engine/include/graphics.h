@@ -4,5 +4,9 @@
 
 class ENGINE_EXPORT Graphics {
 public:
-	static void Blit(RenderTexture src, RenderTexture dest, Renderer renderer);
+	void Blit(RenderTexture src, RenderTexture dest, Renderer renderer);
+
+private:
+	friend class Engine;
+	Graphics() {}
 };

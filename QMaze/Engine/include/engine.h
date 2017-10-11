@@ -2,6 +2,10 @@
 #include "world.h"
 #include "defines.h"
 
+#include "timef.h"
+#include "screen.h"
+#include "graphics.h"
+
 enum {
 	LogLevelDebug,
 	LogLevelWarning,
@@ -14,8 +18,6 @@ public:
 	virtual void OnEngineLogMessage(int level, const char* message) = 0;
 };
 
-class Time;
-class Screen;
 class EngineLogCallback;
 
 class ENGINE_EXPORT Engine {
@@ -24,33 +26,26 @@ public:
 	}
 
 public:
-	static Engine* get() { return &engine_; }
+	static Engine* get();
 
 public:
 	bool initialize();
 	void release();
 
 	/**
-	 * make debug context !!!
+	 * TODO: make debug context !!!
 	 */
-	void setDebugCallback(EngineLogCallback* callback);
+	void setLogCallback(EngineLogCallback* callback);
 
 	void update();
-	void onResize(int w, int h);
+	void resize(int w, int h);
 
 	World world() { return world_; }
 
-	float realTimeSinceStartup();
-	float deltaTime();
-	int frameCount();
-
-	int contextWidth();
-	int contextHeight();
+	Time* time();
+	Screen* screen();
+	Graphics* graphics();
 
 private:
 	World world_;
-	Time* time_;
-	Screen* screen_;
-
-	static Engine engine_;
 };

@@ -3,11 +3,9 @@
 #include "engine.h"
 
 #include "tools/debug.h"
-#include "internal/misc/timef.h"
-#include "internal/misc/screen.h"
-#include "internal/memory/factory.h"
 
-Engine Engine::engine_;
+// TODO: get world instance.
+#include "internal/memory/factory.h"
 
 #ifndef _STDCALL
 #define _STDCALL __stdcall
@@ -22,6 +20,11 @@ static void _STDCALL GLDebugMessageCallback(
 	const GLchar* message, 
 	const GLvoid* userParam
 );
+
+Engine* Engine::get() {
+	static Engine instance;
+	return &instance;
+}
 
 bool Engine::initialize() {
 	AssertX(!world_, "can not initialize engine twice.");
@@ -40,50 +43,40 @@ bool Engine::initialize() {
 
 	world_ = dynamic_sp_cast<World>(Factory::Create(ObjectTypeWorld));
 
-	time_ = Memory::Create<Time>();
-	screen_ = Memory::Create<Screen>();
-
 	return true;
 }
 
 void Engine::release() {
-	Memory::Release(time_);
-	Memory::Release(screen_);
 	world_.reset();
 }
 
-void Engine::setDebugCallback(EngineLogCallback* callback) {
+void Engine::setLogCallback(EngineLogCallback* callback) {
 	Debug::SetLogCallback(callback);
 }
 
-void Engine::onResize(int w, int h) {
-	screen_->SetContentSize(w, h);
+void Engine::resize(int w, int h) {
+	screen()->SetContentSize(w, h);
 	glViewport(0, 0, w, h);
 }
 
+Time* Engine::time() {
+	static Time instance;
+	return &instance;
+}
+
+Screen* Engine::screen() {
+	static Screen instance;
+	return &instance;
+}
+
+Graphics* Engine::graphics() {
+	static Graphics instance;
+	return &instance;
+}
+
 void Engine::update() {
-	time_->Update();
+	time()->Update();
 	world_->Update();
-}
-
-int Engine::frameCount() {
-	return time_->GetFrameCount();
-}
-
-float Engine::deltaTime() {
-	return time_->GetDeltaTime();
-}
-
-float Engine::realTimeSinceStartup() {
-	return time_->GetRealTimeSinceStartup();
-}
-
-int Engine::contextWidth() {
-	return screen_->GetContextWidth();
-}
-
-int Engine::contextHeight() {
-	return screen_->GetContextHeight();
 }
 
 static void _STDCALL GLDebugMessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const GLvoid* userParam) {

@@ -2,8 +2,8 @@
 
 #include "tools/debug.h"
 #include "tools/string.h"
-#include "internal/misc/loader.h"
 #include "internal/base/glsldefines.h"
+#include "internal/text/shaderparser.h"
 
 ShaderDescription ShaderInternal::descriptions_[] =  {
 	GL_VERTEX_SHADER, "VertexShader", "vertex",

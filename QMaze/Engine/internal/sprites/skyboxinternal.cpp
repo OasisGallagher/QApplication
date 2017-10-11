@@ -1,7 +1,6 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "internal/misc/loader.h"
 #include "internal/memory/factory.h"
 #include "internal/base/shaderinternal.h"
 #include "internal/base/textureinternal.h"

@@ -1,15 +1,17 @@
 #pragma once
 #include <time.h>
+#include "defines.h"
 
-class Time {
-public:
-	Time();
-
+class ENGINE_EXPORT Time {
 public:
 	float GetDeltaTime();
 	float GetRealTimeSinceStartup();
 	int GetFrameCount();
 	void Update();
+
+private:
+	friend class Engine;
+	Time();
 
 private:
 	int frames_;

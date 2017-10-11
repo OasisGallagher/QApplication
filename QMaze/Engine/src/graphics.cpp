@@ -1,5 +1,6 @@
 #include "engine.h"
 #include "graphics.h"
+#include "variables.h"
 
 void Graphics::Blit(RenderTexture src, RenderTexture dest, Renderer renderer) {
 	World world = Engine::get()->world();

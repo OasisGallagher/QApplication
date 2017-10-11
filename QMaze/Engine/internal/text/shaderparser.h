@@ -1,14 +1,6 @@
 #pragma once
-#include <vector>
-#include <glm/glm.hpp>
 
 #include "internal/base/shaderinternal.h"
-
-class TextLoader {
-public:
-	static bool Load(const std::string& file, std::string& text);
-	static bool Load(const std::string& file, std::vector<std::string>& lines);
-};
 
 class ShaderParser {
 public:

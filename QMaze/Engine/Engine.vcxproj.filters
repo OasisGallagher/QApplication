@@ -86,6 +86,15 @@
     <Filter Include="src\math">
       <UniqueIdentifier>{3ec7b2f0-2a0c-49cc-a4d2-a54f46e2bc63}</UniqueIdentifier>
     </Filter>
+    <Filter Include="internal\text">
+      <UniqueIdentifier>{3ea0054a-968f-468a-b53d-118a628758ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="internal\text\include">
+      <UniqueIdentifier>{d5ad271e-d5ff-456a-9344-fa70b52dba23}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="internal\text\src">
+      <UniqueIdentifier>{34e3ab19-2b40-4e6e-a324-fb78cb77a9df}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\camera.h">
@@ -169,9 +178,6 @@
     <ClInclude Include="tools\string.h">
       <Filter>tools\include</Filter>
     </ClInclude>
-    <ClInclude Include="internal\misc\loader.h">
-      <Filter>internal\misc\include</Filter>
-    </ClInclude>
     <ClInclude Include="include\defines.h">
       <Filter>include</Filter>
     </ClInclude>
@@ -193,9 +199,6 @@
     <ClInclude Include="internal\misc\ptrmap.h">
       <Filter>internal\containers\include</Filter>
     </ClInclude>
-    <ClInclude Include="internal\base\variables.h">
-      <Filter>internal\base\include</Filter>
-    </ClInclude>
     <ClInclude Include="internal\base\uniform.h">
       <Filter>internal\base\include</Filter>
     </ClInclude>
@@ -204,12 +207,6 @@
     </ClInclude>
     <ClInclude Include="include\posteffect.h">
       <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="internal\misc\timef.h">
-      <Filter>internal\misc\include</Filter>
-    </ClInclude>
-    <ClInclude Include="internal\misc\screen.h">
-      <Filter>internal\misc\include</Filter>
     </ClInclude>
     <ClInclude Include="include\light.h">
       <Filter>include</Filter>
@@ -241,7 +238,22 @@
     <ClInclude Include="internal\base\glsldefines.h">
       <Filter>internal\base\include</Filter>
     </ClInclude>
+    <ClInclude Include="include\variables.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="internal\text\shaderparser.h">
+      <Filter>internal\text\include</Filter>
+    </ClInclude>
+    <ClInclude Include="internal\text\textloader.h">
+      <Filter>internal\text\include</Filter>
+    </ClInclude>
     <ClInclude Include="include\graphics.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\screen.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\timef.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>
@@ -282,9 +294,6 @@
     <ClCompile Include="tools\debug.cpp">
       <Filter>tools\src</Filter>
     </ClCompile>
-    <ClCompile Include="internal\misc\loader.cpp">
-      <Filter>internal\misc\src</Filter>
-    </ClCompile>
     <ClCompile Include="internal\memory\memory.cpp">
       <Filter>internal\memory\src</Filter>
     </ClCompile>
@@ -302,12 +311,6 @@
     </ClCompile>
     <ClCompile Include="internal\base\framebuffer.cpp">
       <Filter>internal\base\src</Filter>
-    </ClCompile>
-    <ClCompile Include="internal\misc\timef.cpp">
-      <Filter>internal\misc\src</Filter>
-    </ClCompile>
-    <ClCompile Include="internal\misc\screen.cpp">
-      <Filter>internal\misc\src</Filter>
     </ClCompile>
     <ClCompile Include="src\math\matrix4x4.cpp">
       <Filter>src\math</Filter>
@@ -339,7 +342,19 @@
     <ClCompile Include="tools\string.cpp">
       <Filter>tools\src</Filter>
     </ClCompile>
+    <ClCompile Include="internal\text\shaderparser.cpp">
+      <Filter>internal\text\src</Filter>
+    </ClCompile>
+    <ClCompile Include="internal\text\textloader.cpp">
+      <Filter>internal\text\src</Filter>
+    </ClCompile>
     <ClCompile Include="src\graphics.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\screen.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\timef.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
