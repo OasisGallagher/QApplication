@@ -7,7 +7,7 @@ public:
 	virtual Skybox GetSkybox() = 0;
 
 	virtual void SetAmbientColor(const glm::vec3& value) = 0;
-	virtual glm::vec3 GetAmbientColor() const = 0;
+	virtual glm::vec3 GetAmbientColor() = 0;
 };
 
-typedef smart_ptr<IEnvironment> Environment;
+typedef std::shared_ptr<IEnvironment> Environment;

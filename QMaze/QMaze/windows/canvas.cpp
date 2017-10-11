@@ -136,13 +136,13 @@ void Canvas::createScene() {
 	World world = Engine::get()->world();
 
 	world->GetEnvironment()->SetAmbientColor(glm::vec3(0.15f));
-	DirectionalLight light = dynamic_sp_cast<DirectionalLight>(world->Create(ObjectTypeDirectionalLight));
+	DirectionalLight light = dsp_cast<DirectionalLight>(world->Create(ObjectTypeDirectionalLight));
 	light->SetColor(glm::vec3(0.7f));
 	light->SetPosition(glm::vec3(0, 7, 5));
 	//glm::quat cq(-glm::lookAt(glm::vec3(0, 7, 5), glm::vec3(0), glm::vec3(0, 1, 0)));
 	//light->SetRotation(cq);
 
-	Camera camera = dynamic_sp_cast<Camera>(world->Create(ObjectTypeCamera));
+	Camera camera = dsp_cast<Camera>(world->Create(ObjectTypeCamera));
 	controller_->setCamera(camera);
 
 	//camera->AddPostEffect(inversion_);
@@ -155,7 +155,7 @@ void Canvas::createScene() {
 	camera->SetClearType(ClearTypeSkybox);
 	//camera->SetClearColor(glm::vec3(0, 0, 0.4f));
 
-	Skybox skybox = dynamic_sp_cast<Skybox>(world->Create(ObjectTypeSkybox));
+	Skybox skybox = dsp_cast<Skybox>(world->Create(ObjectTypeSkybox));
 	std::string faces[] = {
 		"textures/lake_skybox/right.jpg",
 		"textures/lake_skybox/left.jpg",
@@ -168,17 +168,18 @@ void Canvas::createScene() {
 	skybox->Load(faces);
 	camera->SetSkybox(skybox);
 	
-	RenderTexture renderTexture = dynamic_sp_cast<RenderTexture>(world->Create(ObjectTypeRenderTexture));
+	RenderTexture renderTexture = dsp_cast<RenderTexture>(world->Create(ObjectTypeRenderTexture));
 
 	renderTexture->Load(Rgba, width(), height());
 	//camera->SetRenderTexture(renderTexture);
 	//camera->SetClearColor(glm::vec3(0.0f, 0.0f, 0.4f));
 
-	Sprite sprite = dynamic_sp_cast<Sprite>(world->Create(ObjectTypeSprite));
+	Sprite sprite = dsp_cast<Sprite>(world->Create(ObjectTypeSprite));
+	sprite->SetParent(camera);
 	sprite->SetPosition(glm::vec3(0, 0, -18));
 	sprite->SetEulerAngles(glm::vec3(90, 60, 90));
 
-	Surface surface = dynamic_sp_cast<Surface>(world->Create(ObjectTypeSurface));
+	Surface surface = dsp_cast<Surface>(world->Create(ObjectTypeSurface));
 	/* Mesh.
 	Mesh mesh = dynamic_ptr_cast<Mesh>(world->Create("Mesh"));
 	SurfaceAttribute attribute;
@@ -195,23 +196,26 @@ void Canvas::createScene() {
 	*/
 
 	surface->Load("models/room_thickwalls.obj");
-	Texture2D albedo = dynamic_sp_cast<Texture2D>(world->Create(ObjectTypeTexture2D));
+	Texture2D albedo = dsp_cast<Texture2D>(world->Create(ObjectTypeTexture2D));
 	albedo->Load("textures/room_uvmap.dds");
 
 	MaterialTextures& textures = surface->GetMesh(0)->GetMaterialTextures();
 	textures.albedo = albedo;
 	sprite->SetSurface(surface);
 
-	Renderer renderer = dynamic_sp_cast<Renderer>(world->Create(ObjectTypeRenderer));
+	Renderer renderer = dsp_cast<Renderer>(world->Create(ObjectTypeRenderer));
 	renderer->SetRenderState(Cull, Off);
 	renderer->SetRenderState(DepthTest, Less);
 
-	Shader shader = dynamic_sp_cast<Shader>(world->Create(ObjectTypeShader));
+	Shader shader = dsp_cast<Shader>(world->Create(ObjectTypeShader));
 	shader->Load("buildin/shaders/texture");
 
-	Material material = dynamic_sp_cast<Material>(world->Create(ObjectTypeMaterial));
+	Material material = dsp_cast<Material>(world->Create(ObjectTypeMaterial));
 	material->SetShader(shader);
 	renderer->AddMaterial(material);
 
 	sprite->SetRenderer(renderer);
+
+	world.reset();
+	Engine::get()->world().reset();
 }

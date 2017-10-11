@@ -34,7 +34,7 @@ void CameraInternal::SetClearColor(const glm::vec3 & value) {
 	fb0_->SetClearColor(value);
 }
 
-glm::vec3 CameraInternal::GetClearColor() const {
+glm::vec3 CameraInternal::GetClearColor() {
 	return fb0_->GetClearColor();
 }
 
@@ -213,9 +213,9 @@ void CameraInternal::GetLights(Light& forwardBase, std::vector<Light>& forwardAd
 		return;
 	}
 
-	forwardBase = dynamic_sp_cast<Light>(lights.front());
+	forwardBase = dsp_cast<Light>(lights.front());
 	for (int i = 1; i < lights.size(); ++i) {
-		forwardAdd.push_back(dynamic_sp_cast<Light>(lights[i]));
+		forwardAdd.push_back(dsp_cast<Light>(lights[i]));
 	}
 }
 

@@ -34,15 +34,15 @@ WorldInternal::WorldInternal()
 Object WorldInternal::Create(ObjectType type) {
 	Object object = Factory::Create(type);
 	if (type >= ObjectTypeSprite) {
-		sprites_.push_back(dynamic_sp_cast<Sprite>(object));
+		sprites_.push_back(dsp_cast<Sprite>(object));
 	}
 
 	if (type >= ObjectTypeSpotLight && type <= ObjectTypeDirectionalLight) {
-		lights_.insert(dynamic_sp_cast<Light>(object));
+		lights_.insert(dsp_cast<Light>(object));
 	}
 
 	if (type == ObjectTypeCamera) {
-		cameras_.insert(dynamic_sp_cast<Camera>(object));
+		cameras_.insert(dsp_cast<Camera>(object));
 	}
 
 	return object;

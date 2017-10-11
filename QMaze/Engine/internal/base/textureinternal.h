@@ -13,10 +13,10 @@ public:
 public:
 	virtual void Bind(GLenum location);
 	virtual void Unbind();
-	virtual unsigned GetNativePointer() const { return texture_; }
+	virtual unsigned GetNativePointer() { return texture_; }
 	
-	virtual int GetWidth() const { return width_; }
-	virtual int GetHeight() const { return height_; }
+	virtual int GetWidth() { return width_; }
+	virtual int GetHeight() { return height_; }
 
 protected:
 	virtual GLenum GetGLTextureType() = 0;

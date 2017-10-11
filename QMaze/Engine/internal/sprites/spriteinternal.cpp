@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/quaternion.hpp>
 
@@ -27,31 +28,46 @@ void SpriteInternal::RemoveChild(Sprite child) {
 }
 
 void SpriteInternal::SetParent(Sprite value) {
+	std::weak_ptr<ISprite> old = parent_;
+	// old parent.
+	Sprite sprite = old.lock();
+	Sprite thisSp = dsp_cast<Sprite>(shared_from_this());
+	if (sprite) {
+		sprite->RemoveChild(thisSp);
+	}
+
 	parent_ = value;
+	sprite = parent_.lock();
+	if (sprite) {
+		sprite->AddChild(thisSp);
+	}
 }
 
 void SpriteInternal::SetScale(const glm::vec3& value) {
+	Sprite current = dsp_cast<Sprite>(shared_from_this());
 	glm::vec3 scale = value;
-	for (ISprite* current = this; (current = current->GetParent().get()) != nullptr; ) {
-		scale /= current->GetLocalScale();
+	if ((current = current->GetParent())) {
+		scale /= current->GetScale();
 	}
 
 	SetLocalScale(scale);
 }
 
 void SpriteInternal::SetPosition(const glm::vec3& value) {
+	Sprite current = dsp_cast<Sprite>(shared_from_this());
 	glm::vec3 position = value;
-	for (ISprite* current = this; (current = current->GetParent().get()) != nullptr; ) {
-		position -= current->GetLocalPosition();
+	if ((current = current->GetParent())) {
+		position -= current->GetPosition();
 	}
 
 	SetLocalPosition(position);
 }
 
 void SpriteInternal::SetRotation(const glm::quat& value) {
+	Sprite current = dsp_cast<Sprite>(shared_from_this());
 	glm::quat rotation = value;
-	for (ISprite* current = this; (current = current->GetParent().get()) != nullptr; ) {
-		rotation *= glm::inverse(current->GetLocalRotation());
+	if ((current = current->GetParent())) {
+		rotation *= glm::inverse(current->GetRotation());
 	}
 
 	SetLocalRotation(rotation);
@@ -61,41 +77,65 @@ void SpriteInternal::SetEulerAngles(const glm::vec3& value) {
 	SetLocalRotation(glm::quat(glm::vec3(Mathf::Radians(value.x), Mathf::Radians(value.y), Mathf::Radians(value.z))));
 }
 
-glm::vec3 SpriteInternal::GetScale() const {
-	glm::vec3 scale(1);
-	for (const ISprite* current = this; current != nullptr; current = current->GetParent().get()) {
-		scale *= current->GetLocalScale();
+glm::vec3 SpriteInternal::GetScale() {
+	if (IsDirty(DirtyFlagWorldScale)) {
+		Sprite current = dsp_cast<Sprite>(shared_from_this());
+		glm::vec3 scale = GetLocalScale();
+		if ((current = current->GetParent())) {
+			scale *= current->GetScale();
+		}
+
+		worldScale_ = scale;
+		SetDiry(DirtyFlagWorldScale, false);
 	}
 
-	return scale;
+	return worldScale_;
 }
 
-glm::vec3 SpriteInternal::GetPosition() const {
-	glm::vec3 position(0);
-	for (const ISprite* current = this; current != nullptr; current = current->GetParent().get()) {
-		position += current->GetLocalPosition();
+glm::vec3 SpriteInternal::GetPosition() {
+	if (IsDirty(DirtyFlagWorldPosition)) {
+		Sprite current = dsp_cast<Sprite>(shared_from_this());
+		glm::vec3 position = GetLocalPosition();
+		if ((current = current->GetParent())) {
+			position += current->GetPosition();
+		}
+
+		worldPosition_ = position;
+		SetDiry(DirtyFlagWorldPosition, false);
 	}
 
-	return position;
+	return worldPosition_;
 }
 
-glm::quat SpriteInternal::GetRotation() const {
-	glm::quat rotation;
-	for (const ISprite* current = this; current != nullptr; current = current->GetParent().get()) {
-		rotation *= current->GetLocalRotation();
+glm::quat SpriteInternal::GetRotation() {
+	if (IsDirty(DirtyFlagWorldRotation)) {
+		Sprite current = dsp_cast<Sprite>(shared_from_this());
+		glm::quat rotation = GetLocalRotation();
+		if ((current = current->GetParent())) {
+			rotation *= current->GetRotation();
+		}
+
+		worldRotation_ = rotation;
+		SetDiry(DirtyFlagWorldRotation, false);
 	}
 
-	return rotation;
+	return worldRotation_;
 }
 
-glm::vec3 SpriteInternal::GetEulerAngles() const {
-	glm::vec3 angles = glm::eulerAngles(GetRotation());
-	return glm::vec3(Mathf::Degrees(angles.x), Mathf::Degrees(angles.y), Mathf::Degrees(angles.z));
+glm::vec3 SpriteInternal::GetEulerAngles() {
+	if (IsDirty(DirtyFlagWorldEulerAngles)) {
+		glm::vec3 angles = glm::eulerAngles(GetRotation());
+		worldEulerAngles_ = glm::vec3(Mathf::Degrees(angles.x), Mathf::Degrees(angles.y), Mathf::Degrees(angles.z));
+		SetDiry(DirtyFlagWorldEulerAngles, false);
+	}
+
+	return worldEulerAngles_;
 }
 
 void SpriteInternal::SetLocalScale(const glm::vec3& value) {
 	if (scale_ == value) { return; }
 	scale_ = value;
+	SetDiry(DirtyFlagWorldScale, true);
 	SetDiry(DirtyFlagLocalToWorldMatrix, true);
 	SetDiry(DirtyFlagWorldToLocalMatrix, true);
 }
@@ -103,6 +143,7 @@ void SpriteInternal::SetLocalScale(const glm::vec3& value) {
 void SpriteInternal::SetLocalPosition(const glm::vec3& value) {
 	if (position_ == value) { return; }
 	position_ = value;
+	SetDiry(DirtyFlagWorldPosition, true);
 	SetDiry(DirtyFlagLocalToWorldMatrix, true);
 	SetDiry(DirtyFlagWorldToLocalMatrix, true);
 }
@@ -110,6 +151,7 @@ void SpriteInternal::SetLocalPosition(const glm::vec3& value) {
 void SpriteInternal::SetLocalRotation(const glm::quat& value) {
 	if (Mathf::Approximately(glm::dot(rotation_, value), 0)) { return; }
 	rotation_ = value;
+	SetDiry(DirtyFlagWorldRotation, true);
 	SetDiry(DirtyFlagLocalToWorldMatrix, true);
 	SetDiry(DirtyFlagWorldToLocalMatrix, true);
 }
@@ -118,11 +160,21 @@ void SpriteInternal::SetLocalEulerAngles(const glm::vec3& value) {
 	SetLocalRotation(glm::quat(value));
 }
 
+inline glm::vec3 SpriteInternal::GetLocalEulerAngles() {
+	if (IsDirty(DirtyFlagLocalEulerAngles)) {
+		eulerAngles_ = glm::eulerAngles(rotation_);
+		SetDiry(DirtyFlagLocalEulerAngles, false);
+	}
+
+	return eulerAngles_;
+}
+
 glm::mat4 SpriteInternal::GetLocalToWorldMatrix() {
 	if (IsDirty(DirtyFlagLocalToWorldMatrix)) {
-		glm::mat4 matrix = glm::mat4(1.f);
-		for (ISprite* current = this; current != nullptr; current = current->GetParent().get()) {
-			matrix = glm::translate(matrix, position_) * glm::toMat4(rotation_) * glm::scale(matrix, scale_) * matrix;
+		Sprite current = dsp_cast<Sprite>(shared_from_this());
+		glm::mat4 matrix = glm::translate(glm::mat4(1), GetLocalPosition()) * glm::toMat4(GetLocalRotation()) * glm::scale(glm::mat4(1), GetLocalScale());
+		if ((current = current->GetParent())) {
+			matrix = current->GetLocalToWorldMatrix() * matrix;
 		}
 
 		localToWorldMatrix_ = matrix;
@@ -149,15 +201,15 @@ glm::vec3 SpriteInternal::GetWorldToLocalPosition(const glm::vec3& position) {
 	return glm::vec3(GetWorldToLocalMatrix() * glm::vec4(position, 1));
 }
 
-glm::vec3 SpriteInternal::GetUp() const {
+glm::vec3 SpriteInternal::GetUp() {
 	return rotation_ * glm::vec3(0, 1, 0);
 }
 
-glm::vec3 SpriteInternal::GetRight() const {
+glm::vec3 SpriteInternal::GetRight() {
 	return rotation_ * glm::vec3(1, 0, 0);
 }
 
-glm::vec3 SpriteInternal::GetForward() const {
+glm::vec3 SpriteInternal::GetForward() {
 	return rotation_ * glm::vec3(0, 0, -1);
 }
 

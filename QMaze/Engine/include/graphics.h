@@ -7,4 +7,4 @@ public:
 	virtual void Blit(RenderTexture src, RenderTexture dest, Renderer renderer) = 0;
 };
 
-typedef smart_ptr<IGraphics> Graphics;
+typedef std::shared_ptr<IGraphics> Graphics;

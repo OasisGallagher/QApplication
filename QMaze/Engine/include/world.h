@@ -17,4 +17,4 @@ public:
 	virtual Environment GetEnvironment() = 0;
 };
 
-typedef smart_ptr<IWorld> World;
+typedef std::shared_ptr<IWorld> World;

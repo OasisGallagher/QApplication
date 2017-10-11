@@ -29,4 +29,4 @@ public:
 	virtual glm::vec3 GetVector3(const std::string& name) = 0;
 };
 
-typedef smart_ptr<IMaterial> Material;
+typedef std::shared_ptr<IMaterial> Material;

@@ -1,7 +1,7 @@
 #pragma once
+#include <memory>
 #include <string>
 #include "defines.h"
-#include "smartptr.h"
 
 enum ObjectType {
 	ObjectTypeMesh,
@@ -27,13 +27,26 @@ enum ObjectType {
 	ObjectTypeLights,
 };
 
-class ENGINE_EXPORT IObject {
+class ENGINE_EXPORT IObject : public std::enable_shared_from_this<IObject> {
 public:
 	virtual ~IObject() {}
 
 public:
-	virtual ObjectType GetType() const = 0;
-	virtual unsigned GetInstanceID() const = 0;
+	virtual ObjectType GetType() = 0;
+	virtual unsigned GetInstanceID() = 0;
 };
 
-typedef smart_ptr<IObject> Object;
+typedef std::shared_ptr<IObject> Object;
+
+/**
+ * dynamic shared_ptr cast.
+ */
+template<class T, class U>
+inline T dsp_cast(const std::shared_ptr<U>& ptr) {
+	typename T::element_type* p = dynamic_cast<typename T::element_type*>(ptr.get());
+	if (NULL != p) {
+		return T(ptr, p);
+	}
+
+	return T();
+}

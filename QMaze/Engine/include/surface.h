@@ -19,11 +19,11 @@ public:
 
 	virtual void SetAttribute(const SurfaceAttribute& value) = 0;
 	virtual void AddMesh(Mesh mesh) = 0;
-	virtual int GetMeshCount() const = 0;
+	virtual int GetMeshCount() = 0;
 	virtual Mesh GetMesh(int index) = 0;
 
 	virtual void Bind() = 0;
 	virtual void Unbind() = 0;
 };
 
-typedef smart_ptr<ISurface> Surface;
+typedef std::shared_ptr<ISurface> Surface;

@@ -17,9 +17,9 @@ public:
 	virtual void AddMaterial(Material material) { materials_.push_back(material); }
 	virtual Material GetMaterial(int index) { return materials_[index]; }
 	virtual void SetMaterial(int index, Material value) { materials_[index] = value; }
-	virtual int GetMaterialCount() const { return materials_.size(); }
+	virtual int GetMaterialCount() { return materials_.size(); }
 
-	virtual int GetRenderQueue() const { return queue_; }
+	virtual int GetRenderQueue() { return queue_; }
 	virtual void SetRenderQueue(int value) { queue_ = value; }
 
 	virtual void SetRenderState(RenderStateType type, RenderStateParameter parameter0, RenderStateParameter parameter1);

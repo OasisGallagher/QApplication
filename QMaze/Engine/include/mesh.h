@@ -18,4 +18,4 @@ public:
 	virtual void GetTriangles(unsigned& vertexCount, unsigned& baseVertex, unsigned& baseIndex) = 0;
 };
 
-typedef smart_ptr<IMesh> Mesh;
+typedef std::shared_ptr<IMesh> Mesh;

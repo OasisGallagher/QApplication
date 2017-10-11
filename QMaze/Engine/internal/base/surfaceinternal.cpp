@@ -74,7 +74,7 @@ Mesh SurfaceInternal::GetMesh(int index) {
 	return meshes_[index];
 }
 
-int SurfaceInternal::GetMeshCount() const {
+int SurfaceInternal::GetMeshCount() {
 	return meshes_.size();
 }
 

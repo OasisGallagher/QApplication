@@ -16,15 +16,15 @@ public:
 	virtual void Unbind();
 
 public:
-	int GetWidth() const { return width_; }
-	int GetHeight() const { return height_; }
+	int GetWidth() { return width_; }
+	int GetHeight() { return height_; }
 
 	void SetClearColor(const glm::vec3& value) { clearColor_ = value; }
-	glm::vec3 GetClearColor() const { return clearColor_; }
+	glm::vec3 GetClearColor() { return clearColor_; }
 
 	void Clear(int buffers = GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	unsigned GetNativePointer() const { return fbo_; }
+	unsigned GetNativePointer() { return fbo_; }
 
 protected:
 	void PushFramebuffer();
@@ -67,7 +67,7 @@ public:
 
 	void CreateDepthRenderBuffer();
 
-	int GetRenderTextureCount() const;
+	int GetRenderTextureCount();
 	RenderTexture GetDepthTexture();
 	RenderTexture GetRenderTexture(int index);
 

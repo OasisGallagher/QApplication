@@ -27,7 +27,7 @@ public:
 
 	virtual void SetAttribute(const SurfaceAttribute& value);
 	virtual void AddMesh(Mesh mesh);
-	virtual int GetMeshCount() const;
+	virtual int GetMeshCount();
 	virtual Mesh GetMesh(int index);
 
 	virtual void Bind();

@@ -1,6 +1,6 @@
 #pragma once
+#include <memory>
 #include "defines.h"
-#include "smartptr.h"
 
 class ENGINE_EXPORT IScreen {
 public:
@@ -10,4 +10,4 @@ public:
 	virtual void SetContentSize(int w, int h) = 0;
 };
 
-typedef smart_ptr<IScreen> Screen;
+typedef std::shared_ptr<IScreen> Screen;

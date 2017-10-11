@@ -6,4 +6,4 @@ public:
 	virtual bool Load(const std::string(&textures)[6]) = 0;
 };
 
-typedef smart_ptr<ISkybox> Skybox;
+typedef std::shared_ptr<ISkybox> Skybox;

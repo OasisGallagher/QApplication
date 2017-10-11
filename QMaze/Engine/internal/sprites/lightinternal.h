@@ -7,10 +7,10 @@ public:
 	}
 
 	virtual void SetImportance(LightImportance value) { importance_ = value; }
-	virtual LightImportance GetImportance() const { return importance_; }
+	virtual LightImportance GetImportance() { return importance_; }
 
 	virtual void SetColor(const glm::vec3 & value) { color_ = value; }
-	virtual glm::vec3 GetColor() const { return color_; }
+	virtual glm::vec3 GetColor() { return color_; }
 
 private:
 	glm::vec3 color_;

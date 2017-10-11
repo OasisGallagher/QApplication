@@ -31,7 +31,7 @@ public:
 	Texture GetTexture();
 	int GetTextureIndex();
 
-	UniformType GetType() const { return type_; }
+	UniformType GetType() { return type_; }
 
 	void SetInt(int value);
 	void SetBool(bool value);

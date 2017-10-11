@@ -121,7 +121,7 @@ void Framebuffer::SetDepthTexture(RenderTexture texture) {
 	PopFramebuffer();
 }
 
-int Framebuffer::GetRenderTextureCount() const {
+int Framebuffer::GetRenderTextureCount() {
 	return attachedRenderTextureCount_;
 }
 

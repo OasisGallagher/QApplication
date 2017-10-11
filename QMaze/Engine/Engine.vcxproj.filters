@@ -190,9 +190,6 @@
     <ClInclude Include="internal\base\meshinternal.h">
       <Filter>internal\base\include</Filter>
     </ClInclude>
-    <ClInclude Include="internal\memory\smartptr.h">
-      <Filter>internal\memory\include</Filter>
-    </ClInclude>
     <ClInclude Include="internal\resources\resources.h">
       <Filter>internal\resources\include</Filter>
     </ClInclude>

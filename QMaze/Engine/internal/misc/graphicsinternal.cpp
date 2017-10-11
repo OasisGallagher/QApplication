@@ -3,7 +3,7 @@
 
 void GraphicsInternal::Blit(RenderTexture src, RenderTexture dest, Renderer renderer) {
 	World world = Engine::get()->world();
-	Surface surface = dynamic_sp_cast<Surface>(world->Create(ObjectTypeSurface));
+	Surface surface = dsp_cast<Surface>(world->Create(ObjectTypeSurface));
 	surface->Load("buildin/models/quad.obj");
 
 	for (int i = 0; i < renderer->GetMaterialCount(); ++i) {

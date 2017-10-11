@@ -12,10 +12,10 @@ enum LightImportance {
 class ILight : virtual public ISprite {
 public:
 	virtual void SetImportance(LightImportance value) = 0;
-	virtual LightImportance GetImportance() const = 0;
+	virtual LightImportance GetImportance() = 0;
 
 	virtual void SetColor(const glm::vec3& value) = 0;
-	virtual glm::vec3 GetColor() const = 0;
+	virtual glm::vec3 GetColor() = 0;
 };
 
 class ISpotLight : virtual public ILight {
@@ -36,7 +36,7 @@ public:
 class IDirectionalLight : virtual public ILight {
 };
 
-typedef smart_ptr<ILight> Light;
-typedef smart_ptr<ISpotLight> SpotLight;
-typedef smart_ptr<IPointLight> PointLight;
-typedef smart_ptr<IDirectionalLight> DirectionalLight;
+typedef std::shared_ptr<ILight> Light;
+typedef std::shared_ptr<ISpotLight> SpotLight;
+typedef std::shared_ptr<IPointLight> PointLight;
+typedef std::shared_ptr<IDirectionalLight> DirectionalLight;

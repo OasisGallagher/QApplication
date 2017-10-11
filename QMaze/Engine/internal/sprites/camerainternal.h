@@ -28,7 +28,7 @@ public:
 
 public:
 	virtual void SetDepth(int value) { depth_ = value; }
-	virtual int GetDepth() const { return depth_;  }
+	virtual int GetDepth() { return depth_;  }
 
 	virtual void SetClearType(ClearType value) { clearType_ = value; }
 	virtual ClearType GetClearType() { return clearType_; }
@@ -37,7 +37,7 @@ public:
 	virtual Skybox GetSkybox() { return skybox_; }
 
 	virtual void SetClearColor(const glm::vec3& value);
-	virtual glm::vec3 GetClearColor() const;
+	virtual glm::vec3 GetClearColor();
 
 	virtual void SetRenderTexture(RenderTexture value);
 	virtual RenderTexture GetRenderTexture() { return renderTexture_; }
@@ -52,10 +52,10 @@ public:
 	virtual void SetFarClipPlane(float value) { far_ = value; }
 	virtual void SetFieldOfView(float value) { near_ = value; }
 
-	virtual float GetAspect() const { return aspect_; }
-	virtual float GetNearClipPlane() const { return near_; }
-	virtual float GetFarClipPlane() const { return far_; }
-	virtual float GetFieldOfView() const { return fieldOfView_; }
+	virtual float GetAspect() { return aspect_; }
+	virtual float GetNearClipPlane() { return near_; }
+	virtual float GetFarClipPlane() { return far_; }
+	virtual float GetFieldOfView() { return fieldOfView_; }
 
 	virtual const glm::mat4& GetProjectionMatrix();
 

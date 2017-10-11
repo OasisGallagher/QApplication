@@ -51,7 +51,7 @@ bool Engine::initialize() {
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
 	}
 
-	world_ = dynamic_sp_cast<World>(Factory::Create(ObjectTypeWorld));
+	world_ = dsp_cast<World>(Factory::Create(ObjectTypeWorld));
 
 	return true;
 }

@@ -9,8 +9,8 @@ public:
 	virtual ~ObjectInternal() {}
 
 public:
-	virtual ObjectType GetType() const { return type_; }
-	virtual unsigned GetInstanceID() const { return id_; }
+	virtual ObjectType GetType() { return type_; }
+	virtual unsigned GetInstanceID() { return id_; }
 
 public:
 	static void DecodeInstanceID(unsigned value, ObjectType* type, unsigned* id);

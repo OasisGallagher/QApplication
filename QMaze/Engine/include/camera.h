@@ -14,7 +14,7 @@ class PostEffect;
 class ENGINE_EXPORT ICamera : virtual public ISprite {
 public:
 	virtual void SetDepth(int value) = 0;
-	virtual int GetDepth() const = 0;
+	virtual int GetDepth() = 0;
 
 	virtual void SetClearType(ClearType value) = 0;
 	virtual ClearType GetClearType() = 0;
@@ -23,7 +23,7 @@ public:
 	virtual Skybox GetSkybox() = 0;
 
 	virtual void SetClearColor(const glm::vec3& value) = 0;
-	virtual glm::vec3 GetClearColor() const = 0;
+	virtual glm::vec3 GetClearColor() = 0;
 
 	virtual void SetRenderTexture(RenderTexture value) = 0;
 	virtual RenderTexture GetRenderTexture() = 0;
@@ -33,10 +33,10 @@ public:
 	virtual void SetFarClipPlane(float value) = 0;
 	virtual void SetFieldOfView(float value) = 0;
 
-	virtual float GetAspect() const = 0;
-	virtual float GetNearClipPlane() const = 0;
-	virtual float GetFarClipPlane() const = 0;
-	virtual float GetFieldOfView() const = 0;
+	virtual float GetAspect() = 0;
+	virtual float GetNearClipPlane() = 0;
+	virtual float GetFarClipPlane() = 0;
+	virtual float GetFieldOfView() = 0;
 
 	virtual const glm::mat4& GetProjectionMatrix() = 0;
 
@@ -46,4 +46,4 @@ public:
 	virtual void Render() = 0;
 };
 
-typedef smart_ptr<ICamera> Camera;
+typedef std::shared_ptr<ICamera> Camera;

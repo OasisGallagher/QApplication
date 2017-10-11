@@ -1,7 +1,7 @@
 #pragma once
+#include <memory>
 #include <time.h>
 #include "defines.h"
-#include "smartptr.h"
 
 class ENGINE_EXPORT ITime {
 public:
@@ -15,4 +15,4 @@ private:
 	float deltaTime_;
 };
 
-typedef smart_ptr<ITime> Time;
+typedef std::shared_ptr<ITime> Time;

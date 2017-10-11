@@ -51,10 +51,10 @@ public:
 	virtual void AddMaterial(Material material) = 0;
 	virtual Material GetMaterial(int index) = 0;
 	virtual void SetMaterial(int index, Material value) = 0;
-	virtual int GetMaterialCount() const = 0;
+	virtual int GetMaterialCount() = 0;
 
 	virtual void SetRenderQueue(int value) = 0;
-	virtual int GetRenderQueue() const = 0;
+	virtual int GetRenderQueue() = 0;
 
 	/**
 	 * @param Cull: Front, Back, Off
@@ -66,4 +66,4 @@ public:
 	virtual void SetRenderState(RenderStateType type, RenderStateParameter parameter0, RenderStateParameter parameter1 = (RenderStateParameter)None) = 0;
 };
 
-typedef smart_ptr<IRenderer> Renderer;
+typedef std::shared_ptr<IRenderer> Renderer;

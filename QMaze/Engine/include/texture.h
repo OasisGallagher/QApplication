@@ -7,10 +7,10 @@ class ENGINE_EXPORT ITexture : virtual public IObject {
 public:
 	virtual void Bind(GLenum location) = 0;
 	virtual void Unbind() = 0;
-	virtual unsigned GetNativePointer() const = 0;
+	virtual unsigned GetNativePointer() = 0;
 
-	virtual int GetWidth() const = 0;
-	virtual int GetHeight() const = 0;
+	virtual int GetWidth() = 0;
+	virtual int GetHeight() = 0;
 };
 
 class ENGINE_EXPORT ITexture2D : virtual public ITexture {
@@ -34,7 +34,7 @@ public:
 	virtual bool Load(RenderTextureFormat format, int width, int height) = 0;
 };
 
-typedef smart_ptr<ITexture> Texture;
-typedef smart_ptr<ITexture2D> Texture2D;
-typedef smart_ptr<ITextureCube> TextureCube;
-typedef smart_ptr<IRenderTexture> RenderTexture;
+typedef std::shared_ptr<ITexture> Texture;
+typedef std::shared_ptr<ITexture2D> Texture2D;
+typedef std::shared_ptr<ITextureCube> TextureCube;
+typedef std::shared_ptr<IRenderTexture> RenderTexture;
