@@ -2,11 +2,9 @@
 #include "texture.h"
 #include "renderer.h"
 
-class ENGINE_EXPORT Graphics {
+class ENGINE_EXPORT IGraphics {
 public:
-	void Blit(RenderTexture src, RenderTexture dest, Renderer renderer);
-
-private:
-	friend class Engine;
-	Graphics() {}
+	virtual void Blit(RenderTexture src, RenderTexture dest, Renderer renderer) = 0;
 };
+
+typedef smart_ptr<IGraphics> Graphics;

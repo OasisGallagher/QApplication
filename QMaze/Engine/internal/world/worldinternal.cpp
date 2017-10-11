@@ -26,7 +26,9 @@ bool WorldInternal::SpriteComparer::operator() (const Sprite& lhs, const Sprite&
 	return lhs->GetInstanceID() < rhs->GetInstanceID();
 }
 
-WorldInternal::WorldInternal() : ObjectInternal(ObjectTypeWorld), environment_(Memory::Create<EnvironmentInternal>()) {
+WorldInternal::WorldInternal()
+	: ObjectInternal(ObjectTypeWorld)
+	, environment_(Memory::Create<EnvironmentInternal>()) {
 }
 
 Object WorldInternal::Create(ObjectType type) {

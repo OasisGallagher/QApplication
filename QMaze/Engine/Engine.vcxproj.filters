@@ -256,6 +256,15 @@
     <ClInclude Include="include\timef.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="internal\misc\graphicsinternal.h">
+      <Filter>internal\misc\include</Filter>
+    </ClInclude>
+    <ClInclude Include="internal\misc\screeninternal.h">
+      <Filter>internal\misc\include</Filter>
+    </ClInclude>
+    <ClInclude Include="internal\misc\timefinternal.h">
+      <Filter>internal\misc\include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="internal\base\objectinternal.cpp">
@@ -348,14 +357,14 @@
     <ClCompile Include="internal\text\textloader.cpp">
       <Filter>internal\text\src</Filter>
     </ClCompile>
-    <ClCompile Include="src\graphics.cpp">
-      <Filter>src</Filter>
+    <ClCompile Include="internal\misc\graphicsinternal.cpp">
+      <Filter>internal\misc\src</Filter>
     </ClCompile>
-    <ClCompile Include="src\screen.cpp">
-      <Filter>src</Filter>
+    <ClCompile Include="internal\misc\screeninternal.cpp">
+      <Filter>internal\misc\src</Filter>
     </ClCompile>
-    <ClCompile Include="src\timef.cpp">
-      <Filter>src</Filter>
+    <ClCompile Include="internal\misc\timefinternal.cpp">
+      <Filter>internal\misc\src</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

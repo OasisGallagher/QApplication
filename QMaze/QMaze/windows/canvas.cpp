@@ -72,11 +72,11 @@ Canvas::~Canvas() {
 void Canvas::initializeGL() { 
 	// TODO: make debug context.
 	Engine::get()->initialize();
-	Engine::get()->setDebugCallback(this);
+	Engine::get()->setLogCallback(this);
 }
 
 void Canvas::resizeGL(int w, int h) {
-	Engine::get()->onResize(w, h);
+	Engine::get()->resize(w, h);
 }
 
 void Canvas::paintGL() {

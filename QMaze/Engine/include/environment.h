@@ -1,7 +1,7 @@
 #pragma once
 #include "skybox.h"
 
-class IEnvironment {
+class ENGINE_EXPORT IEnvironment {
 public:
 	virtual void SetSkybox(Skybox value) = 0;
 	virtual Skybox GetSkybox() = 0;

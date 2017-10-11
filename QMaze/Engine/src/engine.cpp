@@ -6,6 +6,9 @@
 
 // TODO: get world instance.
 #include "internal/memory/factory.h"
+#include "internal/misc/timefinternal.h"
+#include "internal/misc/screeninternal.h"
+#include "internal/misc/graphicsinternal.h"
 
 #ifndef _STDCALL
 #define _STDCALL __stdcall
@@ -20,6 +23,13 @@ static void _STDCALL GLDebugMessageCallback(
 	const GLchar* message, 
 	const GLvoid* userParam
 );
+
+Engine::Engine() 
+	: time_(Memory::Create<TimeInternal>())
+	, screen_(Memory::Create<ScreenInternal>())
+	, graphics_(Memory::Create<GraphicsInternal>()) {
+
+}
 
 Engine* Engine::get() {
 	static Engine instance;
@@ -57,21 +67,6 @@ void Engine::setLogCallback(EngineLogCallback* callback) {
 void Engine::resize(int w, int h) {
 	screen()->SetContentSize(w, h);
 	glViewport(0, 0, w, h);
-}
-
-Time* Engine::time() {
-	static Time instance;
-	return &instance;
-}
-
-Screen* Engine::screen() {
-	static Screen instance;
-	return &instance;
-}
-
-Graphics* Engine::graphics() {
-	static Graphics instance;
-	return &instance;
 }
 
 void Engine::update() {

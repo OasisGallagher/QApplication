@@ -1,18 +1,13 @@
 #pragma once
 #include "defines.h"
+#include "smartptr.h"
 
-class ENGINE_EXPORT Screen {
+class ENGINE_EXPORT IScreen {
 public:
-	int GetContextWidth();
-	int GetContextHeight();
+	virtual int GetContextWidth() = 0;
+	virtual int GetContextHeight() = 0;
 
-	void SetContentSize(int w, int h);
-
-private:
-	friend class Engine;
-	Screen() {}
-
-private:
-	int width_;
-	int height_;
+	virtual void SetContentSize(int w, int h) = 0;
 };
+
+typedef smart_ptr<IScreen> Screen;
