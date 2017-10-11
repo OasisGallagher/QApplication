@@ -16,6 +16,9 @@ public:
 	virtual void SetParent(Sprite value) = 0;
 	virtual Sprite GetParent() const = 0;
 
+	virtual void AddChild(Sprite child) = 0;
+	virtual void RemoveChild(Sprite child) = 0;
+
 	virtual int GetChildCount() const = 0;
 	virtual Sprite GetChildAt(int i) = 0;
 

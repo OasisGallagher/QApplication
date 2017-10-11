@@ -38,5 +38,6 @@ private:
 	int timer_;
 	bool sceneCreated_;
 	PostEffect* grayscale_;
+	PostEffect* inversion_;
 	CameraController* controller_;
 };

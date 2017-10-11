@@ -4,13 +4,7 @@ uniform vec3 c_lightColor;
 uniform vec3 c_lightDirection;
 
 vec3 calculateDirectionalLight(vec3 worldPos, vec3 worldNormal) {
-#ifdef HIGH
 	const float gloss = 20;
-#elif MID
-	const float gloss = 0.3;
-#else
-	const float gloss = 0.05;
-#endif
 
 	vec3 ambient = vec3(c_ambientLightColor);
 

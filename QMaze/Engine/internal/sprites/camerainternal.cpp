@@ -55,7 +55,7 @@ void CameraInternal::Update() {
 		}
 
 		if (!skybox) {
-			Debug::LogWarning("skybox does not exist.");
+			Debug::LogError("skybox does not exist.");
 			return;
 		}
 
@@ -227,14 +227,17 @@ void CameraInternal::OnPostRender() {
 
 	int index = 1;
 	for (int i = 0; i < postEffects_.size(); ++i) {
-		framebuffers[index]->Bind();
-
+		Framebuffer0* active = framebuffers[index];
+		
 		if (i + 1 == postEffects_.size()) {
+			active = fb0_;
 			textures[index].reset();
-			fb0_->Bind();
 		}
 
+		active->Bind();
 		postEffects_[i]->OnRenderImage(textures[1 - index], textures[index]);
+		active->Unbind();
+
 		index = 1 - index;
 	}
 

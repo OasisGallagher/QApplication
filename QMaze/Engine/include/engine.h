@@ -31,9 +31,6 @@ public:
 	bool initialize();
 	void release();
 
-	/**
-	 * TODO: make debug context !!!
-	 */
 	void setLogCallback(EngineLogCallback* callback);
 
 	void update();

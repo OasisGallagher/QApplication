@@ -173,7 +173,6 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="scripts\cameracontroller.cpp" />
-    <ClCompile Include="scripts\grayscale.cpp" />
     <ClCompile Include="scripts\main.cpp" />
     <ClCompile Include="windows\canvas.cpp" />
     <ClCompile Include="windows\console.cpp" />
@@ -225,6 +224,7 @@
     <ClInclude Include="resources\buildin\shaders\include\light.inc" />
     <ClInclude Include="scripts\cameracontroller.h" />
     <ClInclude Include="scripts\grayscale.h" />
+    <ClInclude Include="scripts\inversion.h" />
     <CustomBuild Include="windows\hierarchy.h">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Moc%27ing hierarchy.h...</Message>
@@ -305,6 +305,7 @@
     <None Include="resources\buildin\shaders\texture.glsl" />
     <None Include="resources\shaders\grayscale.glsl" />
     <None Include="resources\shaders\include\posteffectvertexshader.inc" />
+    <None Include="resources\shaders\inversion.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

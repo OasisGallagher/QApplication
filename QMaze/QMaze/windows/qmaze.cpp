@@ -27,13 +27,13 @@ void QMaze::setupUI() {
 	QSplitter* hs = new QSplitter(Qt::Horizontal, this);
 	QSplitter* vs = new QSplitter(Qt::Vertical, this);
 
-	vs->addWidget(ui.canvas);
+	vs->addWidget(canvas());
 	vs->addWidget(console());
 	vs->setStretchFactor(0, 20);
 	vs->setStretchFactor(1, 1);
 
 	hs->addWidget(vs);
-	hs->addWidget(ui.hierarchy);
+	hs->addWidget(hierarchy());
 	hs->setStretchFactor(0, 10);
 	hs->setStretchFactor(1, 1);
 
@@ -44,7 +44,7 @@ void QMaze::timerEvent(QTimerEvent *event) {
 	if (event->timerId() != timer_) { return; }
 	std::vector<Sprite> sprites;
 	if (Engine::get()->world()->GetSprites(ObjectTypeSprite, sprites)) {
-		ui.hierarchy->update(sprites);
+		hierarchy()->update(sprites);
 		killTimer(timer_);
 	}
 }

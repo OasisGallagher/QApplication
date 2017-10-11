@@ -16,7 +16,10 @@ public:
 	virtual std::string GetName() const { return name_; }
 	virtual void SetName(const std::string& value) { name_ = value; }
 
-	virtual void SetParent(Sprite value) { parent_ = value; }
+	virtual void AddChild(Sprite child);
+	virtual void RemoveChild(Sprite child);
+
+	virtual void SetParent(Sprite value);
 	virtual Sprite GetParent() const { return parent_; }
 
 	virtual int GetChildCount() const { return (int)children_.size(); }

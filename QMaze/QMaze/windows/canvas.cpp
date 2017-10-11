@@ -18,6 +18,7 @@
 #include "surface.h"
 
 #include "scripts/grayscale.h"
+#include "scripts/inversion.h"
 #include "scripts/cameracontroller.h"
 
 // https://github.com/opengl-tutorials/ogl/blob/master/common/quaternion_utils.cpp
@@ -58,6 +59,7 @@ Canvas::Canvas(QWidget *parent)
 	setMouseTracking(true);
 	setFocusPolicy(Qt::StrongFocus);
 	grayscale_ = new Grayscale;
+	inversion_ = new Inversion;
 	controller_ = new CameraController;
 	timer_ = startTimer(10);
 }
@@ -65,6 +67,7 @@ Canvas::Canvas(QWidget *parent)
 Canvas::~Canvas() {
 	killTimer(timer_);
 	delete grayscale_;
+	delete inversion_;
 	delete controller_;
 	Engine::get()->release();
 }
@@ -141,16 +144,18 @@ void Canvas::createScene() {
 
 	Camera camera = dynamic_sp_cast<Camera>(world->Create(ObjectTypeCamera));
 	controller_->setCamera(camera);
-	camera->AddPostEffect(grayscale_);
+
+	//camera->AddPostEffect(inversion_);
+	//camera->AddPostEffect(grayscale_);
 	//camera->SetPosition(glm::vec3(0, 1, 5));
 	
 	//glm::quat q(glm::lookAt(glm::vec3(0, 1, 5), glm::vec3(0), glm::vec3(0, 1, 0)));
 	//camera->SetRotation(q);
 
-	camera->SetClearType(ClearTypeColor);
-	camera->SetClearColor(glm::vec3(0, 0, 0.4f));
+	camera->SetClearType(ClearTypeSkybox);
+	//camera->SetClearColor(glm::vec3(0, 0, 0.4f));
 
-	/*Skybox skybox = dynamic_sp_cast<Skybox>(world->Create(ObjectTypeSkybox));
+	Skybox skybox = dynamic_sp_cast<Skybox>(world->Create(ObjectTypeSkybox));
 	std::string faces[] = {
 		"textures/lake_skybox/right.jpg",
 		"textures/lake_skybox/left.jpg",
@@ -162,8 +167,7 @@ void Canvas::createScene() {
 
 	skybox->Load(faces);
 	camera->SetSkybox(skybox);
-	*/
-
+	
 	RenderTexture renderTexture = dynamic_sp_cast<RenderTexture>(world->Create(ObjectTypeRenderTexture));
 
 	renderTexture->Load(Rgba, width(), height());
@@ -171,8 +175,8 @@ void Canvas::createScene() {
 	//camera->SetClearColor(glm::vec3(0.0f, 0.0f, 0.4f));
 
 	Sprite sprite = dynamic_sp_cast<Sprite>(world->Create(ObjectTypeSprite));
-	sprite->SetPosition(glm::vec3(0, 0, -4));
-	//sprite->SetEulerAngles(glm::vec3(0, 180, 0));
+	sprite->SetPosition(glm::vec3(0, 0, -18));
+	sprite->SetEulerAngles(glm::vec3(90, 60, 90));
 
 	Surface surface = dynamic_sp_cast<Surface>(world->Create(ObjectTypeSurface));
 	/* Mesh.
@@ -190,13 +194,12 @@ void Canvas::createScene() {
 	surface->AddMesh(mesh);
 	*/
 
-	surface->Load("models/suzanne.obj");
+	surface->Load("models/room_thickwalls.obj");
 	Texture2D albedo = dynamic_sp_cast<Texture2D>(world->Create(ObjectTypeTexture2D));
-	albedo->Load("textures/suzanne_uvmap.dds");
+	albedo->Load("textures/room_uvmap.dds");
 
 	MaterialTextures& textures = surface->GetMesh(0)->GetMaterialTextures();
 	textures.albedo = albedo;
-
 	sprite->SetSurface(surface);
 
 	Renderer renderer = dynamic_sp_cast<Renderer>(world->Create(ObjectTypeRenderer));

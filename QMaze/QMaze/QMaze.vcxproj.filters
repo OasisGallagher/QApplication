@@ -99,9 +99,6 @@
     <ClCompile Include="GeneratedFiles\Release\moc_hierarchy.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
-    <ClCompile Include="scripts\grayscale.cpp">
-      <Filter>scripts\src</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="ui\qmaze.ui">
@@ -136,6 +133,9 @@
     <ClInclude Include="scripts\grayscale.h">
       <Filter>scripts\include</Filter>
     </ClInclude>
+    <ClInclude Include="scripts\inversion.h">
+      <Filter>scripts\include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\buildin\shaders\depth.glsl">
@@ -155,6 +155,9 @@
     </None>
     <None Include="resources\shaders\include\posteffectvertexshader.inc">
       <Filter>resources\shaders\include</Filter>
+    </None>
+    <None Include="resources\shaders\inversion.glsl">
+      <Filter>resources\shaders</Filter>
     </None>
   </ItemGroup>
 </Project>
