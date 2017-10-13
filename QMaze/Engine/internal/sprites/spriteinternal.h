@@ -1,5 +1,4 @@
 #pragma once
-#include <bitset>
 #include <glm/gtc/quaternion.hpp>
 
 #include "sprite.h"
@@ -26,6 +25,7 @@ public:
 	virtual Sprite GetChildAt(int i) { return children_[i]; }
 
 public:
+	virtual void Update();
 	virtual void SetScale(const glm::vec3& value);
 	virtual void SetPosition(const glm::vec3& value);
 	virtual void SetRotation(const glm::quat& value);
@@ -41,9 +41,9 @@ public:
 	virtual void SetLocalRotation(const glm::quat& value);
 	virtual void SetLocalEulerAngles(const glm::vec3& value);
 
-	virtual glm::vec3 GetLocalScale() { return scale_; }
-	virtual glm::vec3 GetLocalPosition() { return position_; }
-	virtual glm::quat GetLocalRotation() { return rotation_; }
+	virtual glm::vec3 GetLocalScale();
+	virtual glm::vec3 GetLocalPosition();
+	virtual glm::quat GetLocalRotation();
 	virtual glm::vec3 GetLocalEulerAngles();
 
 	virtual glm::mat4 GetLocalToWorldMatrix();
@@ -56,8 +56,6 @@ public:
 	virtual glm::vec3 GetRight();
 	virtual glm::vec3 GetForward();
 
-	virtual void Update();
-
 	virtual void SetSurface(Surface value){ surface_ = value; }
 	virtual Surface GetSurface() { return surface_; }
 
@@ -68,20 +66,23 @@ protected:
 	SpriteInternal(ObjectType spriteType);
 
 private:
-	enum DirtyFlag {
-		DirtyFlagWorldScale,
-		DirtyFlagWorldRotation,
-		DirtyFlagWorldPosition,
-		DirtyFlagLocalEulerAngles,
-		DirtyFlagWorldEulerAngles,
-		DirtyFlagLocalToWorldMatrix,
-		DirtyFlagWorldToLocalMatrix,
-		DirtyFlagSize,
+	enum {
+		LocalScale = 1,
+		WorldScale = 1 << 1,
+		LocalRotation = 1 << 2,
+		WorldRotation = 1 << 3,
+		LocalPosition = 1 << 4,
+		WorldPosition = 1 << 5,
+		LocalEulerAngles = 1 << 6,
+		WorldEulerAngles = 1 << 7,
+		LocalToWorldMatrix = 1 << 8,
+		WorldToLocalMatrix = 1 << 9,
 	};
 
 private:
-	bool IsDirty(DirtyFlag bit) { return dirtyFlags_.test(bit); }
-	void SetDiry(DirtyFlag bit, bool value) { dirtyFlags_.set(bit, value); }
+	void SetDiry(int bits);
+	bool IsDirty(int bits) { return (dirtyFlag_ & bits) != 0; }
+	void ClearDirty(int bits) { dirtyFlag_ &= ~bits; }
 
 	const char* SpriteTypeToString(ObjectType type);
 
@@ -93,12 +94,12 @@ private:
 	std::weak_ptr<ISprite> parent_;
 
 	std::vector<Sprite> children_;
-	std::bitset<DirtyFlagSize> dirtyFlags_;
+	int dirtyFlag_;
 
-	glm::vec3 scale_, worldScale_;
-	glm::quat rotation_, worldRotation_;
-	glm::vec3 position_, worldPosition_;
-	glm::vec3 eulerAngles_, worldEulerAngles_;
+	glm::vec3 localScale_, worldScale_;
+	glm::quat localRotation_, worldRotation_;
+	glm::vec3 localPosition_, worldPosition_;
+	glm::vec3 localEulerAngles_, worldEulerAngles_;
 
 	glm::mat4 localToWorldMatrix_;
 	glm::mat4 worldToLocalMatrix_;

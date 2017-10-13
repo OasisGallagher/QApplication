@@ -6,7 +6,6 @@
 #include "internal/base/textureinternal.h"
 
 Framebuffer0::Framebuffer0() : oldFramebuffer_(0) {
-	std::fill(oldViewport_, oldViewport_ + 4, 0);
 }
 
 void Framebuffer0::Create(int width, int height) {
@@ -16,40 +15,43 @@ void Framebuffer0::Create(int width, int height) {
 
 void Framebuffer0::Bind() {
 	Clear();
-	PushFramebuffer();
-	PushViewport(0, 0, GetWidth(), GetHeight());
+	BindFramebuffer();
+	BindViewport();
 }
 
 void Framebuffer0::Unbind() {
-	PopFramebuffer();
-	PopViewport();
+	UnbindFramebuffer();
+	UnbindViewport();
 }
 
-void Framebuffer0::PushFramebuffer() {
+void Framebuffer0::BindFramebuffer() {
 	glGetIntegerv(GL_FRAMEBUFFER_BINDING, &oldFramebuffer_);
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo_);
 }
 
-void Framebuffer0::PopFramebuffer() {
+void Framebuffer0::UnbindFramebuffer() {
 	glBindFramebuffer(GL_FRAMEBUFFER, oldFramebuffer_);
 	oldFramebuffer_ = 0;
 }
 
-void Framebuffer0::PushViewport(int x, int y, int w, int h) {
-	glGetIntegerv(GL_VIEWPORT, oldViewport_);
-	glViewport(x, y, w, h);
+void Framebuffer0::BindViewport() {
+	glViewport(0, 0, GetWidth(), GetHeight());
 }
 
-void Framebuffer0::PopViewport() {
-	glViewport(oldViewport_[0], oldViewport_[1], oldViewport_[2], oldViewport_[3]);
-	std::fill(oldViewport_, oldViewport_ + 4, 0);
+void Framebuffer0::UnbindViewport() {
+}
+
+void Framebuffer0::Resize(int w, int h) {
+	if (width_ == w && height_ == h) { return; }
+	width_ = w;
+	height_ = h;
 }
 
 void Framebuffer0::Clear(int buffers) {
-	PushFramebuffer();
+	BindFramebuffer();
 	glClearColor(clearColor_.r, clearColor_.g, clearColor_.b, 1);
 	glClear(buffers);
-	PopFramebuffer();
+	UnbindFramebuffer();
 }
 
 Framebuffer::Framebuffer() : depthRenderbuffer_(0){
@@ -104,21 +106,21 @@ int Framebuffer::UpdateAttachments() {
 
 void Framebuffer::CreateDepthRenderBuffer() {
 	AssertX(depthRenderbuffer_ == 0, "depth texture or render buffer already exists");
-	PushFramebuffer();
+	BindFramebuffer();
 
 	glGenRenderbuffers(1, &depthRenderbuffer_);
 	glBindRenderbuffer(GL_RENDERBUFFER, depthRenderbuffer_);
 	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, GetWidth(), GetHeight());
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthRenderbuffer_);
 
-	PopFramebuffer();
+	UnbindFramebuffer();
 }
 
 void Framebuffer::SetDepthTexture(RenderTexture texture) {
-	PushFramebuffer();
+	BindFramebuffer();
 	depthTexture_ = texture;
 	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, texture->GetNativePointer(), 0);
-	PopFramebuffer();
+	UnbindFramebuffer();
 }
 
 int Framebuffer::GetRenderTextureCount() {
@@ -139,7 +141,7 @@ void Framebuffer::AddRenderTexture(RenderTexture texture) {
 	int index = FindAttachmentIndex();
 	AssertX(index >= 0, "too many render textures");
 
-	PushFramebuffer();
+	BindFramebuffer();
 
 	renderTextures_[index] = texture;
 
@@ -147,7 +149,7 @@ void Framebuffer::AddRenderTexture(RenderTexture texture) {
 
 	++attachedRenderTextureCount_;
 
-	PopFramebuffer();
+	UnbindFramebuffer();
 }
 
 void Framebuffer::RemoveRenderTexture(RenderTexture texture) {
@@ -164,7 +166,7 @@ void Framebuffer::RemoveRenderTexture(RenderTexture texture) {
 #else
 
 void Framebuffer::SetRenderTexture(RenderTexture texture) {
-	PushFramebuffer();
+	BindFramebuffer();
 
 	renderTextures_[0] = texture;
 
@@ -172,7 +174,7 @@ void Framebuffer::SetRenderTexture(RenderTexture texture) {
 
 	attachedRenderTextureCount_ = texture ? 1 : 0;
 
-	PopFramebuffer();
+	UnbindFramebuffer();
 }
 #endif	// MRT
 

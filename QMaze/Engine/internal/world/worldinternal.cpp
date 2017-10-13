@@ -1,7 +1,10 @@
 #include "tools/mathf.h"
 #include "worldinternal.h"
 #include "internal/memory/factory.h"
+#include "internal/sprites/spriteinternal.h"
 #include "internal/world/environmentinternal.h"
+
+World worldInstance(Factory::Create<WorldInternal>());
 
 bool WorldInternal::LightComparer::operator()(const Light & lhs, const Light & rhs) const {
 	// Directional light > Importance > Luminance.
@@ -28,13 +31,17 @@ bool WorldInternal::SpriteComparer::operator() (const Sprite& lhs, const Sprite&
 
 WorldInternal::WorldInternal()
 	: ObjectInternal(ObjectTypeWorld)
-	, environment_(Memory::Create<EnvironmentInternal>()) {
+	, environment_(Memory::Create<EnvironmentInternal>())
+	, root_(Factory::Create<SpriteInternal>()) {
+	root_->SetName("root");
 }
 
 Object WorldInternal::Create(ObjectType type) {
 	Object object = Factory::Create(type);
 	if (type >= ObjectTypeSprite) {
-		sprites_.push_back(dsp_cast<Sprite>(object));
+		Sprite sprite = dsp_cast<Sprite>(object);
+		sprite->SetParent(GetRootSprite());
+		sprites_.push_back(sprite);
 	}
 
 	if (type >= ObjectTypeSpotLight && type <= ObjectTypeDirectionalLight) {

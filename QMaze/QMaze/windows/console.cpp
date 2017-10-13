@@ -14,7 +14,6 @@ void Console::initialize() {
 }
 
 void Console::addMessage(MessageType type, const QString& message) {
-	// TODO: log tags/filters.
 	if (messages_.contains(QString::number(type) + message)) {
 		return;
 	}

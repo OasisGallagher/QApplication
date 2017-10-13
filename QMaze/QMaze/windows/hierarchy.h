@@ -13,12 +13,11 @@ public:
 	~Hierarchy();
 
 public:
-	void update(const std::vector<Sprite>& sprites);
+	void update(Sprite root);
 
 private:
 	void updateRecursively(Sprite pp, QStandardItem* pi);
 
 private:
-	QSet<unsigned> updated_;
 	QStandardItemModel* model_;
 };

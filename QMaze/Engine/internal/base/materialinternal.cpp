@@ -123,7 +123,11 @@ void MaterialInternal::Undefine(const std::string& name) {
 Uniform* MaterialInternal::GetUniform(const std::string& name, UniformType type) {
 	Uniform* ans = nullptr;
 	if (!uniforms_.get(name, ans)) {
-		Debug::LogWarning("uniform " + name + " does not exist.");
+		static int variablePrefixLength = strlen(VARIABLE_PREFIX);
+		if (strncmp(name.c_str(), VARIABLE_PREFIX, variablePrefixLength) != 0) {
+			Debug::LogWarning("uniform " + name + " does not exist.");
+		}
+
 		return false;
 	}
 
@@ -150,6 +154,7 @@ void MaterialInternal::UpdateVertexAttributes() {
 
 void MaterialInternal::UpdateFragmentAttributes() {
 	GLuint program = shader_->GetNativePointer();
+	// TODO: bind fragment output.
 	//glBindFragDataLocation(program, 0, Variables::fragColor);
 	glBindFragDataLocation(program, 0, Variables::depth);
 }

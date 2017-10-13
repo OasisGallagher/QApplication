@@ -36,15 +36,9 @@ public:
 	void update();
 	void resize(int w, int h);
 
-	World world() { return world_; }
+	World world();
 
-	Time time() { return time_; }
-	Screen screen() { return screen_; }
-	Graphics graphics() { return graphics_; }
-
-private:
-	World world_;
-	Time time_;
-	Screen screen_;
-	Graphics graphics_;
+	Time time();
+	Screen screen();
+	Graphics graphics();
 };

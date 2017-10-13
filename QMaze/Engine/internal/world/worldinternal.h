@@ -8,6 +8,8 @@
 #include "environment.h"
 #include "internal/base/objectinternal.h"
 
+extern World worldInstance;
+
 class WorldInternal : public ObjectInternal, public IWorld {
 	DEFINE_FACTORY_METHOD(World)
 
@@ -16,6 +18,7 @@ public:
 
 public:
 	virtual void Update();
+	virtual Sprite GetRootSprite() { return root_; }
 	virtual Object Create(ObjectType type);
 
 	virtual bool GetSprites(ObjectType type, std::vector<Sprite>& sprites);
@@ -31,9 +34,10 @@ private:
 	typedef std::set<Camera, CameraComparer> CameraContainer;
 
 private:
+	Sprite root_;
 	LightContainer lights_;
-	SpriteContainer sprites_;
 	CameraContainer cameras_;
+	SpriteContainer sprites_;
 
 	Environment environment_;
 };

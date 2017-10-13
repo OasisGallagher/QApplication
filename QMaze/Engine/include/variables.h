@@ -1,5 +1,6 @@
 #pragma once
-#define DEFINE_VARIABLE(name)	static const char* name = "c_" #name
+#define VARIABLE_PREFIX			"c_"
+#define DEFINE_VARIABLE(name)	static const char* name = VARIABLE_PREFIX #name
 
 namespace Variables {
 	DEFINE_VARIABLE(position);
@@ -26,6 +27,7 @@ namespace Variables {
 
 	DEFINE_VARIABLE(localToClipSpaceMatrix);
 	DEFINE_VARIABLE(localToWorldSpaceMatrix);
+	DEFINE_VARIABLE(localToOrthographicLightSpaceMatrix);
 };
 
 #undef DEFINE_VARIABLE

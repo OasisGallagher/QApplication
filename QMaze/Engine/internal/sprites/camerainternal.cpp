@@ -1,17 +1,20 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "light.h"
-#include "engine.h"
 #include "camera.h"
 #include "variables.h"
 #include "tools/debug.h"
+#include "tools/mathf.h"
 #include "internal/memory/factory.h"
 #include "internal/base/framebuffer.h"
 #include "internal/resources/resources.h"
 #include "internal/base/shaderinternal.h"
+#include "internal/world/worldinternal.h"
+#include "internal/misc/screeninternal.h"
 #include "internal/base/textureinternal.h"
 #include "internal/base/materialinternal.h"
 #include "internal/base/rendererinternal.h"
+#include "internal/misc/graphicsinternal.h"
 #include "internal/sprites/camerainternal.h"
 
 CameraInternal::CameraInternal() 
@@ -21,12 +24,14 @@ CameraInternal::CameraInternal()
 	, pass_(RenderPassNone), fbRenderTexture_(nullptr) {
 	CreateFramebuffers();
 	CreateDepthRenderer();
+	CreateShadowRenderer();
 	glClearDepth(1);
 }
 
 CameraInternal::~CameraInternal() {
 	Memory::Release(fb0_);
 	Memory::Release(fbDepth_);
+	Memory::Release(fbShadow_);
 	Memory::Release(fbRenderTexture_);
 }
 
@@ -36,6 +41,34 @@ void CameraInternal::SetClearColor(const glm::vec3 & value) {
 
 glm::vec3 CameraInternal::GetClearColor() {
 	return fb0_->GetClearColor();
+}
+
+void CameraInternal::SetAspect(float value) {
+	if (!Mathf::Approximately(aspect_, value)) {
+		aspect_ = value;
+		projection_ = glm::perspective(fieldOfView_, aspect_, near_, far_);
+	}
+}
+
+void CameraInternal::SetNearClipPlane(float value) {
+	if (!Mathf::Approximately(near_, value)) {
+		near_ = value;
+		projection_ = glm::perspective(fieldOfView_, aspect_, near_, far_);
+	}
+}
+
+void CameraInternal::SetFarClipPlane(float value) {
+	if (!Mathf::Approximately(far_, value)) {
+		far_ = value;
+		projection_ = glm::perspective(fieldOfView_, aspect_, near_, far_);
+	}
+}
+
+void CameraInternal::SetFieldOfView(float value) {
+	if (!Mathf::Approximately(near_, value)) {
+		near_ = value;
+		projection_ = glm::perspective(fieldOfView_, aspect_, near_, far_);
+	}
 }
 
 void CameraInternal::SetRenderTexture(RenderTexture value) {
@@ -48,19 +81,14 @@ void CameraInternal::SetRenderTexture(RenderTexture value) {
 }
 
 void CameraInternal::Update() {
-	if (clearType_ == ClearTypeSkybox) {
-		Skybox skybox = skybox_;
-		if (!skybox) {
-			skybox = Engine::get()->world()->GetEnvironment()->GetSkybox();
-		}
+	int w = screenInstance->GetContextWidth();
+	int h = screenInstance->GetContextHeight();
 
-		if (!skybox) {
-			Debug::LogError("skybox does not exist.");
-			return;
-		}
-
-		skybox->SetPosition(GetPosition());
+	if (w != fb0_->GetWidth() || h != fb0_->GetHeight()) {
+		OnContextSizeChanged(w, h);
 	}
+
+	UpdateSkybox();
 }
 
 void CameraInternal::Render() {
@@ -74,6 +102,11 @@ void CameraInternal::Render() {
 	Light forwardBase;
 	std::vector<Light> forwardAdd;
 	GetLights(forwardBase, forwardAdd);
+
+	RenderShadowPass(sprites, forwardBase);
+	Resources::FindShader
+	graphicsInstance->Blit(fbShadow_->GetDepthTexture(), nullptr, renderer);
+	return;
 
 	Framebuffer0* active = GetActiveFramebuffer();
 	active->Bind();
@@ -94,8 +127,8 @@ void CameraInternal::Render() {
 }
 
 void CameraInternal::CreateFramebuffers() {
-	int w = Engine::get()->screen()->GetContextWidth();
-	int h = Engine::get()->screen()->GetContextHeight();
+	int w = screenInstance->GetContextWidth();
+	int h = screenInstance->GetContextHeight();
 
 	fb0_ = Memory::Create<Framebuffer0>();
 	fb0_->Create(w, h);
@@ -105,6 +138,12 @@ void CameraInternal::CreateFramebuffers() {
 	RenderTexture depthTexture = Factory::Create<RenderTextureInternal>();
 	depthTexture->Load(Depth, w, h);
 	fbDepth_->SetDepthTexture(depthTexture);
+
+	fbShadow_ = Memory::Create<Framebuffer>();
+	fbShadow_->Create(w, h);
+	RenderTexture shadowTexture = Factory::Create<RenderTextureInternal>();
+	shadowTexture->Load(Depth, w, h);
+	fbShadow_->SetDepthTexture(shadowTexture);
 
 	fbRenderTexture_ = Memory::Create<Framebuffer>();
 	fbRenderTexture_->Create(w, h);
@@ -132,6 +171,45 @@ void CameraInternal::CreateDepthRenderer() {
 	depthRenderer_->SetRenderState(DepthTest, Less);
 }
 
+void CameraInternal::CreateShadowRenderer() {
+	directionalLightShadowRenderer_ = Factory::Create<RendererInternal>();
+	Shader shader = Factory::Create<ShaderInternal>();
+	shader->Load("buildin/shaders/directionallightdepth");
+
+	Material material = Factory::Create<MaterialInternal>();
+	material->SetShader(shader);
+
+	directionalLightShadowRenderer_->AddMaterial(material);
+	depthRenderer_->SetRenderState(DepthTest, LessEqual);
+}
+
+void CameraInternal::UpdateSkybox() {
+	if (clearType_ != ClearTypeSkybox) { return; }
+	Skybox skybox = skybox_;
+	if (!skybox) {
+		skybox = worldInstance->GetEnvironment()->GetSkybox();
+	}
+
+	if (!skybox) {
+		Debug::LogError("skybox does not exist.");
+		return;
+	}
+
+	skybox->SetPosition(GetPosition());
+}
+
+void CameraInternal::OnContextSizeChanged(int w, int h) {
+	fb0_->Resize(w, h);
+	fbDepth_->Resize(w, h);
+	fbRenderTexture_->Resize(w, h);
+	fbRenderTexture2_->Resize(w, h);
+
+	float aspect = (float)w / h;
+	if (!Mathf::Approximately(aspect, GetAspect())) {
+		SetAspect(aspect);
+	}
+}
+
 Framebuffer0* CameraInternal::GetActiveFramebuffer() {
 	Framebuffer0* active = nullptr;
 	if (fbRenderTexture_->GetRenderTexture(0) != renderTexture_ || !postEffects_.empty()) {
@@ -144,7 +222,7 @@ Framebuffer0* CameraInternal::GetActiveFramebuffer() {
 	return active;
 }
 
-void CameraInternal::SetForwardBaseLightParameter(std::vector<Sprite>& sprites, Light light) {
+void CameraInternal::SetForwardBaseLightParameter(const std::vector<Sprite>& sprites, Light light) {
 	for (int i = 0; i < sprites.size(); ++i) {
 		Renderer renderer = sprites[i]->GetRenderer();
 		int materialCount = renderer->GetMaterialCount();
@@ -152,7 +230,7 @@ void CameraInternal::SetForwardBaseLightParameter(std::vector<Sprite>& sprites, 
 			Material material = renderer->GetMaterial(i);
 
 			material->SetVector3(Variables::cameraPosition, GetPosition());
-			material->SetVector3(Variables::ambientLightColor, Engine::get()->world()->GetEnvironment()->GetAmbientColor());
+			material->SetVector3(Variables::ambientLightColor, worldInstance->GetEnvironment()->GetAmbientColor());
 			material->SetVector3(Variables::lightColor, light->GetColor());
 			material->SetVector3(Variables::lightPosition, light->GetPosition());
 			material->SetVector3(Variables::lightDirection, light->GetRotation() * glm::vec3(0, 0, -1));
@@ -160,7 +238,7 @@ void CameraInternal::SetForwardBaseLightParameter(std::vector<Sprite>& sprites, 
 	}
 }
 
-void CameraInternal::RenderForwardBase(std::vector<Sprite>& sprites, Light light) {
+void CameraInternal::RenderForwardBase(const std::vector<Sprite>& sprites, Light light) {
 	SetForwardBaseLightParameter(sprites, light);
 
 	int from = 0;
@@ -169,16 +247,36 @@ void CameraInternal::RenderForwardBase(std::vector<Sprite>& sprites, Light light
 	from = RenderTransparentPass(sprites, from);
 }
 
-void CameraInternal::RenderForwardAdd(std::vector<Sprite>& sprites, std::vector<Light>& lights) {
+void CameraInternal::RenderShadowPass(const std::vector<Sprite>& sprites, Light light) {
+	pass_ = RenderPassShadow;
+	Assert(light->GetType() == ObjectTypeDirectionalLight);
 
+	fbShadow_->Bind();
+
+	glm::vec3 lightPosition = light->GetRotation() * glm::vec3(0, 0, -1) * -1.f;
+	glm::mat4 projection = glm::ortho<float>(-10, 10, -10, 10);
+	glm::mat4 view = glm::lookAt(lightPosition, glm::vec3(0), glm::vec3(0, 1, 0));
+	glm::mat4 shadowDepthMatrix = projection * view;
+
+	for (int i = 0; i < sprites.size(); ++i) {
+		Sprite sprite = sprites[i];
+		Material material = directionalLightShadowRenderer_->GetMaterial(0);
+		material->SetMatrix4(Variables::localToOrthographicLightSpaceMatrix, shadowDepthMatrix);
+		RenderSprite(sprite, directionalLightShadowRenderer_);
+	}
+
+	fbShadow_->Unbind();
 }
 
-int CameraInternal::RenderBackgroundPass(std::vector<Sprite>& sprites, int from) {
+void CameraInternal::RenderForwardAdd(const std::vector<Sprite>& sprites, const std::vector<Light>& lights) {
+}
+
+int CameraInternal::RenderBackgroundPass(const std::vector<Sprite>& sprites, int from) {
 	pass_ = RenderPassBackground;
 	return 0;
 }
 
-void CameraInternal::RenderDepthPass(std::vector<Sprite>& sprites) {
+void CameraInternal::RenderDepthPass(const std::vector<Sprite>& sprites) {
 	pass_ = RenderPassDepth;
 	
 	fbDepth_->Bind();
@@ -191,7 +289,7 @@ void CameraInternal::RenderDepthPass(std::vector<Sprite>& sprites) {
 	fbDepth_->Unbind();
 }
 
-int CameraInternal::RenderOpaquePass(std::vector<Sprite>& sprites, int from) {
+int CameraInternal::RenderOpaquePass(const std::vector<Sprite>& sprites, int from) {
 	pass_ = RenderPassOpaque;
 	for (int i = 0; i < sprites.size(); ++i) {
 		Sprite sprite = sprites[i];
@@ -201,15 +299,14 @@ int CameraInternal::RenderOpaquePass(std::vector<Sprite>& sprites, int from) {
 	return 0;
 }
 
-int CameraInternal::RenderTransparentPass(std::vector<Sprite>& sprites, int from) {
+int CameraInternal::RenderTransparentPass(const std::vector<Sprite>& sprites, int from) {
 	pass_ = RenderPassTransparent;
 	return 0;
 }
 
 void CameraInternal::GetLights(Light& forwardBase, std::vector<Light>& forwardAdd) {
-	World world = Engine::get()->world();
 	std::vector<Sprite> lights;
-	if (!world->GetSprites(ObjectTypeLights, lights)) {
+	if (!worldInstance->GetSprites(ObjectTypeLights, lights)) {
 		return;
 	}
 
@@ -249,8 +346,7 @@ bool CameraInternal::IsRenderable(Sprite sprite) {
 }
 
 bool CameraInternal::GetRenderableSprites(std::vector<Sprite>& sprites) {
-	World world = Engine::get()->world();
-	world->GetSprites(ObjectTypeSprite, sprites);
+	worldInstance->GetSprites(ObjectTypeSprite, sprites);
 
 	// sort sprites by render queue.
 	int p = 0;
@@ -283,8 +379,4 @@ void CameraInternal::RenderSprite(Sprite sprite, Renderer renderer) {
 	material->SetMatrix4(Variables::localToClipSpaceMatrix, localToClipSpaceMatrix);
 	material->SetMatrix4(Variables::localToWorldSpaceMatrix, localToWorldMatrix);
 	renderer->Render(surface);
-}
-
-const glm::mat4& CameraInternal::GetProjectionMatrix() {
-	return projection_;
 }

@@ -17,6 +17,7 @@ class CameraInternal : public ICamera, public SpriteInternal {
 		RenderPassNone = -1,
 		RenderPassBackground,
 		RenderPassDepth,
+		RenderPassShadow,
 		RenderPassOpaque,
 		RenderPassTransparent,
 		RenderPassCount
@@ -47,17 +48,17 @@ public:
 	virtual void Render();
 
 public:
-	virtual void SetAspect(float value) { aspect_ = value; }
-	virtual void SetNearClipPlane(float value) { near_ = value; }
-	virtual void SetFarClipPlane(float value) { far_ = value; }
-	virtual void SetFieldOfView(float value) { near_ = value; }
+	virtual void SetAspect(float value);
+	virtual void SetNearClipPlane(float value);
+	virtual void SetFarClipPlane(float value);
+	virtual void SetFieldOfView(float value);
 
 	virtual float GetAspect() { return aspect_; }
 	virtual float GetNearClipPlane() { return near_; }
 	virtual float GetFarClipPlane() { return far_; }
 	virtual float GetFieldOfView() { return fieldOfView_; }
 
-	virtual const glm::mat4& GetProjectionMatrix();
+	virtual const glm::mat4& GetProjectionMatrix() { return projection_; }
 
 public:
 	virtual void AddPostEffect(PostEffect* effect) { postEffects_.push_back(effect); }
@@ -65,22 +66,27 @@ public:
 private:
 	void CreateFramebuffers();
 	void CreateDepthRenderer();
+	void CreateShadowRenderer();
+
+	void UpdateSkybox();
+	void OnContextSizeChanged(int w, int h);
 	Framebuffer0* GetActiveFramebuffer();
 
-	void RenderDepthPass(std::vector<Sprite>& sprites);
-	int RenderBackgroundPass(std::vector<Sprite>& sprites, int from);
-	int RenderOpaquePass(std::vector<Sprite>& sprites, int from);
-	int RenderTransparentPass(std::vector<Sprite>& sprites, int from);
+	void RenderDepthPass(const std::vector<Sprite>& sprites);
+	void RenderShadowPass(const std::vector<Sprite>& sprites, Light light);
+	int RenderBackgroundPass(const std::vector<Sprite>& sprites, int from);
+	int RenderOpaquePass(const std::vector<Sprite>& sprites, int from);
+	int RenderTransparentPass(const std::vector<Sprite>& sprites, int from);
 
 	bool IsRenderable(Sprite sprite);
 
 	void RenderSprite(Sprite sprite, Renderer renderer);
 	bool GetRenderableSprites(std::vector<Sprite>& sprites);
 
-	void SetForwardBaseLightParameter(std::vector<Sprite>& sprites, Light light);
+	void SetForwardBaseLightParameter(const std::vector<Sprite>& sprites, Light light);
 
-	void RenderForwardBase(std::vector<Sprite>& sprites, Light light);
-	void RenderForwardAdd(std::vector<Sprite>& sprites, std::vector<Light>& lights);
+	void RenderForwardBase(const std::vector<Sprite>& sprites, Light light);
+	void RenderForwardAdd(const std::vector<Sprite>& sprites, const std::vector<Light>& lights);
 
 	void OnPostRender();
 	void GetLights(Light& forwardBase, std::vector<Light>& forwardAdd);
@@ -95,11 +101,13 @@ private:
 
 	Framebuffer0* fb0_;
 	Framebuffer* fbDepth_;
+	Framebuffer* fbShadow_;
 	Framebuffer* fbRenderTexture_;
 	Framebuffer* fbRenderTexture2_;
 
 	// TODO: Common renderer.
 	Renderer depthRenderer_;
+	Renderer directionalLightShadowRenderer_;
 
 	RenderTexture renderTexture_;
 	RenderTexture renderTexture2_;

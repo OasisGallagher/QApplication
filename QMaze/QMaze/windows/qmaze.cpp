@@ -10,7 +10,7 @@ QMaze::QMaze(QWidget *parent)
 
 	connect(canvas(), SIGNAL(onEngineLogReceived(int, const char*)), this, SLOT(OnEngineLogReceived(int, const char*)));
 
-	timer_ = startTimer(1);
+	timer_ = startTimer(1000);
 }
 
 QMaze::~QMaze() {
@@ -43,22 +43,18 @@ void QMaze::setupUI() {
 void QMaze::timerEvent(QTimerEvent *event) {
 	if (event->timerId() != timer_) { return; }
 	std::vector<Sprite> sprites;
-	if (Engine::get()->world()->GetSprites(ObjectTypeSprite, sprites)) {
-		hierarchy()->update(sprites);
-		killTimer(timer_);
-	}
+	hierarchy()->update(Engine::get()->world()->GetRootSprite());
+	killTimer(timer_);
 }
 
 void QMaze::OnEngineLogReceived(int type, const char* message) {
 	switch (type) {
 		case 0:
 			console()->addMessage(Console::Debug, message);
-			qDebug(message);
 			break;
 
 		case 1:
 			console()->addMessage(Console::Warning, message);
-			qWarning(message);
 			break;
 
 		case 2:

@@ -175,9 +175,10 @@ void Canvas::createScene() {
 	//camera->SetClearColor(glm::vec3(0.0f, 0.0f, 0.4f));
 
 	Sprite sprite = dsp_cast<Sprite>(world->Create(ObjectTypeSprite));
-	sprite->SetParent(camera);
+	//sprite->SetParent(camera);
+	light->SetParent(camera);
 	sprite->SetPosition(glm::vec3(0, 0, -18));
-	sprite->SetEulerAngles(glm::vec3(90, 60, 90));
+	sprite->SetEulerAngles(glm::vec3(-60, 180, 0));
 
 	Surface surface = dsp_cast<Surface>(world->Create(ObjectTypeSurface));
 	/* Mesh.
@@ -199,8 +200,12 @@ void Canvas::createScene() {
 	Texture2D albedo = dsp_cast<Texture2D>(world->Create(ObjectTypeTexture2D));
 	albedo->Load("textures/room_uvmap.dds");
 
+	//Texture2D bump = dsp_cast<Texture2D>(world->Create(ObjectTypeTexture2D));
+	//bump->Load("textures/bump.bmp");
+
 	MaterialTextures& textures = surface->GetMesh(0)->GetMaterialTextures();
 	textures.albedo = albedo;
+	//textures.bump = bump;
 	sprite->SetSurface(surface);
 
 	Renderer renderer = dsp_cast<Renderer>(world->Create(ObjectTypeRenderer));

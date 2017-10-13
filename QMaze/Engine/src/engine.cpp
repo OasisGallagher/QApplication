@@ -1,14 +1,12 @@
 #include <gl/glew.h>
 
 #include "engine.h"
-
 #include "tools/debug.h"
 
-// TODO: get world instance.
-#include "internal/memory/factory.h"
-#include "internal/misc/timefinternal.h"
-#include "internal/misc/screeninternal.h"
-#include "internal/misc/graphicsinternal.h"
+extern Time timeInstance;
+extern World worldInstance;
+extern Screen screenInstance;
+extern Graphics graphicsInstance;
 
 #ifndef _STDCALL
 #define _STDCALL __stdcall
@@ -24,11 +22,7 @@ static void _STDCALL GLDebugMessageCallback(
 	const GLvoid* userParam
 );
 
-Engine::Engine() 
-	: time_(Memory::Create<TimeInternal>())
-	, screen_(Memory::Create<ScreenInternal>())
-	, graphics_(Memory::Create<GraphicsInternal>()) {
-
+Engine::Engine() {
 }
 
 Engine* Engine::get() {
@@ -37,8 +31,6 @@ Engine* Engine::get() {
 }
 
 bool Engine::initialize() {
-	AssertX(!world_, "can not initialize engine twice.");
-
 	glewExperimental = true;
 
 	if (glewInit() != GLEW_OK) {
@@ -51,13 +43,10 @@ bool Engine::initialize() {
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
 	}
 
-	world_ = dsp_cast<World>(Factory::Create(ObjectTypeWorld));
-
 	return true;
 }
 
 void Engine::release() {
-	world_.reset();
 }
 
 void Engine::setLogCallback(EngineLogCallback* callback) {
@@ -69,9 +58,25 @@ void Engine::resize(int w, int h) {
 	glViewport(0, 0, w, h);
 }
 
+World Engine::world() {
+	return worldInstance;
+}
+
+Time Engine::time() {
+	return timeInstance;
+}
+
+Screen Engine::screen() {
+	return screenInstance;
+}
+
+Graphics Engine::graphics() {
+	return graphicsInstance;
+}
+
 void Engine::update() {
 	time()->Update();
-	world_->Update();
+	world()->Update();
 }
 
 static void _STDCALL GLDebugMessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const GLvoid* userParam) {

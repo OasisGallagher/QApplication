@@ -159,5 +159,8 @@
     <None Include="resources\shaders\inversion.glsl">
       <Filter>resources\shaders</Filter>
     </None>
+    <None Include="resources\buildin\shaders\directionallightdepth.glsl">
+      <Filter>resources\buildin\shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

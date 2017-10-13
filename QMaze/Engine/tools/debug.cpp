@@ -47,7 +47,7 @@ void Debug::Break(const std::string& expression, const char* file, int line) {
 
 void Debug::Break(const std::string& expression, const std::string& message, const char* file, int line) {
 	std::ostringstream oss;
-	oss << expression + ":\n" + message << "\n";
+	oss << /*expression + ":\n" + */message << "\n";
 	oss << "at " << file << ":" << line;
 	if (callback_ != nullptr) { callback_->OnEngineLogMessage(LogLevelFatal, oss.str().c_str()); }
 }

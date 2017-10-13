@@ -19,6 +19,8 @@ public:
 	int GetWidth() { return width_; }
 	int GetHeight() { return height_; }
 
+	void Resize(int w, int h);
+
 	void SetClearColor(const glm::vec3& value) { clearColor_ = value; }
 	glm::vec3 GetClearColor() { return clearColor_; }
 
@@ -27,11 +29,11 @@ public:
 	unsigned GetNativePointer() { return fbo_; }
 
 protected:
-	void PushFramebuffer();
-	void PopFramebuffer();
+	void BindFramebuffer();
+	void UnbindFramebuffer();
 
-	void PushViewport(int x, int y, int w, int h);
-	void PopViewport();
+	void BindViewport();
+	void UnbindViewport();
 
 protected:
 	GLuint fbo_;
@@ -43,7 +45,6 @@ private:
 	glm::vec3 clearColor_;
 
 	GLint oldFramebuffer_;
-	GLint oldViewport_[4];
 };
 
 class Framebuffer : public Framebuffer0 {

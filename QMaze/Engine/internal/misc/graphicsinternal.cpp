@@ -1,9 +1,11 @@
-#include "engine.h"
 #include "graphicsinternal.h"
+#include "internal/memory/memory.h"
+#include "internal/world/worldinternal.h"
+
+Graphics graphicsInstance(Memory::Create<GraphicsInternal>());
 
 void GraphicsInternal::Blit(RenderTexture src, RenderTexture dest, Renderer renderer) {
-	World world = Engine::get()->world();
-	Surface surface = dsp_cast<Surface>(world->Create(ObjectTypeSurface));
+	Surface surface = dsp_cast<Surface>(worldInstance->Create(ObjectTypeSurface));
 	surface->Load("buildin/models/quad.obj");
 
 	for (int i = 0; i < renderer->GetMaterialCount(); ++i) {
