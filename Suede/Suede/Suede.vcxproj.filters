@@ -1,0 +1,169 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Generated Files">
+      <UniqueIdentifier>{71ED8ED8-ACB9-4CE9-BBE1-E00B30144E11}</UniqueIdentifier>
+      <Extensions>moc;h;cpp</Extensions>
+      <SourceControlFiles>False</SourceControlFiles>
+    </Filter>
+    <Filter Include="Generated Files\Debug">
+      <UniqueIdentifier>{402f3300-9718-425e-ae2a-09de1f08b65e}</UniqueIdentifier>
+      <Extensions>cpp;moc</Extensions>
+      <SourceControlFiles>False</SourceControlFiles>
+    </Filter>
+    <Filter Include="Generated Files\Release">
+      <UniqueIdentifier>{efaaf5fe-4bac-4b51-b5b5-11101849618f}</UniqueIdentifier>
+      <Extensions>cpp;moc</Extensions>
+      <SourceControlFiles>False</SourceControlFiles>
+    </Filter>
+    <Filter Include="resources">
+      <UniqueIdentifier>{D9D6E242-F8AF-46E4-B9FD-80ECBC20BA3E}</UniqueIdentifier>
+      <Extensions>qrc;*</Extensions>
+      <ParseFiles>false</ParseFiles>
+    </Filter>
+    <Filter Include="ui">
+      <UniqueIdentifier>{99349809-55BA-4b9d-BF79-8FDBB0286EB3}</UniqueIdentifier>
+      <Extensions>ui</Extensions>
+    </Filter>
+    <Filter Include="resources\buildin">
+      <UniqueIdentifier>{ef71728c-0118-4a07-ba75-c636b628828c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="resources\buildin\shaders">
+      <UniqueIdentifier>{7799e13f-e719-497a-b633-ff8c543af3e9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="windows">
+      <UniqueIdentifier>{b2387caa-cad8-41c5-b0b7-574d52dbdb14}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="scripts">
+      <UniqueIdentifier>{d9d38ab5-25a0-4526-8735-dbceb209adba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="windows\include">
+      <UniqueIdentifier>{a8b8c673-6a4b-4d6f-ad47-694561ff1ff6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="windows\src">
+      <UniqueIdentifier>{b3748fa1-e9cd-4486-a2ca-fee7ab76f9af}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="scripts\include">
+      <UniqueIdentifier>{82c9ccf8-a40a-49f9-bdf3-b19e9dbf76ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="scripts\src">
+      <UniqueIdentifier>{dfce4a84-8832-4749-b332-0fdd5a01e4e8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="resources\buildin\shaders\include">
+      <UniqueIdentifier>{d4b000e9-5adc-4391-a49a-d9fb0bfbc95b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="resources\shaders">
+      <UniqueIdentifier>{cda91b8e-50f4-4c01-a697-db1bad03772d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="resources\shaders\include">
+      <UniqueIdentifier>{293ae9ed-e6bb-4edb-878e-204ffb3e8ba9}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="GeneratedFiles\qrc_suede.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="windows\canvas.cpp">
+      <Filter>windows\src</Filter>
+    </ClCompile>
+    <ClCompile Include="windows\console.cpp">
+      <Filter>windows\src</Filter>
+    </ClCompile>
+    <ClCompile Include="scripts\cameracontroller.cpp">
+      <Filter>scripts\src</Filter>
+    </ClCompile>
+    <ClCompile Include="scripts\main.cpp">
+      <Filter>scripts\src</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_canvas.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_console.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="windows\hierarchy.cpp">
+      <Filter>windows\src</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_hierarchy.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_hierarchy.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_suede.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_suede.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="windows\suede.cpp">
+      <Filter>windows\src</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="suede.qrc">
+      <Filter>resources</Filter>
+    </CustomBuild>
+    <CustomBuild Include="windows\canvas.h">
+      <Filter>windows\include</Filter>
+    </CustomBuild>
+    <CustomBuild Include="windows\console.h">
+      <Filter>windows\include</Filter>
+    </CustomBuild>
+    <CustomBuild Include="windows\hierarchy.h">
+      <Filter>windows\include</Filter>
+    </CustomBuild>
+    <CustomBuild Include="windows\suede.h">
+      <Filter>windows\include</Filter>
+    </CustomBuild>
+    <CustomBuild Include="ui\suede.ui">
+      <Filter>ui</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="scripts\cameracontroller.h">
+      <Filter>scripts\include</Filter>
+    </ClInclude>
+    <ClInclude Include="scripts\grayscale.h">
+      <Filter>scripts\include</Filter>
+    </ClInclude>
+    <ClInclude Include="scripts\inversion.h">
+      <Filter>scripts\include</Filter>
+    </ClInclude>
+    <ClInclude Include="resources\buildin\shaders\include\fragmentlight.inc">
+      <Filter>resources\buildin\shaders\include</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_suede.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="resources\buildin\shaders\depth.glsl">
+      <Filter>resources\buildin\shaders</Filter>
+    </None>
+    <None Include="resources\buildin\shaders\skybox.glsl">
+      <Filter>resources\buildin\shaders</Filter>
+    </None>
+    <None Include="resources\buildin\shaders\texture.glsl">
+      <Filter>resources\buildin\shaders</Filter>
+    </None>
+    <None Include="resources\buildin\shaders\blit.glsl">
+      <Filter>resources\buildin\shaders</Filter>
+    </None>
+    <None Include="resources\shaders\grayscale.glsl">
+      <Filter>resources\shaders</Filter>
+    </None>
+    <None Include="resources\shaders\include\posteffectvertexshader.inc">
+      <Filter>resources\shaders\include</Filter>
+    </None>
+    <None Include="resources\shaders\inversion.glsl">
+      <Filter>resources\shaders</Filter>
+    </None>
+    <None Include="resources\buildin\shaders\directionallightdepth.glsl">
+      <Filter>resources\buildin\shaders</Filter>
+    </None>
+    <None Include="resources\buildin\shaders\include\vertexlight.inc">
+      <Filter>resources\buildin\shaders\include</Filter>
+    </None>
+  </ItemGroup>
+</Project>
