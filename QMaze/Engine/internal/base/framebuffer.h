@@ -1,4 +1,6 @@
 #pragma once
+#include <vector>
+
 #include <gl/glew.h>
 #include <glm/glm.hpp>
 
@@ -11,6 +13,7 @@ public:
 
 public:
 	virtual void Create(int width, int height);
+	virtual void ReadBuffer(std::vector<unsigned char>& data);
 
 	virtual void Bind();
 	virtual void Unbind();
@@ -70,7 +73,12 @@ public:
 
 	int GetRenderTextureCount();
 	RenderTexture GetDepthTexture();
+
+#ifdef MRT
 	RenderTexture GetRenderTexture(int index);
+#else
+	RenderTexture GetRenderTexture();
+#endif
 
 private:
 	int UpdateAttachments();

@@ -20,13 +20,16 @@ public:
 
 protected:
 	virtual GLenum GetGLTextureType() = 0;
+	virtual GLenum GetGLTextureBindingName() = 0;
+
+	void BindTexture();
+	void UnbindTexture();
 	void DestroyTexture();
 
 protected:
-	const void* ReadRawTexture(const std::string& path, int& width, int& height);
-
-protected:
 	int width_, height_;
+	GLint oldBindingTexture_;
+
 	GLuint texture_;
 	GLenum location_;
 };
@@ -40,9 +43,14 @@ public:
 
 public:
 	virtual bool Load(const std::string& path);
+	virtual bool Load(const void* data, int width, int height);
+
+	virtual bool EncodeToPng(std::vector<unsigned char>& data);
+	virtual bool EncodeToJpg(std::vector<unsigned char>& data);
 
 protected:
 	virtual GLenum GetGLTextureType() { return GL_TEXTURE_2D; }
+	virtual GLenum GetGLTextureBindingName() { return GL_TEXTURE_BINDING_2D; }
 };
 
 class TextureCubeInternal : public ITextureCube, public TextureInternal {
@@ -57,6 +65,7 @@ public:
 
 protected:
 	virtual GLenum GetGLTextureType() { return GL_TEXTURE_CUBE_MAP; }
+	virtual GLenum GetGLTextureBindingName() { return GL_TEXTURE_BINDING_CUBE_MAP; }
 };
 
 class RenderTextureInternal : public IRenderTexture, public TextureInternal {
@@ -70,5 +79,6 @@ public:
 
 protected:
 	virtual GLenum GetGLTextureType() { return GL_TEXTURE_2D; }
-	std::pair<GLenum, GLenum> RenderTextureFormatToGLEnum(RenderTextureFormat renderTextureFormat);
+	virtual GLenum GetGLTextureBindingName() { return GL_TEXTURE_BINDING_2D; }
+	void RenderTextureFormatToGLEnum(RenderTextureFormat renderTextureFormat, GLenum (&parameters)[3]);
 };

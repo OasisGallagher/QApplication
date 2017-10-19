@@ -1,4 +1,5 @@
 #pragma once
+#include <vector>
 #include <gl/glew.h>
 
 #include "object.h"
@@ -16,6 +17,10 @@ public:
 class ENGINE_EXPORT ITexture2D : virtual public ITexture {
 public:
 	virtual bool Load(const std::string& path) = 0;
+	virtual bool Load(const void* data, int width, int height) = 0;
+
+	virtual bool EncodeToPng(std::vector<unsigned char>& data) = 0;
+	virtual bool EncodeToJpg(std::vector<unsigned char>& data) = 0;
 };
 
 class ENGINE_EXPORT ITextureCube : virtual public ITexture {
@@ -27,6 +32,7 @@ enum RenderTextureFormat {
 	Rgba,
 	RgbaHdr,
 	Depth,
+	Shadow,
 };
 
 class ENGINE_EXPORT IRenderTexture : virtual public ITexture {

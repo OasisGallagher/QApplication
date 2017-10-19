@@ -221,7 +221,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GeneratedFiles\ui_qmaze.h" />
-    <ClInclude Include="resources\buildin\shaders\include\light.inc" />
+    <ClInclude Include="resources\buildin\shaders\include\fragmentlight.inc" />
     <ClInclude Include="scripts\cameracontroller.h" />
     <ClInclude Include="scripts\grayscale.h" />
     <ClInclude Include="scripts\inversion.h" />
@@ -302,6 +302,7 @@
     <None Include="resources\buildin\shaders\blit.glsl" />
     <None Include="resources\buildin\shaders\depth.glsl" />
     <None Include="resources\buildin\shaders\directionallightdepth.glsl" />
+    <None Include="resources\buildin\shaders\include\vertexlight.inc" />
     <None Include="resources\buildin\shaders\skybox.glsl" />
     <None Include="resources\buildin\shaders\texture.glsl" />
     <None Include="resources\shaders\grayscale.glsl" />

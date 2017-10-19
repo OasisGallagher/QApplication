@@ -127,14 +127,14 @@
     <ClInclude Include="scripts\cameracontroller.h">
       <Filter>scripts\include</Filter>
     </ClInclude>
-    <ClInclude Include="resources\buildin\shaders\include\light.inc">
-      <Filter>resources\buildin\shaders\include</Filter>
-    </ClInclude>
     <ClInclude Include="scripts\grayscale.h">
       <Filter>scripts\include</Filter>
     </ClInclude>
     <ClInclude Include="scripts\inversion.h">
       <Filter>scripts\include</Filter>
+    </ClInclude>
+    <ClInclude Include="resources\buildin\shaders\include\fragmentlight.inc">
+      <Filter>resources\buildin\shaders\include</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -161,6 +161,9 @@
     </None>
     <None Include="resources\buildin\shaders\directionallightdepth.glsl">
       <Filter>resources\buildin\shaders</Filter>
+    </None>
+    <None Include="resources\buildin\shaders\include\vertexlight.inc">
+      <Filter>resources\buildin\shaders\include</Filter>
     </None>
   </ItemGroup>
 </Project>

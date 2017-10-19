@@ -2,15 +2,15 @@
 
 #include "internal/base/shaderinternal.h"
 
-class ShaderParser {
+class ShaderCompiler {
 public:
-	bool Parse(const std::string& path, std::string(&answer)[ShaderTypeCount]);
+	bool Compile(const std::string& path, const std::string& defines, std::string(&answer)[ShaderTypeCount]);
 
 private:
 	void Clear();
 	bool ReadShaderSource(const std::vector<std::string> &lines);
 	std::string FormatDefines(const std::string& defines);
-	bool ParseShaderSource(const std::vector<std::string>& lines);
+	bool CompileShaderSource(const std::vector<std::string>& lines, const std::string& defines);
 
 	bool Preprocess(const std::string& line);
 	bool PreprocessInclude(const std::string& parameter);

@@ -5,6 +5,7 @@
 #include "variables.h"
 #include "tools/debug.h"
 #include "tools/mathf.h"
+#include "internal/file/image.h"
 #include "internal/memory/factory.h"
 #include "internal/base/framebuffer.h"
 #include "internal/resources/resources.h"
@@ -21,7 +22,7 @@ CameraInternal::CameraInternal()
 	: SpriteInternal(ObjectTypeCamera), clearType_(ClearTypeColor)
 	, depth_(0), aspect_(1.3f), near_(1.f), far_(100.f)
 	, fieldOfView_(3.141592f / 3.f), projection_(glm::perspective(fieldOfView_, aspect_, near_, far_))
-	, pass_(RenderPassNone), fbRenderTexture_(nullptr) {
+	, pass_(RenderPassNone), fbRenderTexture_(nullptr), viewToShadowSpaceMatrix_(1) {
 	CreateFramebuffers();
 	CreateDepthRenderer();
 	CreateShadowRenderer();
@@ -104,10 +105,19 @@ void CameraInternal::Render() {
 	GetLights(forwardBase, forwardAdd);
 
 	RenderShadowPass(sprites, forwardBase);
-	Resources::FindShader
-	graphicsInstance->Blit(fbShadow_->GetDepthTexture(), nullptr, renderer);
-	return;
 
+	//Renderer renderer = Factory::Create<RendererInternal>();
+	//Material material = Factory::Create<MaterialInternal>();
+	//Shader shader = Factory::Create<ShaderInternal>();
+	//shader->Load("buildin/shaders/blit");
+	//material->SetShader(shader);
+	//renderer->AddMaterial(material);
+
+	//fb0_->Bind();
+	//graphicsInstance->Blit(fbShadow_->GetDepthTexture(), nullptr, renderer);
+	//fb0_->Unbind();
+	//return;
+	
 	Framebuffer0* active = GetActiveFramebuffer();
 	active->Bind();
 
@@ -126,6 +136,16 @@ void CameraInternal::Render() {
 	pass_ = RenderPassNone;
 }
 
+Texture2D CameraInternal::Capture() {
+	std::vector<unsigned char> data;
+	fb0_->ReadBuffer(data);
+
+	Texture2D tex = Factory::Create<Texture2DInternal>();
+	tex->Load(&data[0], fb0_->GetWidth(), fb0_->GetHeight());
+
+	return tex;
+}
+
 void CameraInternal::CreateFramebuffers() {
 	int w = screenInstance->GetContextWidth();
 	int h = screenInstance->GetContextHeight();
@@ -142,7 +162,7 @@ void CameraInternal::CreateFramebuffers() {
 	fbShadow_ = Memory::Create<Framebuffer>();
 	fbShadow_->Create(w, h);
 	RenderTexture shadowTexture = Factory::Create<RenderTextureInternal>();
-	shadowTexture->Load(Depth, w, h);
+	shadowTexture->Load(Shadow, w, h);
 	fbShadow_->SetDepthTexture(shadowTexture);
 
 	fbRenderTexture_ = Memory::Create<Framebuffer>();
@@ -167,8 +187,9 @@ void CameraInternal::CreateDepthRenderer() {
 	material->SetShader(shader);
 
 	depthRenderer_->AddMaterial(material);
+	depthRenderer_->SetRenderState(Cull, Back);
 	depthRenderer_->SetRenderState(DepthWrite, On);
-	depthRenderer_->SetRenderState(DepthTest, Less);
+	depthRenderer_->SetRenderState(DepthTest, LessEqual);
 }
 
 void CameraInternal::CreateShadowRenderer() {
@@ -180,7 +201,9 @@ void CameraInternal::CreateShadowRenderer() {
 	material->SetShader(shader);
 
 	directionalLightShadowRenderer_->AddMaterial(material);
-	depthRenderer_->SetRenderState(DepthTest, LessEqual);
+	directionalLightShadowRenderer_->SetRenderState(Cull, Back);
+	directionalLightShadowRenderer_->SetRenderState(DepthWrite, On);
+	directionalLightShadowRenderer_->SetRenderState(DepthTest, LessEqual);
 }
 
 void CameraInternal::UpdateSkybox() {
@@ -201,6 +224,7 @@ void CameraInternal::UpdateSkybox() {
 void CameraInternal::OnContextSizeChanged(int w, int h) {
 	fb0_->Resize(w, h);
 	fbDepth_->Resize(w, h);
+	fbShadow_->Resize(w, h);
 	fbRenderTexture_->Resize(w, h);
 	fbRenderTexture2_->Resize(w, h);
 
@@ -212,7 +236,7 @@ void CameraInternal::OnContextSizeChanged(int w, int h) {
 
 Framebuffer0* CameraInternal::GetActiveFramebuffer() {
 	Framebuffer0* active = nullptr;
-	if (fbRenderTexture_->GetRenderTexture(0) != renderTexture_ || !postEffects_.empty()) {
+	if (fbRenderTexture_->GetRenderTexture() != renderTexture_ || !postEffects_.empty()) {
 		active = fbRenderTexture_;
 	}
 	else {
@@ -253,18 +277,30 @@ void CameraInternal::RenderShadowPass(const std::vector<Sprite>& sprites, Light 
 
 	fbShadow_->Bind();
 
-	glm::vec3 lightPosition = light->GetRotation() * glm::vec3(0, 0, -1) * -1.f;
-	glm::mat4 projection = glm::ortho<float>(-10, 10, -10, 10);
-	glm::mat4 view = glm::lookAt(lightPosition, glm::vec3(0), glm::vec3(0, 1, 0));
+	glm::vec3 lightPosition = light->GetRotation() * glm::vec3(0, 0, 1);
+	glm::mat4 projection = glm::ortho(-100.f, 100.f, -100.f, 100.f, -100.f, 100.f);
+	glm::mat4 view = glm::lookAt(lightPosition * 10.f, glm::vec3(0), glm::vec3(0, 1, 0));
 	glm::mat4 shadowDepthMatrix = projection * view;
 
 	for (int i = 0; i < sprites.size(); ++i) {
 		Sprite sprite = sprites[i];
+		if (sprite->GetRenderer()->GetRenderQueue() < Geometry) {
+			continue;
+		}
+
 		Material material = directionalLightShadowRenderer_->GetMaterial(0);
-		material->SetMatrix4(Variables::localToOrthographicLightSpaceMatrix, shadowDepthMatrix);
+		material->SetMatrix4(Variables::localToOrthographicLightSpaceMatrix, shadowDepthMatrix * sprite->GetLocalToWorldMatrix());
 		RenderSprite(sprite, directionalLightShadowRenderer_);
 	}
 
+	glm::mat4 bias(
+		0.5f, 0, 0, 0,
+		0, 0.5f, 0, 0,
+		0, 0, 0.5f, 0,
+		0.5, 0.5f, 0.5f, 1.f
+	);
+
+	viewToShadowSpaceMatrix_ = bias * shadowDepthMatrix;
 	fbShadow_->Unbind();
 }
 
@@ -278,11 +314,14 @@ int CameraInternal::RenderBackgroundPass(const std::vector<Sprite>& sprites, int
 
 void CameraInternal::RenderDepthPass(const std::vector<Sprite>& sprites) {
 	pass_ = RenderPassDepth;
-	
 	fbDepth_->Bind();
 
 	for (int i = 0; i < sprites.size(); ++i) {
 		Sprite sprite = sprites[i];
+		if (sprite->GetRenderer()->GetRenderQueue() < Geometry) {
+			continue;
+		}
+
 		RenderSprite(sprite, depthRenderer_);
 	}
 
@@ -320,7 +359,7 @@ void CameraInternal::OnPostRender() {
 	if (postEffects_.empty()) { return; }
 
 	Framebuffer* framebuffers[] = { fbRenderTexture_, fbRenderTexture2_ };
-	RenderTexture textures[] = { fbRenderTexture_->GetRenderTexture(0), renderTexture2_ };
+	RenderTexture textures[] = { fbRenderTexture_->GetRenderTexture(), renderTexture2_ };
 
 	int index = 1;
 	for (int i = 0; i < postEffects_.size(); ++i) {
@@ -378,5 +417,11 @@ void CameraInternal::RenderSprite(Sprite sprite, Renderer renderer) {
 	glm::mat4 localToClipSpaceMatrix = projection_ * GetWorldToLocalMatrix() * localToWorldMatrix;
 	material->SetMatrix4(Variables::localToClipSpaceMatrix, localToClipSpaceMatrix);
 	material->SetMatrix4(Variables::localToWorldSpaceMatrix, localToWorldMatrix);
+
+	if (pass_ >= RenderPassOpaque) {
+		material->SetMatrix4(Variables::localToShadowSpaceMatrix, viewToShadowSpaceMatrix_ * localToWorldMatrix);
+		material->SetTexture(Variables::shadowDepthTexture, fbShadow_->GetDepthTexture());
+	}
+
 	renderer->Render(surface);
 }

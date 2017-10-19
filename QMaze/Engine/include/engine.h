@@ -4,6 +4,7 @@
 
 #include "timef.h"
 #include "screen.h"
+#include "logger.h"
 #include "graphics.h"
 
 enum {
@@ -39,6 +40,7 @@ public:
 	World world();
 
 	Time time();
+	Logger logger();
 	Screen screen();
 	Graphics graphics();
 };

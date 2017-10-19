@@ -3,7 +3,7 @@
 #include "tools/debug.h"
 #include "tools/string.h"
 #include "internal/base/glsldefines.h"
-#include "internal/text/shaderparser.h"
+#include "internal/file/shadercompiler.h"
 
 ShaderDescription ShaderInternal::descriptions_[] =  {
 	GL_VERTEX_SHADER, "VertexShader", "vertex",
@@ -24,9 +24,9 @@ ShaderInternal::~ShaderInternal() {
 }
 
 bool ShaderInternal::Load(const std::string& path) {
-	ShaderParser parser;
+	ShaderCompiler parser;
 	std::string sources[ShaderTypeCount];
-	if (!parser.Parse(path + GLSL_POSTFIX, sources)) {
+	if (!parser.Compile(path + GLSL_POSTFIX, "", sources)) {
 		return false;
 	}
 

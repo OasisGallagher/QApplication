@@ -44,7 +44,7 @@ typedef std::shared_ptr<IObject> Object;
 template<class T, class U>
 inline T dsp_cast(const std::shared_ptr<U>& ptr) {
 	typename T::element_type* p = dynamic_cast<typename T::element_type*>(ptr.get());
-	if (NULL != p) {
+	if (nullptr != p) {
 		return T(ptr, p);
 	}
 

@@ -7,6 +7,8 @@ out vec2 texCoord;
 out vec3 worldPos;
 out vec3 normal;
 
+#include "buildin/shaders/include/vertexlight.inc"
+
 uniform mat4 c_localToClipSpaceMatrix;
 uniform mat4 c_localToWorldSpaceMatrix;
 
@@ -15,6 +17,8 @@ void main() {
 
 	normal = (c_localToWorldSpaceMatrix * vec4(c_normal, 0)).xyz;
 	worldPos = (c_localToWorldSpaceMatrix * vec4(c_position, 1)).xyz;
+	
+	calculateShadowCoord();
 
 	gl_Position = c_localToClipSpaceMatrix * vec4(c_position, 1);
 }
@@ -23,14 +27,15 @@ void main() {
 out vec4 c_fragColor;
 
 in vec2 texCoord;
-in vec3 normal;
 in vec3 worldPos;
+in vec3 normal;
 
 uniform sampler2D c_mainTexture;
 
-#include "buildin/shaders/include/light.inc"
+#include "buildin/shaders/include/fragmentlight.inc"
 
 void main() {
 	vec4 albedo = texture(c_mainTexture, texCoord);
-	c_fragColor = albedo * vec4(calculateDirectionalLight(worldPos, normalize(normal)), 1);
+	float visibility = calculateShadowVisibility();
+	c_fragColor = albedo * vec4(calculateDirectionalLight(worldPos, normalize(normal), visibility), 1);
 }

@@ -91,7 +91,7 @@ private:
 
 	Surface surface_;
 	Renderer renderer_;
-	std::weak_ptr<ISprite> parent_;
+	std::weak_ptr<Sprite::element_type> parent_;
 
 	std::vector<Sprite> children_;
 	int dirtyFlag_;

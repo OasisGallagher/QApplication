@@ -6,6 +6,7 @@
 extern Time timeInstance;
 extern World worldInstance;
 extern Screen screenInstance;
+extern Logger loggerInstance;
 extern Graphics graphicsInstance;
 
 #ifndef _STDCALL
@@ -64,6 +65,10 @@ World Engine::world() {
 
 Time Engine::time() {
 	return timeInstance;
+}
+
+Logger Engine::logger() {
+	return loggerInstance;
 }
 
 Screen Engine::screen() {

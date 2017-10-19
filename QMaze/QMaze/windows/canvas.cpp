@@ -4,10 +4,12 @@
 #include <QtGui/QWheelEvent>
 #include <gl/glew.h>
 
-#include <glm/gtx/quaternion.hpp>
+#include <glm/gtc/quaternion.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "canvas.h"
+#include "qmaze.h"
+
 #include "light.h"
 #include "skybox.h"
 #include "camera.h"
@@ -21,7 +23,10 @@
 #include "scripts/inversion.h"
 #include "scripts/cameracontroller.h"
 
+Camera gCamera;
+
 // https://github.com/opengl-tutorials/ogl/blob/master/common/quaternion_utils.cpp
+/*
 glm::quat RotationBetweenVectors(glm::vec3 start, glm::vec3 dest) {
 	start = glm::normalize(start);
 	dest = glm::normalize(dest);
@@ -53,7 +58,7 @@ glm::quat RotationBetweenVectors(glm::vec3 start, glm::vec3 dest) {
 		rotationAxis.z * invs
 	);
 }
-
+*/
 Canvas::Canvas(QWidget *parent) 
 	: QGLWidget(parent), sceneCreated_(false) {
 	setMouseTracking(true);
@@ -117,10 +122,15 @@ void Canvas::mouseMoveEvent(QMouseEvent *event) {
 	QGLWidget::mouseMoveEvent(event);
 }
 
+#include <QFileDialog>
+
 void Canvas::keyPressEvent(QKeyEvent* event) {
 	switch (event->key()) {
 	case Qt::Key_Escape:
 		qApp->quit();
+		break;
+	case Qt::Key_P:
+		screenCapture();
 		break;
 	default:
 		event->ignore();
@@ -132,17 +142,32 @@ void Canvas::OnEngineLogMessage(int level, const char* message) {
 	emit onEngineLogReceived(level, message);
 }
 
+void Canvas::screenCapture() {
+	Texture2D tex = gCamera->Capture();
+	std::vector<unsigned char> data;
+	if (!tex->EncodeToJpg(data)) {
+		return;
+	}
+
+	QImage image;
+	if (image.loadFromData(&data[0], data.size())) {
+		QString filter = "image(*.jpg)";
+		QString path = QFileDialog::getSaveFileName(this, "", "", filter);
+		if (!path.isEmpty()) {
+			image.save(path);
+		}
+	}
+}
+
 void Canvas::createScene() {
 	World world = Engine::get()->world();
 
 	world->GetEnvironment()->SetAmbientColor(glm::vec3(0.15f));
 	DirectionalLight light = dsp_cast<DirectionalLight>(world->Create(ObjectTypeDirectionalLight));
 	light->SetColor(glm::vec3(0.7f));
-	light->SetPosition(glm::vec3(0, 7, 5));
-	//glm::quat cq(-glm::lookAt(glm::vec3(0, 7, 5), glm::vec3(0), glm::vec3(0, 1, 0)));
-	//light->SetRotation(cq);
 
 	Camera camera = dsp_cast<Camera>(world->Create(ObjectTypeCamera));
+	gCamera = camera;
 	controller_->setCamera(camera);
 
 	//camera->AddPostEffect(inversion_);
@@ -176,7 +201,7 @@ void Canvas::createScene() {
 
 	Sprite sprite = dsp_cast<Sprite>(world->Create(ObjectTypeSprite));
 	//sprite->SetParent(camera);
-	light->SetParent(camera);
+	//light->SetParent(camera);
 	sprite->SetPosition(glm::vec3(0, 0, -18));
 	sprite->SetEulerAngles(glm::vec3(-60, 180, 0));
 
@@ -210,7 +235,7 @@ void Canvas::createScene() {
 
 	Renderer renderer = dsp_cast<Renderer>(world->Create(ObjectTypeRenderer));
 	renderer->SetRenderState(Cull, Off);
-	renderer->SetRenderState(DepthTest, Less);
+	renderer->SetRenderState(DepthTest, LessEqual);
 
 	Shader shader = dsp_cast<Shader>(world->Create(ObjectTypeShader));
 	shader->Load("buildin/shaders/texture");
@@ -220,7 +245,4 @@ void Canvas::createScene() {
 	renderer->AddMaterial(material);
 
 	sprite->SetRenderer(renderer);
-
-	world.reset();
-	Engine::get()->world().reset();
 }

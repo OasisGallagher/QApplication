@@ -1,38 +1,29 @@
-#include <Magick++.h>
 #include <glm/glm.hpp>
 
 #include "tools/debug.h"
 #include "textureinternal.h"
+#include "internal/file/image.h"
 
 void TextureInternal::Bind(GLenum location) {
 	AssertX(glIsTexture(texture_), "invalid texture");
 	location_ = location;
 	glActiveTexture(location);
-	glBindTexture(GetGLTextureType(), texture_);
+	BindTexture();
 }
 
 void TextureInternal::Unbind() {
 	glActiveTexture(location_);
-	glBindTexture(GetGLTextureType(), 0);
+	UnbindTexture();
 }
 
-const void* TextureInternal::ReadRawTexture(const std::string& path, int& width, int& height) {
-	Magick::Image image;
-	static Magick::Blob blob;
+void TextureInternal::BindTexture() {
+	glGetIntegerv(GetGLTextureBindingName(), &oldBindingTexture_);
+	glBindTexture(GetGLTextureType(), texture_);
+}
 
-	std::string fpath = "resources/" + path;
-	try {
-		image.read(fpath.c_str());
-		image.write(&blob, "RGBA");
-		width = image.columns();
-		height = image.rows();
-	}
-	catch (Magick::Error& err) {
-		Debug::LogError("failed to load " + fpath + ": " + err.what());
-		return nullptr;
-	}
-
-	return blob.data();
+void TextureInternal::UnbindTexture() {
+	glBindTexture(GetGLTextureType(), oldBindingTexture_);
+	oldBindingTexture_ = 0;
 }
 
 void TextureInternal::DestroyTexture() {
@@ -51,28 +42,49 @@ Texture2DInternal::~Texture2DInternal() {
 
 bool Texture2DInternal::Load(const std::string& path) {
 	int width, height;
-	const void* data = ReadRawTexture(path, width, height);
+	const void* data = Image::Read("resources/" + path, width, height);
 	if (data == nullptr) {
 		return false;
 	}
 
+	return Load(data, width, height);
+}
+
+bool Texture2DInternal::Load(const void* data, int width, int height) {
 	DestroyTexture();
 
 	width_ = width;
 	height_ = height;
 
-	GLint oldBindingTexture = 0;
-	glGetIntegerv(GL_TEXTURE_2D, &oldBindingTexture);
-
 	glGenTextures(1, &texture_);
-	glBindTexture(GL_TEXTURE_2D, texture_);
+	
+	BindTexture();
+
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-	glBindTexture(GL_TEXTURE_2D, oldBindingTexture);
+	UnbindTexture();
 
 	return true;
+}
+
+bool Texture2DInternal::EncodeToPng(std::vector<unsigned char>& data) {
+	BindTexture();
+	data.resize(4 * GetWidth() * GetHeight());
+	glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, &data[0]);
+	UnbindTexture();
+
+	return Image::Encode(GetWidth(), GetHeight(), data, "PNG");
+}
+
+bool Texture2DInternal::EncodeToJpg(std::vector<unsigned char>& data) {
+	BindTexture();
+	data.resize(4 * GetWidth() * GetHeight());
+	glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, &data[0]);
+	UnbindTexture();
+
+	return Image::Encode(GetWidth(), GetHeight(), data, "JPG");
 }
 
 TextureCubeInternal::TextureCubeInternal() : TextureInternal(ObjectTypeTextureCube) {
@@ -85,15 +97,13 @@ TextureCubeInternal::~TextureCubeInternal() {
 bool TextureCubeInternal::Load(const std::string(&textures)[6]) {
 	DestroyTexture();
 
-	GLint oldBindingTexture = 0;
-	glGetIntegerv(GL_TEXTURE_BINDING_CUBE_MAP, &oldBindingTexture);
-
 	glGenTextures(1, &texture_);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, texture_);
+
+	BindTexture();
 
 	for (int i = 0; i < 6; ++i) {
 		int width, height;
-		const void* data = ReadRawTexture(textures[i], width, height);
+		const void* data = Image::Read("resources/" + textures[i], width, height);
 
 		if (data == nullptr) {
 			DestroyTexture();
@@ -110,7 +120,7 @@ bool TextureCubeInternal::Load(const std::string(&textures)[6]) {
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 	}
 
-	glBindTexture(GL_TEXTURE_CUBE_MAP, oldBindingTexture);
+	UnbindTexture();
 	return true;
 }
 
@@ -123,31 +133,32 @@ bool RenderTextureInternal::Load(RenderTextureFormat format, int width, int heig
 	width_ = width;
 	height_ = height;
 
-	GLint oldBindingTexture = 0;
-	glGetIntegerv(GL_TEXTURE_2D, &oldBindingTexture);
-
 	glGenTextures(1, &texture_);
-	glBindTexture(GL_TEXTURE_2D, texture_);
+	BindTexture();
 
-	std::pair<GLenum, GLenum> formats = RenderTextureFormatToGLEnum(format);
-
-	glTexImage2D(GL_TEXTURE_2D, 0, formats.first, width, height, 0, formats.second, GL_FLOAT, nullptr);
+	GLenum parameters[3];
+	RenderTextureFormatToGLEnum(format, parameters);
+	glTexImage2D(GL_TEXTURE_2D, 0, parameters[0], width, height, 0, parameters[1], parameters[2], nullptr);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
 
-	glBindTexture(GL_TEXTURE_2D, oldBindingTexture);
+	if (format == Shadow) {
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
+	}
+
+	UnbindTexture();
 
 	return true;
 }
 
-std::pair<GLenum, GLenum> RenderTextureInternal::RenderTextureFormatToGLEnum(RenderTextureFormat renderTextureFormat) {
+void RenderTextureInternal::RenderTextureFormatToGLEnum(RenderTextureFormat renderTextureFormat, GLenum(&parameters)[3]) {
 	GLenum internalFormat = GL_RGBA;
 	GLenum format = GL_RGBA;
+	GLenum type = GL_UNSIGNED_BYTE;
 
 	switch (renderTextureFormat) {
 		case  Rgba:
@@ -157,13 +168,17 @@ std::pair<GLenum, GLenum> RenderTextureInternal::RenderTextureFormatToGLEnum(Ren
 			internalFormat = GL_RGBA32F;
 			break;
 		case Depth:
+		case Shadow:
 			internalFormat = GL_DEPTH_COMPONENT24;
 			format = GL_DEPTH_COMPONENT;
+			type = GL_FLOAT;
 			break;
 		default:
 			Debug::LogError("invalid render texture format: " + std::to_string(renderTextureFormat));
 			break;
 	}
 
-	return std::make_pair(internalFormat, format);
+	parameters[0] = internalFormat;
+	parameters[1] = format;
+	parameters[2] = type;
 }

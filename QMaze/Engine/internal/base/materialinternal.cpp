@@ -15,6 +15,8 @@ void MaterialInternal::SetShader(Shader value) {
 	UnbindTextures();
 
 	UpdateVertexAttributes();
+	UpdateFragmentAttributes();
+
 	shader_->Link();
 
 	UpdateVariables();

@@ -62,6 +62,7 @@ public:
 
 public:
 	virtual void AddPostEffect(PostEffect* effect) { postEffects_.push_back(effect); }
+	virtual Texture2D Capture();
 
 private:
 	void CreateFramebuffers();
@@ -98,6 +99,7 @@ private:
 	float near_, far_;
 	float fieldOfView_;
 	glm::mat4 projection_;
+	glm::mat4 viewToShadowSpaceMatrix_;
 
 	Framebuffer0* fb0_;
 	Framebuffer* fbDepth_;

@@ -25,10 +25,6 @@ bool WorldInternal::CameraComparer::operator() (const Camera& lhs, const Camera&
 	return lhs->GetDepth() < rhs->GetDepth();
 }
 
-bool WorldInternal::SpriteComparer::operator() (const Sprite& lhs, const Sprite& rhs) const {
-	return lhs->GetInstanceID() < rhs->GetInstanceID();
-}
-
 WorldInternal::WorldInternal()
 	: ObjectInternal(ObjectTypeWorld)
 	, environment_(Memory::Create<EnvironmentInternal>())
@@ -41,7 +37,7 @@ Object WorldInternal::Create(ObjectType type) {
 	if (type >= ObjectTypeSprite) {
 		Sprite sprite = dsp_cast<Sprite>(object);
 		sprite->SetParent(GetRootSprite());
-		sprites_.push_back(sprite);
+		sprites_.insert(std::make_pair(sprite->GetInstanceID(), sprite));
 	}
 
 	if (type >= ObjectTypeSpotLight && type <= ObjectTypeDirectionalLight) {
@@ -55,10 +51,18 @@ Object WorldInternal::Create(ObjectType type) {
 	return object;
 }
 
+Sprite WorldInternal::GetSprite(unsigned id) {
+	SpriteContainer::iterator ite = sprites_.find(id);
+	if (ite == sprites_.end()) { return nullptr; }
+	return ite->second;
+}
+
 bool WorldInternal::GetSprites(ObjectType type, std::vector<Sprite>& sprites) {
 	AssertX(type >= ObjectTypeSprite, "invalid sprite type");
 	if (type == ObjectTypeSprite) {
-		sprites.assign(sprites_.begin(), sprites_.end());
+		for (SpriteContainer::iterator ite = sprites_.begin(); ite != sprites_.end(); ++ite) {
+			sprites.push_back(ite->second);
+		}
 	}
 	else if (type == ObjectTypeCamera) {
 		sprites.assign(cameras_.begin(), cameras_.end());
@@ -68,8 +72,8 @@ bool WorldInternal::GetSprites(ObjectType type, std::vector<Sprite>& sprites) {
 	}
 	else {
 		for (SpriteContainer::iterator ite = sprites_.begin(); ite != sprites_.end(); ++ite) {
-			if ((*ite)->GetType() == type) {
-				sprites.push_back(*ite);
+			if (ite->second->GetType() == type) {
+				sprites.push_back(ite->second);
 			}
 		}
 	}
@@ -79,7 +83,7 @@ bool WorldInternal::GetSprites(ObjectType type, std::vector<Sprite>& sprites) {
 
 void WorldInternal::Update() {
 	for (SpriteContainer::iterator ite = sprites_.begin(); ite != sprites_.end(); ++ite) {
-		(*ite)->Update();
+		ite->second->Update();
 	}
 
 	for (CameraContainer::iterator ite = cameras_.begin(); ite != cameras_.end(); ++ite) {

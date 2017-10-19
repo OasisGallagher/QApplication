@@ -1,6 +1,6 @@
 #include <algorithm>
 #include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtx/quaternion.hpp>
+#include <glm/gtc/quaternion.hpp>
 
 #include "tools/mathf.h"
 #include "tools/string.h"
@@ -37,7 +37,7 @@ void SpriteInternal::SetParent(Sprite value) {
 		return;
 	}
 
-	std::weak_ptr<ISprite> old = parent_;
+	std::weak_ptr<Sprite::element_type> old = parent_;
 	// old parent.
 	Sprite sprite = old.lock();
 	if (sprite == value) { return; }
@@ -342,7 +342,7 @@ glm::vec3 SpriteInternal::GetLocalEulerAngles() {
 glm::mat4 SpriteInternal::GetLocalToWorldMatrix() {
 	if (IsDirty(LocalToWorldMatrix)) {
 		Sprite current = dsp_cast<Sprite>(shared_from_this());
-		glm::mat4 matrix = glm::translate(glm::mat4(1), GetLocalPosition()) * glm::toMat4(GetLocalRotation()) * glm::scale(glm::mat4(1), GetLocalScale());
+		glm::mat4 matrix = glm::translate(glm::mat4(1), GetLocalPosition()) * glm::mat4(GetLocalRotation()) * glm::scale(glm::mat4(1), GetLocalScale());
 		if ((current = current->GetParent()) != worldInstance->GetRootSprite()) {
 			matrix = current->GetLocalToWorldMatrix() * matrix;
 		}

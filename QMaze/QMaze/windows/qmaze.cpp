@@ -4,8 +4,12 @@
 #include "canvas.h"
 #include "console.h"
 
+static QMaze* instance_;
+
 QMaze::QMaze(QWidget *parent)
 	: QMainWindow(parent) {
+	instance_ = this;
+
 	setupUI();
 
 	connect(canvas(), SIGNAL(onEngineLogReceived(int, const char*)), this, SLOT(OnEngineLogReceived(int, const char*)));
@@ -14,6 +18,10 @@ QMaze::QMaze(QWidget *parent)
 }
 
 QMaze::~QMaze() {
+}
+
+QMaze* QMaze::get() {
+	return instance_;
 }
 
 void QMaze::setupUI() {

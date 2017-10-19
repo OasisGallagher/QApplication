@@ -42,6 +42,8 @@ public:
 
 	virtual void AddPostEffect(PostEffect* effect) = 0;
 
+	virtual Texture2D Capture() = 0;
+
 	// TODO: internal method.
 	virtual void Render() = 0;
 };

@@ -16,6 +16,9 @@ public:
 	~QMaze();
 
 public:
+	static QMaze* get();
+
+public:
 	Canvas* canvas() { return ui.canvas; }
 	Console* console() { return ui.console; }
 	Hierarchy* hierarchy() { return ui.hierarchy; }

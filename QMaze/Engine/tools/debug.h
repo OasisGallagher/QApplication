@@ -8,9 +8,9 @@ class Debug {
 public:
 	static void SetLogCallback(EngineLogCallback* cb);
 
-	static void Log(const std::string& text);
-	static void LogWarning(const std::string& text);
-	static void LogError(const std::string& text);
+	static void Log(const std::string& message);
+	static void LogWarning(const std::string& message);
+	static void LogError(const std::string& message);
 
 	static std::string Now();
 	static void Break(const std::string& expression, const char* file, int line);

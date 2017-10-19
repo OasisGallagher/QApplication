@@ -24,6 +24,20 @@ void Framebuffer0::Unbind() {
 	UnbindViewport();
 }
 
+void Framebuffer0::ReadBuffer(std::vector<unsigned char>& pixels) {
+	BindFramebuffer();
+	
+	int oldPackAlignment = 4;
+	glGetIntegerv(GL_UNPACK_ALIGNMENT, &oldPackAlignment);
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+	pixels.resize(4 * GetWidth() * GetHeight());
+	glReadPixels(0, 0, GetWidth(), GetHeight(), GL_RGBA, GL_UNSIGNED_BYTE, &pixels[0]);
+	
+	glPixelStorei(GL_UNPACK_ALIGNMENT, oldPackAlignment);
+	UnbindFramebuffer();
+}
+
 void Framebuffer0::BindFramebuffer() {
 	glGetIntegerv(GL_FRAMEBUFFER_BINDING, &oldFramebuffer_);
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo_);
@@ -76,9 +90,6 @@ void Framebuffer::Create(int width, int height) {
 	glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS, &maxRenderTextures_);
 	renderTextures_ = Memory::CreateArray<RenderTexture>(maxRenderTextures_);
 	attachments_ = Memory::CreateArray<GLenum>(maxRenderTextures_);
-
-	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-	AssertX(status == GL_FRAMEBUFFER_COMPLETE, String::Format("failed to create framebuffer, 0x04x.", status));
 }
 
 void Framebuffer::Bind() {
@@ -119,7 +130,9 @@ void Framebuffer::CreateDepthRenderBuffer() {
 void Framebuffer::SetDepthTexture(RenderTexture texture) {
 	BindFramebuffer();
 	depthTexture_ = texture;
-	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, texture->GetNativePointer(), 0);
+	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, texture ? texture->GetNativePointer() : 0, 0);
+	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+	Assert(status == GL_FRAMEBUFFER_COMPLETE);
 	UnbindFramebuffer();
 }
 
@@ -127,16 +140,16 @@ int Framebuffer::GetRenderTextureCount() {
 	return attachedRenderTextureCount_;
 }
 
-RenderTexture Framebuffer::GetRenderTexture(int index) {
-	AssertX(index < attachedRenderTextureCount_, "index out of range");
-	return renderTextures_[index];
-}
-
 RenderTexture Framebuffer::GetDepthTexture() {
 	return depthTexture_;
 }
 
 #ifdef MRT
+RenderTexture Framebuffer::GetRenderTexture(int index) {
+	AssertX(index < attachedRenderTextureCount_, "index out of range");
+	return renderTextures_[index];
+}
+
 void Framebuffer::AddRenderTexture(RenderTexture texture) {
 	int index = FindAttachmentIndex();
 	AssertX(index >= 0, "too many render textures");
@@ -173,9 +186,17 @@ void Framebuffer::SetRenderTexture(RenderTexture texture) {
 	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, texture ? texture->GetNativePointer() : 0, 0);
 
 	attachedRenderTextureCount_ = texture ? 1 : 0;
+	
+	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+	AssertX(status == GL_FRAMEBUFFER_COMPLETE, String::Format("failed to create framebuffer, 0x04x.", status));
 
 	UnbindFramebuffer();
 }
+
+RenderTexture Framebuffer::GetRenderTexture() {
+	return renderTextures_[0];
+}
+
 #endif	// MRT
 
 int Framebuffer::FindAttachmentIndex() {

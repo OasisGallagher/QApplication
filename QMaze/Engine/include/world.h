@@ -10,6 +10,7 @@ public:
 	virtual Object Create(ObjectType type) = 0;
 
 	virtual Sprite GetRootSprite() = 0;
+	virtual Sprite GetSprite(unsigned id) = 0;
 	virtual bool GetSprites(ObjectType type, std::vector<Sprite>& sprites) = 0;
 
 	virtual Environment GetEnvironment() = 0;

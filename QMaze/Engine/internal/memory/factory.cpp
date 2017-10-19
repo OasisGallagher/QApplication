@@ -2,11 +2,13 @@
 
 #include "internal/base/meshinternal.h"
 #include "internal/base/shaderinternal.h"
-#include "internal/world/worldinternal.h"
 #include "internal/base/surfaceinternal.h"
 #include "internal/base/textureinternal.h"
 #include "internal/base/rendererinternal.h"
 #include "internal/base/materialinternal.h"
+
+#include "internal/world/worldinternal.h"
+
 #include "internal/sprites/lightinternal.h"
 #include "internal/sprites/skyboxinternal.h"
 #include "internal/sprites/camerainternal.h"
@@ -20,8 +22,9 @@ Factory Factory::instance;
 Factory::Factory() {
 	std::fill(methodArray_, methodArray_ + ObjectTypeCount, nullptr);
 
+	//ADD_FACTROY_METHOD(World);
+
 	ADD_FACTROY_METHOD(Mesh);
-	ADD_FACTROY_METHOD(World);
 	ADD_FACTROY_METHOD(Camera);
 	ADD_FACTROY_METHOD(Shader);
 	ADD_FACTROY_METHOD(Skybox);

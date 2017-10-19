@@ -15,6 +15,9 @@ public:
 public:
 	void update(Sprite root);
 
+	Sprite selectedSprite();
+	bool selectedSprites(QList<Sprite>& sprites);
+
 private:
 	void updateRecursively(Sprite pp, QStandardItem* pi);
 

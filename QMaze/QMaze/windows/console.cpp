@@ -14,11 +14,11 @@ void Console::initialize() {
 }
 
 void Console::addMessage(MessageType type, const QString& message) {
-	if (messages_.contains(QString::number(type) + message)) {
-		return;
-	}
+	//if (messages_.contains(QString::number(type) + message)) {
+	//	return;
+	//}
 
-	messages_.insert(QString::number(type) + message);
+	//messages_.insert(QString::number(type) + message);
 	int r = view_->rowCount();
 	view_->insertRow(r);
 	view_->setRowHeight(r, 20);
@@ -28,6 +28,7 @@ void Console::addMessage(MessageType type, const QString& message) {
 	QTableWidgetItem* text = new QTableWidgetItem(message);
 	view_->setItem(r, 0, icon);
 	view_->setItem(r, 1, text);
+	view_->scrollToBottom();
 }
 
 const char* Console::messageIconPath(MessageType type) {

@@ -15,6 +15,8 @@ namespace Variables {
 	DEFINE_VARIABLE(bumpTexture);
 	DEFINE_VARIABLE(specularTexture);
 
+	DEFINE_VARIABLE(shadowDepthTexture);
+
 	DEFINE_VARIABLE(gloss);
 
 	DEFINE_VARIABLE(ambientLightColor);
@@ -27,6 +29,7 @@ namespace Variables {
 
 	DEFINE_VARIABLE(localToClipSpaceMatrix);
 	DEFINE_VARIABLE(localToWorldSpaceMatrix);
+	DEFINE_VARIABLE(localToShadowSpaceMatrix);
 	DEFINE_VARIABLE(localToOrthographicLightSpaceMatrix);
 };
 

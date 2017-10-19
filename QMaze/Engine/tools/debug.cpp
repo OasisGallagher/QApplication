@@ -20,16 +20,16 @@ void Debug::SetLogCallback(EngineLogCallback* cb) {
 	callback_ = cb;
 }
 
-void Debug::Log(const std::string& text) {
-	if (callback_ != nullptr) { callback_->OnEngineLogMessage(LogLevelDebug, text.c_str()); }
+void Debug::Log(const std::string& message) {
+	if (callback_ != nullptr) { callback_->OnEngineLogMessage(LogLevelDebug, message.c_str()); }
 }
 
-void Debug::LogWarning(const std::string& text) {
-	if (callback_ != nullptr) { callback_->OnEngineLogMessage(LogLevelWarning, text.c_str()); }
+void Debug::LogWarning(const std::string& message) {
+	if (callback_ != nullptr) { callback_->OnEngineLogMessage(LogLevelWarning, message.c_str()); }
 }
 
-void Debug::LogError(const std::string& text) {
-	if (callback_ != nullptr) { callback_->OnEngineLogMessage(LogLevelError, text.c_str()); }
+void Debug::LogError(const std::string& message) {
+	if (callback_ != nullptr) { callback_->OnEngineLogMessage(LogLevelError, message.c_str()); }
 }
 
 std::string Debug::Now() {

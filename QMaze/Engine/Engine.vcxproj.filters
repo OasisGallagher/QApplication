@@ -86,13 +86,13 @@
     <Filter Include="src\math">
       <UniqueIdentifier>{3ec7b2f0-2a0c-49cc-a4d2-a54f46e2bc63}</UniqueIdentifier>
     </Filter>
-    <Filter Include="internal\text">
+    <Filter Include="internal\file">
       <UniqueIdentifier>{3ea0054a-968f-468a-b53d-118a628758ce}</UniqueIdentifier>
     </Filter>
-    <Filter Include="internal\text\include">
+    <Filter Include="internal\file\include">
       <UniqueIdentifier>{d5ad271e-d5ff-456a-9344-fa70b52dba23}</UniqueIdentifier>
     </Filter>
-    <Filter Include="internal\text\src">
+    <Filter Include="internal\file\src">
       <UniqueIdentifier>{34e3ab19-2b40-4e6e-a324-fb78cb77a9df}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -238,12 +238,6 @@
     <ClInclude Include="include\variables.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="internal\text\shaderparser.h">
-      <Filter>internal\text\include</Filter>
-    </ClInclude>
-    <ClInclude Include="internal\text\textloader.h">
-      <Filter>internal\text\include</Filter>
-    </ClInclude>
     <ClInclude Include="include\graphics.h">
       <Filter>include</Filter>
     </ClInclude>
@@ -261,6 +255,21 @@
     </ClInclude>
     <ClInclude Include="internal\misc\timefinternal.h">
       <Filter>internal\misc\include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\logger.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="internal\misc\loggerinternal.h">
+      <Filter>internal\misc\include</Filter>
+    </ClInclude>
+    <ClInclude Include="internal\file\shadercompiler.h">
+      <Filter>internal\file\include</Filter>
+    </ClInclude>
+    <ClInclude Include="internal\file\textloader.h">
+      <Filter>internal\file\include</Filter>
+    </ClInclude>
+    <ClInclude Include="internal\file\image.h">
+      <Filter>internal\file\include</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -348,12 +357,6 @@
     <ClCompile Include="tools\string.cpp">
       <Filter>tools\src</Filter>
     </ClCompile>
-    <ClCompile Include="internal\text\shaderparser.cpp">
-      <Filter>internal\text\src</Filter>
-    </ClCompile>
-    <ClCompile Include="internal\text\textloader.cpp">
-      <Filter>internal\text\src</Filter>
-    </ClCompile>
     <ClCompile Include="internal\misc\graphicsinternal.cpp">
       <Filter>internal\misc\src</Filter>
     </ClCompile>
@@ -362,6 +365,18 @@
     </ClCompile>
     <ClCompile Include="internal\misc\timefinternal.cpp">
       <Filter>internal\misc\src</Filter>
+    </ClCompile>
+    <ClCompile Include="internal\misc\loggerinternal.cpp">
+      <Filter>internal\misc\src</Filter>
+    </ClCompile>
+    <ClCompile Include="internal\file\shadercompiler.cpp">
+      <Filter>internal\file\src</Filter>
+    </ClCompile>
+    <ClCompile Include="internal\file\textloader.cpp">
+      <Filter>internal\file\src</Filter>
+    </ClCompile>
+    <ClCompile Include="internal\file\image.cpp">
+      <Filter>internal\file\src</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
