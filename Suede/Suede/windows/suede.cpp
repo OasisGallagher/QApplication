@@ -1,6 +1,10 @@
+#include <QMenuBar>
 #include <QSplitter>
+#include <QKeyEvent>
+#include <QFileDialog>
 
 #include "suede.h"
+#include "camera.h"
 #include "canvas.h"
 #include "console.h"
 
@@ -9,10 +13,14 @@ static Suede* instance_;
 Suede::Suede(QWidget *parent)
 	: QMainWindow(parent) {
 	instance_ = this;
-
 	setupUI();
 
-	connect(canvas(), SIGNAL(onEngineLogReceived(int, const char*)), this, SLOT(OnEngineLogReceived(int, const char*)));
+	QMenu* fileMenu = menuBar()->findChild<QMenu*>("file");
+	QList<QAction*> actions = fileMenu->actions();
+
+	connect(canvas(), SIGNAL(onEngineLogReceived(int, const char*)), this, SLOT(onEngineLogReceived(int, const char*)));
+	connect(actions[0], SIGNAL(triggered()), this, SLOT(screenCapture()));
+	connect(actions[1], SIGNAL(triggered()), qApp, SLOT(quit()));
 
 	timer_ = startTimer(1000);
 }
@@ -55,7 +63,39 @@ void Suede::timerEvent(QTimerEvent *event) {
 	killTimer(timer_);
 }
 
-void Suede::OnEngineLogReceived(int type, const char* message) {
+void Suede::keyPressEvent(QKeyEvent* event) {
+	switch (event->key()) {
+		case Qt::Key_Escape:
+			qApp->quit();
+			break;
+	}
+}
+
+void Suede::screenCapture() {
+	std::vector<Sprite> sprites;
+	if (!Engine::get()->world()->GetSprites(ObjectTypeCamera, sprites)) {
+		return;
+	}
+
+	Camera camera = dsp_cast<Camera>(sprites.front());
+
+	Texture2D tex = camera->Capture();
+	std::vector<unsigned char> data;
+	if (!tex->EncodeToJpg(data)) {
+		return;
+	}
+
+	QImage image;
+	if (image.loadFromData(&data[0], data.size())) {
+		QString filter = "image(*.jpg)";
+		QString path = QFileDialog::getSaveFileName(this, "", "", filter);
+		if (!path.isEmpty()) {
+			image.save(path);
+		}
+	}
+}
+
+void Suede::onEngineLogReceived(int type, const char* message) {
 	switch (type) {
 		case 0:
 			console()->addMessage(Console::Debug, message);

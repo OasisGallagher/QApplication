@@ -11,12 +11,12 @@
 #include "surfaceinternal.h"
 #include "internal/memory/memory.h"
 #include "internal/memory/factory.h"
+#include "internal/misc/idcreater.h"
 #include "internal/base/meshinternal.h"
 #include "internal/base/textureinternal.h"
 #include "internal/base/materialinternal.h"
-#include "internal/resources/resources.h"
 
-static void aiMaterixToGlm(glm::mat4& answer, const aiMatrix4x4& mat) {
+static void AIMaterixToGlm(glm::mat4& answer, const aiMatrix4x4& mat) {
 	answer = glm::mat4(
 		mat.a1, mat.b1, mat.c1, mat.d1,
 		mat.a2, mat.b2, mat.c2, mat.d2,
@@ -25,7 +25,7 @@ static void aiMaterixToGlm(glm::mat4& answer, const aiMatrix4x4& mat) {
 		);
 }
 
-static void aiMaterixToGlm(glm::mat4& answer, const aiMatrix3x3& mat) {
+static void AIMaterixToGlm(glm::mat4& answer, const aiMatrix3x3& mat) {
 	answer = glm::mat4(
 		mat.a1, mat.b1, mat.c1, 0,
 		mat.a2, mat.b2, mat.c2, 0,
@@ -127,28 +127,33 @@ void SurfaceInternal::InitMeshes(const aiScene* scene, MaterialTextures* texture
 	InitMeshAttributes(scene, vertexCount, indexCount);
 }
 
-void SurfaceInternal::InitMeshAttributes(const aiScene* scene, unsigned numVertices, unsigned numIndices) {
+void SurfaceInternal::InitMeshAttributes(const aiScene* scene, unsigned numVertices, unsigned numIndexes) {
 	SurfaceAttribute attribute;
 	attribute.positions.reserve(numVertices);
 	attribute.normals.reserve(numVertices);
 	attribute.texCoords.reserve(numVertices);
 	attribute.tangents.reserve(numVertices);
-	attribute.indices.reserve(numIndices);
+	attribute.indexes.reserve(numIndexes);
+
+	attribute.bones.resize(numVertices);
+	for (int i = 0; i < numVertices; ++i) {
+		memset(&attribute.bones[i], 0, sizeof(BoneAttribute));
+	}
 
 	for (unsigned i = 0; i < scene->mNumMeshes; ++i) {
-		InitAttribute(scene->mMeshes[i], attribute);
+		InitAttribute(scene->mMeshes[i], i, attribute);
 	}
 
 	UpdateGLBuffers(attribute);
 }
 
-void SurfaceInternal::InitAttribute(const aiMesh* mesh, SurfaceAttribute& attribute) {
+void SurfaceInternal::InitAttribute(const aiMesh* aimesh, int nm, SurfaceAttribute& attribute) {
 	const aiVector3D zero(0);
-	for (unsigned i = 0; i < mesh->mNumVertices; ++i) {
-		const aiVector3D* pos = &mesh->mVertices[i];
-		const aiVector3D* normal = &mesh->mNormals[i];
-		const aiVector3D* texCoord = mesh->HasTextureCoords(0) ? &(mesh->mTextureCoords[0][i]) : &zero;
-		const aiVector3D* tangent = (mesh->mTangents != nullptr) ? &mesh->mTangents[i] : &zero;
+	for (unsigned i = 0; i < aimesh->mNumVertices; ++i) {
+		const aiVector3D* pos = &aimesh->mVertices[i];
+		const aiVector3D* normal = &aimesh->mNormals[i];
+		const aiVector3D* texCoord = aimesh->HasTextureCoords(0) ? &(aimesh->mTextureCoords[0][i]) : &zero;
+		const aiVector3D* tangent = (aimesh->mTangents != nullptr) ? &aimesh->mTangents[i] : &zero;
 
 		attribute.positions.push_back(glm::vec3(pos->x, pos->y, pos->z));
 		attribute.normals.push_back(glm::vec3(normal->x, normal->y, normal->z));
@@ -156,12 +161,48 @@ void SurfaceInternal::InitAttribute(const aiMesh* mesh, SurfaceAttribute& attrib
 		attribute.tangents.push_back(glm::vec3(tangent->x, tangent->y, tangent->z));
 	}
 
-	for (unsigned i = 0; i < mesh->mNumFaces; ++i) {
-		const aiFace& face = mesh->mFaces[i];
+	for (unsigned i = 0; i < aimesh->mNumFaces; ++i) {
+		const aiFace& face = aimesh->mFaces[i];
 		AssertX(face.mNumIndices == 3, "invalid index count");
-		attribute.indices.push_back(face.mIndices[0]);
-		attribute.indices.push_back(face.mIndices[1]);
-		attribute.indices.push_back(face.mIndices[2]);
+		attribute.indexes.push_back(face.mIndices[0]);
+		attribute.indexes.push_back(face.mIndices[1]);
+		attribute.indexes.push_back(face.mIndices[2]);
+	}
+
+	InitBoneAttribute(aimesh, nm, attribute);
+}
+
+void SurfaceInternal::InitBoneAttribute(const aiMesh* aimesh, int nm, SurfaceAttribute &attribute) {
+	for (unsigned i = 0; i < aimesh->mNumBones; ++i) {
+		unsigned index = 0;
+		std::string name(aimesh->mBones[i]->mName.data);
+
+		if (map_.find(name) == map_.end()) {
+			index = bones_.size();
+			Bone bone;
+			AIMaterixToGlm(bone.localToBoneSpaceMatrix, aimesh->mBones[i]->mOffsetMatrix);
+			bones_.push_back(bone);
+			map_[name] = index;
+		}
+		else {
+			index = map_[name];
+		}
+
+		for (unsigned j = 0; j < aimesh->mBones[i]->mNumWeights; ++j) {
+			// Since vertex IDs are relevant to a single mesh and we store all meshes
+			// in a single vector we add the base vertex ID of the current aiMesh to 
+			// vertex ID from the mWeights array to get the absolute vertex ID.
+			unsigned vertexCount, baseVertex, baseIndex;
+			meshes_[nm]->GetTriangles(vertexCount, baseVertex, baseIndex);
+			unsigned vertexID = baseVertex + aimesh->mBones[i]->mWeights[j].mVertexId;
+			float weight = aimesh->mBones[i]->mWeights[j].mWeight;
+			for (int k = 0; k < MaxBoneCount; ++k) {
+				if (Mathf::Approximately(attribute.bones[vertexID].weights[k])) {
+					attribute.bones[vertexID].indexes[k] = index;
+					attribute.bones[vertexID].weights[k] = weight;
+				}
+			}
+		}
 	}
 }
 
@@ -206,34 +247,45 @@ void SurfaceInternal::UpdateGLBuffers(const SurfaceAttribute& attribute) {
 	if (!attribute.positions.empty()) {
 		glBindBuffer(GL_ARRAY_BUFFER, vbos_[VBOPositions]);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * attribute.positions.size(), &attribute.positions[0], GL_STATIC_DRAW);
-		glEnableVertexAttribArray(VBOPositions);
-		glVertexAttribPointer(VBOPositions, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+		glEnableVertexAttribArray(IndexPosition);
+		glVertexAttribPointer(IndexPosition, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 	}
 
 	if (!attribute.texCoords.empty()) {
 		glBindBuffer(GL_ARRAY_BUFFER, vbos_[VBOTexCoords]);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2) * attribute.texCoords.size(), &attribute.texCoords[0], GL_STATIC_DRAW);
-		glEnableVertexAttribArray(VBOTexCoords);
-		glVertexAttribPointer(VBOTexCoords, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
+		glEnableVertexAttribArray(IndexTexCoord);
+		glVertexAttribPointer(IndexTexCoord, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
 	}
 
 	if (!attribute.normals.empty()) {
 		glBindBuffer(GL_ARRAY_BUFFER, vbos_[VBONormals]);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * attribute.normals.size(), &attribute.normals[0], GL_STATIC_DRAW);
-		glEnableVertexAttribArray(VBONormals);
-		glVertexAttribPointer(VBONormals, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+		glEnableVertexAttribArray(IndexNormal);
+		glVertexAttribPointer(IndexNormal, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 	}
 
 	if (!attribute.tangents.empty()) {
 		glBindBuffer(GL_ARRAY_BUFFER, vbos_[VBOTangents]);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * attribute.tangents.size(), &attribute.tangents[0], GL_STATIC_DRAW);
-		glEnableVertexAttribArray(VBOTangents);
-		glVertexAttribPointer(VBOTangents, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+		glEnableVertexAttribArray(IndexTangent);
+		glVertexAttribPointer(IndexTangent, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 	}
 
-	if (!attribute.indices.empty()) {
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbos_[VBOIndices]);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned) * attribute.indices.size(), &attribute.indices[0], GL_STATIC_DRAW);
+	if (!attribute.bones.empty()) {
+		glBindBuffer(GL_ARRAY_BUFFER, vbos_[VBOBones]);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(Bone)* attribute.bones.size(), &attribute.bones[0], GL_STATIC_DRAW);
+
+		glEnableVertexAttribArray(IndexBoneIndexes);
+		glVertexAttribIPointer(IndexBoneIndexes, 4, GL_INT, sizeof(Bone), nullptr);
+
+		glEnableVertexAttribArray(IndexBoneWeights);
+		glVertexAttribPointer(IndexBoneWeights, 4, GL_FLOAT, GL_FALSE, sizeof(Bone), (const GLvoid*)(sizeof(unsigned) * MaxBoneCount));
+	}
+
+	if (!attribute.indexes.empty()) {
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbos_[VBOIndexes]);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned) * attribute.indexes.size(), &attribute.indexes[0], GL_STATIC_DRAW);
 	}
 }
 

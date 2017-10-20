@@ -4,6 +4,15 @@
 #include "internal/base/uniform.h"
 #include "internal/base/objectinternal.h"
 
+enum VertexAttributeIndex {
+	IndexPosition,
+	IndexTexCoord,
+	IndexNormal,
+	IndexTangent,
+	IndexBoneIndexes,
+	IndexBoneWeights,
+};
+
 class MaterialInternal : public IMaterial, public ObjectInternal {
 	DEFINE_FACTORY_METHOD(Material)
 

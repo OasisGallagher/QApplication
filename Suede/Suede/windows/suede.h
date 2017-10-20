@@ -25,9 +25,11 @@ public:
 protected:
 	// TODO: update hierarchy.
 	virtual void timerEvent(QTimerEvent *event);
+	virtual void keyPressEvent(QKeyEvent *event);
 
 private slots:
-	void OnEngineLogReceived(int type, const char * message);
+	void onEngineLogReceived(int type, const char * message);
+	void screenCapture();
 
 private:
 	void setupUI();

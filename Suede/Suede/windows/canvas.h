@@ -30,7 +30,6 @@ protected:
 
 private:
 	void createScene();
-	void screenCapture();
 
 signals:
 	void onEngineLogReceived(int level, const char* message);

@@ -271,6 +271,9 @@
     <ClInclude Include="internal\file\image.h">
       <Filter>internal\file\include</Filter>
     </ClInclude>
+    <ClInclude Include="internal\misc\idcreater.h">
+      <Filter>internal\misc\include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="internal\base\objectinternal.cpp">

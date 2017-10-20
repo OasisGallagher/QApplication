@@ -10,6 +10,9 @@
     <height>450</height>
    </rect>
   </property>
+  <property name="focusPolicy">
+   <enum>Qt::StrongFocus</enum>
+  </property>
   <property name="windowTitle">
    <string>QMaze</string>
   </property>
@@ -22,6 +25,9 @@
       <width>256</width>
       <height>25</height>
      </rect>
+    </property>
+    <property name="focusPolicy">
+     <enum>Qt::ClickFocus</enum>
     </property>
    </widget>
    <widget class="Console" name="console" native="true">
@@ -123,23 +129,29 @@
      <height>23</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menu_File">
+   <widget class="QMenu" name="file">
+    <property name="focusPolicy">
+     <enum>Qt::StrongFocus</enum>
+    </property>
     <property name="title">
      <string>&amp;File</string>
     </property>
-    <addaction name="actionScreenCapture"/>
-    <addaction name="action_Exit"/>
+    <addaction name="screenCapture"/>
+    <addaction name="exit"/>
    </widget>
-   <addaction name="menu_File"/>
+   <addaction name="file"/>
   </widget>
-  <action name="action_Exit">
+  <action name="exit">
    <property name="text">
     <string>&amp;Exit</string>
    </property>
   </action>
-  <action name="actionScreenCapture">
+  <action name="screenCapture">
    <property name="text">
     <string>ScreenCapture</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+P</string>
    </property>
   </action>
  </widget>

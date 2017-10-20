@@ -23,46 +23,9 @@
 #include "scripts/inversion.h"
 #include "scripts/cameracontroller.h"
 
-Camera gCamera;
-
-// https://github.com/opengl-tutorials/ogl/blob/master/common/quaternion_utils.cpp
-/*
-glm::quat RotationBetweenVectors(glm::vec3 start, glm::vec3 dest) {
-	start = glm::normalize(start);
-	dest = glm::normalize(dest);
-
-	float cosTheta = glm::dot(start, dest);
-	glm::vec3 rotationAxis;
-
-	if (cosTheta < -1 + 0.001f) {
-		// special case when vectors in opposite directions:
-		// there is no "ideal" rotation axis
-		// So guess one; any will do as long as it's perpendicular to start
-		rotationAxis = glm::cross(glm::vec3(0.0f, 0.0f, 1.0f), start);
-		if (glm::length2(rotationAxis) < 0.01) // bad luck, they were parallel, try again!
-			rotationAxis = glm::cross(glm::vec3(1.0f, 0.0f, 0.0f), start);
-
-		rotationAxis = normalize(rotationAxis);
-		return glm::angleAxis(glm::radians(180.0f), rotationAxis);
-	}
-
-	rotationAxis = cross(start, dest);
-
-	float s = sqrt((1 + cosTheta) * 2);
-	float invs = 1 / s;
-
-	return glm::quat(
-		s * 0.5f,
-		rotationAxis.x * invs,
-		rotationAxis.y * invs,
-		rotationAxis.z * invs
-	);
-}
-*/
 Canvas::Canvas(QWidget *parent) 
 	: QGLWidget(parent), sceneCreated_(false) {
 	setMouseTracking(true);
-	setFocusPolicy(Qt::StrongFocus);
 	grayscale_ = new Grayscale;
 	inversion_ = new Inversion;
 	controller_ = new CameraController;
@@ -122,41 +85,13 @@ void Canvas::mouseMoveEvent(QMouseEvent *event) {
 	QGLWidget::mouseMoveEvent(event);
 }
 
-#include <QFileDialog>
-
 void Canvas::keyPressEvent(QKeyEvent* event) {
 	switch (event->key()) {
-	case Qt::Key_Escape:
-		qApp->quit();
-		break;
-	case Qt::Key_P:
-		screenCapture();
-		break;
-	default:
-		event->ignore();
-		break;
 	}
 }
 
 void Canvas::OnEngineLogMessage(int level, const char* message) {
 	emit onEngineLogReceived(level, message);
-}
-
-void Canvas::screenCapture() {
-	Texture2D tex = gCamera->Capture();
-	std::vector<unsigned char> data;
-	if (!tex->EncodeToJpg(data)) {
-		return;
-	}
-
-	QImage image;
-	if (image.loadFromData(&data[0], data.size())) {
-		QString filter = "image(*.jpg)";
-		QString path = QFileDialog::getSaveFileName(this, "", "", filter);
-		if (!path.isEmpty()) {
-			image.save(path);
-		}
-	}
 }
 
 void Canvas::createScene() {
@@ -167,7 +102,6 @@ void Canvas::createScene() {
 	light->SetColor(glm::vec3(0.7f));
 
 	Camera camera = dsp_cast<Camera>(world->Create(ObjectTypeCamera));
-	gCamera = camera;
 	controller_->setCamera(camera);
 
 	//camera->AddPostEffect(inversion_);
@@ -212,9 +146,9 @@ void Canvas::createScene() {
 	attribute.positions.push_back(glm::vec3(-1.0f, -1.0f, 0.0f));
 	attribute.positions.push_back(glm::vec3(1.0f, -1.0f, 0.0f));
 	attribute.positions.push_back(glm::vec3(0.0f, 1.0f, 0.0f));
-	attribute.indices.push_back(0);
-	attribute.indices.push_back(1);
-	attribute.indices.push_back(2);
+	attribute.indexes.push_back(0);
+	attribute.indexes.push_back(1);
+	attribute.indexes.push_back(2);
 
 	surface->SetAttribute(attribute);
 	mesh->SetTriangles(3, 0, 0);

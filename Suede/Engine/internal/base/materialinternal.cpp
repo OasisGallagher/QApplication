@@ -148,10 +148,12 @@ void MaterialInternal::UpdateVariables() {
 
 void MaterialInternal::UpdateVertexAttributes() {
 	GLuint program = shader_->GetNativePointer();
-	glBindAttribLocation(program, 0, Variables::position);
-	glBindAttribLocation(program, 1, Variables::texCoord);
-	glBindAttribLocation(program, 2, Variables::normal);
-	glBindAttribLocation(program, 3, Variables::tangent);
+	glBindAttribLocation(program, IndexPosition, Variables::position);
+	glBindAttribLocation(program, IndexTexCoord, Variables::texCoord);
+	glBindAttribLocation(program, IndexNormal, Variables::normal);
+	glBindAttribLocation(program, IndexTangent, Variables::tangent);
+	glBindAttribLocation(program, IndexBoneIndexes, Variables::boneIndexes);
+	glBindAttribLocation(program, IndexBoneWeights, Variables::boneWeights);
 }
 
 void MaterialInternal::UpdateFragmentAttributes() {

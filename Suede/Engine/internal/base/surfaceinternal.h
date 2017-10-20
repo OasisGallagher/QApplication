@@ -1,5 +1,6 @@
 #pragma once
 
+#include <map>
 #include <vector>
 #include <gl/glew.h>
 #include <glm/glm.hpp>
@@ -14,6 +15,8 @@ struct aiMesh;
 struct aiScene;
 struct aiNodeAnim;
 struct aiAnimation;
+
+class SequenceIDCreater;
 
 class SurfaceInternal : public ISurface, public ObjectInternal {
 	DEFINE_FACTORY_METHOD(Surface)
@@ -39,15 +42,23 @@ private:
 		VBOTexCoords,
 		VBONormals,
 		VBOTangents,
-		VBOIndices,
+		VBOBones,
+		VBOIndexes,
 		VBOCount,
 	};
 
-	void InitAttribute(const aiMesh* mesh, SurfaceAttribute& attribute);
+	struct Bone {
+		glm::mat4 localToBoneSpaceMatrix;
+		glm::mat4 world;
+	};
+
+	void InitAttribute(const aiMesh* aimesh, int nm, SurfaceAttribute& attribute);
+	void InitBoneAttribute(const aiMesh* aimesh, int nm, SurfaceAttribute &attribute);
+
 	void InitMeshes(const aiScene* scene, MaterialTextures* textures);
 	bool InitFromScene(const aiScene* scene, const std::string& path);
 	void InitTextures(const aiScene* scene, const std::string& path, MaterialTextures* textures);
-	void InitMeshAttributes(const aiScene* scene, unsigned numVertices, unsigned numIndices);
+	void InitMeshAttributes(const aiScene* scene, unsigned numVertices, unsigned numIndexes);
 
 	void Clear();
 	void UpdateGLBuffers(const SurfaceAttribute& attribute);
@@ -55,6 +66,10 @@ private:
 private:
 	GLuint vao_;
 	GLuint vbos_[VBOCount];
-
 	std::vector<Mesh> meshes_;
+
+	typedef std::map<std::string, unsigned> BoneMap;
+
+	BoneMap map_;
+	std::vector<Bone> bones_;
 };

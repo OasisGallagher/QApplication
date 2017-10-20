@@ -195,7 +195,7 @@ void CameraInternal::CreateDepthRenderer() {
 void CameraInternal::CreateShadowRenderer() {
 	directionalLightShadowRenderer_ = Factory::Create<RendererInternal>();
 	Shader shader = Factory::Create<ShaderInternal>();
-	shader->Load("buildin/shaders/directionallightdepth");
+	shader->Load("buildin/shaders/directional_light_depth");
 
 	Material material = Factory::Create<MaterialInternal>();
 	material->SetShader(shader);

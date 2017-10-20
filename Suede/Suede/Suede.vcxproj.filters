@@ -130,11 +130,11 @@
     <ClInclude Include="scripts\inversion.h">
       <Filter>scripts\include</Filter>
     </ClInclude>
-    <ClInclude Include="resources\buildin\shaders\include\fragmentlight.inc">
-      <Filter>resources\buildin\shaders\include</Filter>
-    </ClInclude>
     <ClInclude Include="GeneratedFiles\ui_suede.h">
       <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="resources\buildin\shaders\include\light_fragment.inc">
+      <Filter>resources\buildin\shaders\include</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -153,17 +153,17 @@
     <None Include="resources\shaders\grayscale.glsl">
       <Filter>resources\shaders</Filter>
     </None>
-    <None Include="resources\shaders\include\posteffectvertexshader.inc">
-      <Filter>resources\shaders\include</Filter>
-    </None>
     <None Include="resources\shaders\inversion.glsl">
       <Filter>resources\shaders</Filter>
     </None>
-    <None Include="resources\buildin\shaders\directionallightdepth.glsl">
+    <None Include="resources\buildin\shaders\directional_light_depth.glsl">
       <Filter>resources\buildin\shaders</Filter>
     </None>
-    <None Include="resources\buildin\shaders\include\vertexlight.inc">
+    <None Include="resources\buildin\shaders\include\light_vertex.inc">
       <Filter>resources\buildin\shaders\include</Filter>
+    </None>
+    <None Include="resources\shaders\include\post_effect_vertex.inc">
+      <Filter>resources\shaders\include</Filter>
     </None>
   </ItemGroup>
 </Project>

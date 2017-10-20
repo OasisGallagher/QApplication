@@ -7,6 +7,8 @@ namespace Variables {
 	DEFINE_VARIABLE(texCoord);
 	DEFINE_VARIABLE(normal);
 	DEFINE_VARIABLE(tangent);
+	DEFINE_VARIABLE(boneIndexes);
+	DEFINE_VARIABLE(boneWeights);
 
 	DEFINE_VARIABLE(fragColor);
 	DEFINE_VARIABLE(depth);

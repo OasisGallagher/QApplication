@@ -5,12 +5,22 @@
 #include "mesh.h"
 #include "object.h"
 
+enum {
+	MaxBoneCount = 4,
+};
+
+struct BoneAttribute {
+	unsigned indexes[MaxBoneCount];
+	float weights[MaxBoneCount];
+};
+
 struct SurfaceAttribute {
 	std::vector<glm::vec3> positions;
 	std::vector<glm::vec3> normals;
 	std::vector<glm::vec2> texCoords;
 	std::vector<glm::vec3> tangents;
-	std::vector<unsigned> indices;
+	std::vector<BoneAttribute> bones;
+	std::vector<unsigned> indexes;
 };
 
 class ENGINE_EXPORT ISurface : virtual public IObject {

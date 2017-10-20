@@ -234,6 +234,7 @@ copy $(TargetDir)$(TargetName).dll $(SolutionDir)$(SolutionName)\bin</Command>
     <ClInclude Include="internal\memory\factory.h" />
     <ClInclude Include="internal\memory\memory.h" />
     <ClInclude Include="internal\misc\graphicsinternal.h" />
+    <ClInclude Include="internal\misc\idcreater.h" />
     <ClInclude Include="internal\misc\loggerinternal.h" />
     <ClInclude Include="internal\misc\ptrmap.h" />
     <ClInclude Include="internal\misc\screeninternal.h" />

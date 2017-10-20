@@ -1,5 +1,5 @@
 #shader vertex
-#include "shaders/include/posteffectvertexshader.inc"
+#include "shaders/include/post_effect_vertex.inc"
 
 #shader fragment
 out vec4 c_fragColor;
