@@ -11,12 +11,12 @@
 /ConfigTools/ConfigTools/x64
 /ConfigTools/ConfigTools/Debug/*
 
-/QMaze/.vs/*
-/QMaze/Debug/*
-/QMaze/x64/*
-/QMaze/QMaze/GeneratedFiles/*
-/QMaze/QMaze/x64/*
-/QMaze/QMaze/Debug/*
+/Suede/.vs/*
+/Suede/Debug/*
+/Suede/x64/*
+/Suede/Suede/GeneratedFiles/*
+/Suede/Suede/x64/*
+/Suede/Suede/Debug/*
 
-/QMaze/Engine/x64/*
+/Suede/Engine/x64/*
 
