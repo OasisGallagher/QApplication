@@ -191,6 +191,7 @@ copy $(TargetDir)$(TargetName).dll $(SolutionDir)$(SolutionName)\bin</Command>
     <ClCompile Include="tools\string.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\animation.h" />
     <ClInclude Include="include\camera.h" />
     <ClInclude Include="include\defines.h" />
     <ClInclude Include="include\engine.h" />

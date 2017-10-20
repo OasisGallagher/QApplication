@@ -274,6 +274,9 @@
     <ClInclude Include="internal\misc\idcreater.h">
       <Filter>internal\misc\include</Filter>
     </ClInclude>
+    <ClInclude Include="include\animation.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="internal\base\objectinternal.cpp">
