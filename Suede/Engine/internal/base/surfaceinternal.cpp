@@ -99,6 +99,7 @@ bool SurfaceInternal::InitFromScene(const aiScene* scene, const std::string& pat
 	InitTextures(scene, path, textures);
 
 	InitMeshes(scene, textures);
+	InitAnimations(scene);
 
 	Memory::ReleaseArray(textures);
 
@@ -145,6 +146,12 @@ void SurfaceInternal::InitMeshAttributes(const aiScene* scene, unsigned numVerti
 	}
 
 	UpdateGLBuffers(attribute);
+}
+
+void SurfaceInternal::InitAnimations(const aiScene * scene) {
+	for (int i = 0; i < scene->mNumAnimations; ++i) {
+		aiAnimation* anim = scene->mAnimations[i];
+	}
 }
 
 void SurfaceInternal::InitAttribute(const aiMesh* aimesh, int nm, SurfaceAttribute& attribute) {

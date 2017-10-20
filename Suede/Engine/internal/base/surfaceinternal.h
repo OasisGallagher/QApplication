@@ -60,6 +60,8 @@ private:
 	void InitTextures(const aiScene* scene, const std::string& path, MaterialTextures* textures);
 	void InitMeshAttributes(const aiScene* scene, unsigned numVertices, unsigned numIndexes);
 
+	void InitAnimations(const aiScene* scene);
+
 	void Clear();
 	void UpdateGLBuffers(const SurfaceAttribute& attribute);
 
