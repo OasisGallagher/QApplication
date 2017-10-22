@@ -10,6 +10,8 @@ typedef std::shared_ptr<ISprite> Sprite;
 
 class ENGINE_EXPORT ISprite : virtual public IObject {
 public:
+	virtual bool LoadModel(const std::string& path) = 0;
+
 	virtual std::string GetName() = 0;
 	virtual void SetName(const std::string& value) = 0;
 

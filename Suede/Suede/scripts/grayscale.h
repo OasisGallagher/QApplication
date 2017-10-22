@@ -6,7 +6,7 @@ class Grayscale : public PostEffect {
 public:
 	virtual void OnRenderImage(RenderTexture src, RenderTexture dest) {
 		World world = Engine::get()->world();
-		Renderer renderer = dsp_cast<Renderer>(world->Create(ObjectTypeRenderer));
+		Renderer renderer = dsp_cast<Renderer>(world->Create(ObjectTypeSurfaceRenderer));
 
 		Shader shader = dsp_cast<Shader>(world->Create(ObjectTypeShader));
 		shader->Load("shaders/grayscale");

@@ -3,6 +3,7 @@
 
 #include "sprite.h"
 #include "surface.h"
+#include "animation.h"
 #include "internal/base/objectinternal.h"
 
 class SpriteInternal : virtual public ISprite, public ObjectInternal {
@@ -12,6 +13,7 @@ public:
 	SpriteInternal();
 
 public:
+	virtual bool LoadModel(const std::string& path) { return true; }
 	virtual std::string GetName() { return name_; }
 	virtual void SetName(const std::string& value) { name_ = value; }
 
@@ -91,6 +93,8 @@ private:
 
 	Surface surface_;
 	Renderer renderer_;
+	Animation animation_;
+
 	std::weak_ptr<Sprite::element_type> parent_;
 
 	std::vector<Sprite> children_;

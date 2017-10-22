@@ -10,6 +10,8 @@ namespace Variables {
 	DEFINE_VARIABLE(boneIndexes);
 	DEFINE_VARIABLE(boneWeights);
 
+	DEFINE_VARIABLE(bones);
+
 	DEFINE_VARIABLE(fragColor);
 	DEFINE_VARIABLE(depth);
 

@@ -2,7 +2,7 @@
 #include "renderstate.h"
 #include "rendererinternal.h"
 
-RendererInternal::RendererInternal() : ObjectInternal(ObjectTypeRenderer), queue_(Geometry) {
+RendererInternal::RendererInternal(ObjectType type) : ObjectInternal(type), queue_(Geometry) {
 	states_ = Memory::CreateArray<RenderState*>(RenderStateCount);
 	std::fill(states_, states_ + RenderStateCount, nullptr);
 }
@@ -95,4 +95,8 @@ void RendererInternal::UnbindRenderStates() {
 			states_[i]->Unbind();
 		}
 	}
+}
+
+void SkinnedSurfaceRendererInternal::Render(Surface surface) {
+	RendererInternal::Render(surface);
 }

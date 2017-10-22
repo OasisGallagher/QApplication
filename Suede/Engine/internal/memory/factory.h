@@ -46,3 +46,5 @@ private:
 	MapContainer methodDictionary_;
 	FactoryMethod methodArray_[ObjectTypeCount];
 };
+
+#define FactoryCreate(type)	Factory::Create<type ## Internal>()

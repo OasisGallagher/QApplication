@@ -4,11 +4,9 @@
 
 class RenderState;
 
-class RendererInternal : public IRenderer, public ObjectInternal {
-	DEFINE_FACTORY_METHOD(Renderer)
-
+class RendererInternal : virtual public IRenderer, public ObjectInternal {
 public:
-	RendererInternal();
+	RendererInternal(ObjectType type);
 	~RendererInternal();
 
 public:
@@ -35,4 +33,25 @@ private:
 	int queue_;
 	RenderState** states_;
 	std::vector<Material> materials_;
+};
+
+class SurfaceRendererInternal : public ISurfaceRenderer, public RendererInternal {
+	DEFINE_FACTORY_METHOD(SurfaceRenderer)
+
+public:
+	SurfaceRendererInternal() : RendererInternal(ObjectTypeSurfaceRenderer) {}
+};
+
+class SkinnedSurfaceRendererInternal : public ISkinnedSurfaceRenderer, public RendererInternal {
+	DEFINE_FACTORY_METHOD(SkinnedSurfaceRenderer)
+
+public:
+	SkinnedSurfaceRendererInternal() : RendererInternal(ObjectTypeSkinnedSurfaceRenderer) {}
+
+public:
+	virtual void Render(Surface surface);
+	virtual void SetSkeleton(const Skeleton* value) { skeleton_ = value; }
+
+private:
+	const Skeleton* skeleton_;
 };

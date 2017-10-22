@@ -1,8 +1,8 @@
 #include <Magick++.h>
-#include "image.h"
+#include "imagecodec.h"
 #include "tools/debug.h"
 
-const void* Image::Read(const std::string& path, int& width, int& height) {
+const void* ImageCodec::Decode(const std::string& path, int& width, int& height) {
 	Magick::Image image;
 	static Magick::Blob blob;
 
@@ -13,21 +13,21 @@ const void* Image::Read(const std::string& path, int& width, int& height) {
 		height = image.rows();
 	}
 	catch (Magick::Error& err) {
-		Debug::LogError("failed to load " + path + ": " + err.what());
+		Debug::LogError("failed to decode image " + path + ": " + err.what());
 		return nullptr;
 	}
 
 	return blob.data();
 }
 
-bool Image::Encode(int width, int height, std::vector<unsigned char>& data, const char* encoder) {
+bool ImageCodec::Encode(int width, int height, std::vector<unsigned char>& data, const char* format) {
 	Magick::Image image;
 	try {
 		image.read(width, height, "RGBA", Magick::CharPixel, &data[0]);
 		image.flip();
 
 		Magick::Blob blob;
-		image.magick(encoder);
+		image.magick(format);
 		image.write(&blob);
 		unsigned char* ptr = (unsigned char*)blob.data();
 		data.assign(ptr, ptr + blob.length());

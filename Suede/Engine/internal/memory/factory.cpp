@@ -31,7 +31,8 @@ Factory::Factory() {
 	ADD_FACTROY_METHOD(Sprite);
 	ADD_FACTROY_METHOD(Surface);
 	ADD_FACTROY_METHOD(Material);
-	ADD_FACTROY_METHOD(Renderer);
+	ADD_FACTROY_METHOD(SurfaceRenderer);
+	ADD_FACTROY_METHOD(SkinnedSurfaceRenderer);
 	ADD_FACTROY_METHOD(Texture2D);
 	ADD_FACTROY_METHOD(TextureCube);
 	ADD_FACTROY_METHOD(RenderTexture);

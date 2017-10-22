@@ -105,7 +105,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;_USRDLL;__EXPORT_ENGINE__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>.\include;$(SolutionDir)Engine;..\3rdParty\glm-0.9.7.1;..\3rdParty\assimp-3.0\include;..\3rdParty\glew-2.1.0\include;..\3rdParty\image-magick-6\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>4251;4996;4267;4250</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4251;4996;4267;4250;4018</DisableSpecificWarnings>
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
@@ -154,6 +154,7 @@ copy $(TargetDir)$(TargetName).dll $(SolutionDir)$(SolutionName)\bin</Command>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="internal\base\animationinternal.cpp" />
     <ClCompile Include="internal\base\framebuffer.cpp" />
     <ClCompile Include="internal\base\materialinternal.cpp" />
     <ClCompile Include="internal\base\meshinternal.cpp" />
@@ -164,8 +165,9 @@ copy $(TargetDir)$(TargetName).dll $(SolutionDir)$(SolutionName)\bin</Command>
     <ClCompile Include="internal\base\surfaceinternal.cpp" />
     <ClCompile Include="internal\base\textureinternal.cpp" />
     <ClCompile Include="internal\base\uniform.cpp" />
-    <ClCompile Include="internal\file\image.cpp" />
+    <ClCompile Include="internal\file\imagecodec.cpp" />
     <ClCompile Include="internal\file\shadercompiler.cpp" />
+    <ClCompile Include="internal\file\modelimporter.cpp" />
     <ClCompile Include="internal\file\textloader.cpp" />
     <ClCompile Include="internal\memory\factory.cpp" />
     <ClCompile Include="internal\memory\memory.cpp" />
@@ -218,6 +220,7 @@ copy $(TargetDir)$(TargetName).dll $(SolutionDir)$(SolutionName)\bin</Command>
     <ClInclude Include="include\timef.h" />
     <ClInclude Include="include\variables.h" />
     <ClInclude Include="include\world.h" />
+    <ClInclude Include="internal\base\animationinternal.h" />
     <ClInclude Include="internal\base\framebuffer.h" />
     <ClInclude Include="internal\base\glsldefines.h" />
     <ClInclude Include="internal\base\materialinternal.h" />
@@ -229,8 +232,9 @@ copy $(TargetDir)$(TargetName).dll $(SolutionDir)$(SolutionName)\bin</Command>
     <ClInclude Include="internal\base\surfaceinternal.h" />
     <ClInclude Include="internal\base\textureinternal.h" />
     <ClInclude Include="internal\base\uniform.h" />
-    <ClInclude Include="internal\file\image.h" />
+    <ClInclude Include="internal\file\imagecodec.h" />
     <ClInclude Include="internal\file\shadercompiler.h" />
+    <ClInclude Include="internal\file\modelimporter.h" />
     <ClInclude Include="internal\file\textloader.h" />
     <ClInclude Include="internal\memory\factory.h" />
     <ClInclude Include="internal\memory\memory.h" />

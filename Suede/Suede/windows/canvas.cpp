@@ -154,8 +154,8 @@ void Canvas::createScene() {
 	mesh->SetTriangles(3, 0, 0);
 	surface->AddMesh(mesh);
 	*/
-
-	surface->Load("models/room_thickwalls.obj");
+	
+	sprite->LoadModel("models/room_thickwalls.obj");
 	Texture2D albedo = dsp_cast<Texture2D>(world->Create(ObjectTypeTexture2D));
 	albedo->Load("textures/room_uvmap.dds");
 
@@ -165,18 +165,12 @@ void Canvas::createScene() {
 	MaterialTextures& textures = surface->GetMesh(0)->GetMaterialTextures();
 	textures.albedo = albedo;
 	//textures.bump = bump;
-	sprite->SetSurface(surface);
 
-	Renderer renderer = dsp_cast<Renderer>(world->Create(ObjectTypeRenderer));
+	Renderer renderer = sprite->GetRenderer();
 	renderer->SetRenderState(Cull, Off);
 	renderer->SetRenderState(DepthTest, LessEqual);
 
 	Shader shader = dsp_cast<Shader>(world->Create(ObjectTypeShader));
 	shader->Load("buildin/shaders/texture");
-
-	Material material = dsp_cast<Material>(world->Create(ObjectTypeMaterial));
-	material->SetShader(shader);
-	renderer->AddMaterial(material);
-
-	sprite->SetRenderer(renderer);
+	renderer->GetMaterial(0)->SetShader(shader);
 }

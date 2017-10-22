@@ -9,10 +9,18 @@ enum ObjectType {
 	ObjectTypeShader,
 	ObjectTypeSurface,
 	ObjectTypeMaterial,
-	ObjectTypeRenderer,
 	ObjectTypeTexture2D,
 	ObjectTypeTextureCube,
 	ObjectTypeRenderTexture,
+	ObjectTypeSurfaceRenderer,
+	ObjectTypeSkinnedSurfaceRenderer,
+
+	ObjectTypeAnimation,
+	ObjectTypeAnimationClip,
+	ObjectTypeAnimationKeys,
+	ObjectTypeAnimationCurve,
+	ObjectTypeAnimationState,
+	ObjectTypeAnimationKeyframe,
 
 	// Sprites.
 	ObjectTypeSprite,

@@ -5,8 +5,8 @@
 #include "variables.h"
 #include "tools/debug.h"
 #include "tools/mathf.h"
-#include "internal/file/image.h"
 #include "internal/memory/factory.h"
+#include "internal/file/imagecodec.h"
 #include "internal/base/framebuffer.h"
 #include "internal/resources/resources.h"
 #include "internal/base/shaderinternal.h"
@@ -106,7 +106,7 @@ void CameraInternal::Render() {
 
 	RenderShadowPass(sprites, forwardBase);
 
-	//Renderer renderer = Factory::Create<RendererInternal>();
+	//Renderer renderer = Factory::Create<SurfaceRendererInternal>();
 	//Material material = Factory::Create<MaterialInternal>();
 	//Shader shader = Factory::Create<ShaderInternal>();
 	//shader->Load("buildin/shaders/blit");
@@ -179,7 +179,7 @@ void CameraInternal::CreateFramebuffers() {
 }
 
 void CameraInternal::CreateDepthRenderer() {
-	depthRenderer_ = Factory::Create<RendererInternal>();
+	depthRenderer_ = Factory::Create<SurfaceRendererInternal>();
 	Shader shader = Factory::Create<ShaderInternal>();
 	shader->Load("buildin/shaders/depth");
 
@@ -193,7 +193,7 @@ void CameraInternal::CreateDepthRenderer() {
 }
 
 void CameraInternal::CreateShadowRenderer() {
-	directionalLightShadowRenderer_ = Factory::Create<RendererInternal>();
+	directionalLightShadowRenderer_ = Factory::Create<SurfaceRendererInternal>();
 	Shader shader = Factory::Create<ShaderInternal>();
 	shader->Load("buildin/shaders/directional_light_depth");
 

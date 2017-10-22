@@ -66,4 +66,17 @@ public:
 	virtual void SetRenderState(RenderStateType type, RenderStateParameter parameter0, RenderStateParameter parameter1 = (RenderStateParameter)None) = 0;
 };
 
+class ENGINE_EXPORT ISurfaceRenderer : virtual public IRenderer {
+
+};
+
+struct Skeleton;
+
+class ENGINE_EXPORT ISkinnedSurfaceRenderer : virtual public IRenderer {
+public:
+	virtual void SetSkeleton(const Skeleton* value) = 0;
+};
+
 typedef std::shared_ptr<IRenderer> Renderer;
+typedef std::shared_ptr<ISurfaceRenderer> SurfaceRenderer;
+typedef std::shared_ptr<ISkinnedSurfaceRenderer> SkinnedSurfaceRenderer;

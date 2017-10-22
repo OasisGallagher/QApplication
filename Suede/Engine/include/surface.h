@@ -5,13 +5,13 @@
 #include "mesh.h"
 #include "object.h"
 
-enum {
-	MaxBoneCount = 4,
-};
+struct BlendAttribute {
+	enum {
+		Quality = 4,
+	};
 
-struct BoneAttribute {
-	unsigned indexes[MaxBoneCount];
-	float weights[MaxBoneCount];
+	unsigned indexes[Quality];
+	float weights[Quality];
 };
 
 struct SurfaceAttribute {
@@ -19,14 +19,12 @@ struct SurfaceAttribute {
 	std::vector<glm::vec3> normals;
 	std::vector<glm::vec2> texCoords;
 	std::vector<glm::vec3> tangents;
-	std::vector<BoneAttribute> bones;
+	std::vector<BlendAttribute> blendAttrs;
 	std::vector<unsigned> indexes;
 };
 
 class ENGINE_EXPORT ISurface : virtual public IObject {
 public:
-	virtual bool Load(const std::string& path) = 0;
-
 	virtual void SetAttribute(const SurfaceAttribute& value) = 0;
 	virtual void AddMesh(Mesh mesh) = 0;
 	virtual int GetMeshCount() = 0;

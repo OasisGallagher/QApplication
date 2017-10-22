@@ -2,7 +2,7 @@
 
 #include "tools/debug.h"
 #include "textureinternal.h"
-#include "internal/file/image.h"
+#include "internal/file/imagecodec.h"
 
 void TextureInternal::Bind(GLenum location) {
 	AssertX(glIsTexture(texture_), "invalid texture");
@@ -42,7 +42,7 @@ Texture2DInternal::~Texture2DInternal() {
 
 bool Texture2DInternal::Load(const std::string& path) {
 	int width, height;
-	const void* data = Image::Read("resources/" + path, width, height);
+	const void* data = ImageCodec::Decode("resources/" + path, width, height);
 	if (data == nullptr) {
 		return false;
 	}
@@ -75,7 +75,7 @@ bool Texture2DInternal::EncodeToPng(std::vector<unsigned char>& data) {
 	glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, &data[0]);
 	UnbindTexture();
 
-	return Image::Encode(GetWidth(), GetHeight(), data, "PNG");
+	return ImageCodec::Encode(GetWidth(), GetHeight(), data, "PNG");
 }
 
 bool Texture2DInternal::EncodeToJpg(std::vector<unsigned char>& data) {
@@ -84,7 +84,7 @@ bool Texture2DInternal::EncodeToJpg(std::vector<unsigned char>& data) {
 	glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, &data[0]);
 	UnbindTexture();
 
-	return Image::Encode(GetWidth(), GetHeight(), data, "JPG");
+	return ImageCodec::Encode(GetWidth(), GetHeight(), data, "JPG");
 }
 
 TextureCubeInternal::TextureCubeInternal() : TextureInternal(ObjectTypeTextureCube) {
@@ -103,7 +103,7 @@ bool TextureCubeInternal::Load(const std::string(&textures)[6]) {
 
 	for (int i = 0; i < 6; ++i) {
 		int width, height;
-		const void* data = Image::Read("resources/" + textures[i], width, height);
+		const void* data = ImageCodec::Decode("resources/" + textures[i], width, height);
 
 		if (data == nullptr) {
 			DestroyTexture();
