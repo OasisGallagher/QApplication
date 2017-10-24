@@ -1,5 +1,3 @@
-#include <map>
-
 #include "surface.h"
 #include "renderer.h"
 #include "animation.h"
@@ -38,6 +36,7 @@ private:
 
 	bool ImportAnimation(Animation& animation);
 	void ImportAnimationClip(const aiAnimation* anim, AnimationClip clip);
+	void ImportAnimationNode(const aiAnimation* anim, const aiNode* paiNode, SkeletonNode* pskNode);
 	const aiNodeAnim * FindChannel(const aiAnimation* anim, const char* name);
 
 	bool InitRenderer(Animation animation, Renderer& renderer);
@@ -46,7 +45,6 @@ private:
 	Skeleton skeleton_;
 	std::string path_;
 	const aiScene* scene_;
-	std::map<std::string, int> boneMap_;
 
 	Surface surface_;
 	Renderer renderer_;

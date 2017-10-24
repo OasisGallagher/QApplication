@@ -13,7 +13,8 @@ public:
 	SpriteInternal();
 
 public:
-	virtual bool LoadModel(const std::string& path) { return true; }
+	virtual bool LoadModel(const std::string& path);
+
 	virtual std::string GetName() { return name_; }
 	virtual void SetName(const std::string& value) { name_ = value; }
 
@@ -57,6 +58,9 @@ public:
 	virtual glm::vec3 GetUp();
 	virtual glm::vec3 GetRight();
 	virtual glm::vec3 GetForward();
+
+	virtual void SetAnimation(Animation value) { animation_ = value; }
+	virtual Animation GetAnimation() { return animation_; }
 
 	virtual void SetSurface(Surface value){ surface_ = value; }
 	virtual Surface GetSurface() { return surface_; }

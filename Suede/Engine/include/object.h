@@ -15,6 +15,7 @@ enum ObjectType {
 	ObjectTypeSurfaceRenderer,
 	ObjectTypeSkinnedSurfaceRenderer,
 
+	ObjectTypeSkeleton,
 	ObjectTypeAnimation,
 	ObjectTypeAnimationClip,
 	ObjectTypeAnimationKeys,

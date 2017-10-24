@@ -4,6 +4,7 @@
 #include "object.h"
 #include "surface.h"
 #include "renderer.h"
+#include "animation.h"
 
 class ISprite;
 typedef std::shared_ptr<ISprite> Sprite;
@@ -56,9 +57,12 @@ public:
 
 	virtual void Update() = 0;
 
+	virtual void SetAnimation(Animation value) = 0;
+	virtual Animation GetAnimation() = 0;
+
 	virtual void SetSurface(Surface value) = 0;
 	virtual Surface GetSurface() = 0;
 
-	virtual void SetRenderer(Renderer renderer) = 0;
+	virtual void SetRenderer(Renderer value) = 0;
 	virtual Renderer GetRenderer() = 0;
 };

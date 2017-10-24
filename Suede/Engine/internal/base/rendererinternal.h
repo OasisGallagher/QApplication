@@ -31,7 +31,7 @@ private:
 
 private:
 	int queue_;
-	RenderState** states_;
+	RenderState* states_[RenderStateCount];
 	std::vector<Material> materials_;
 };
 
@@ -50,8 +50,8 @@ public:
 
 public:
 	virtual void Render(Surface surface);
-	virtual void SetSkeleton(const Skeleton* value) { skeleton_ = value; }
+	virtual void SetSkeleton(Skeleton value) { skeleton_ = value; }
 
 private:
-	const Skeleton* skeleton_;
+	Skeleton skeleton_;
 };

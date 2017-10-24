@@ -23,21 +23,21 @@ void MaterialInternal::SetShader(Shader value) {
 }
 
 void MaterialInternal::SetInt(const std::string& name, int value) {
-	Uniform* u = GetUniform(name, UniformInt);
+	Uniform* u = GetUniform(name, VariantInt);
 	if (u != nullptr && u->value.GetInt() != value) {
 		glProgramUniform1i(shader_->GetNativePointer(), u->location, value);
 	}
 }
 
 void MaterialInternal::SetFloat(const std::string& name, float value) {
-	Uniform* u = GetUniform(name, UniformFloat);
+	Uniform* u = GetUniform(name, VariantFloat);
 	if (u != nullptr && !Mathf::Approximately(u->value.GetFloat(), value)) {
 		glProgramUniform1f(shader_->GetNativePointer(), u->location, value);
 	}
 }
 
 void MaterialInternal::SetTexture(const std::string& name, Texture value) {
-	Uniform* u = GetUniform(name, UniformTexture);
+	Uniform* u = GetUniform(name, VariantTexture);
 
 	if (u != nullptr && u->value.GetTexture() != value) {
 		u->value.SetTexture(value);
@@ -46,21 +46,21 @@ void MaterialInternal::SetTexture(const std::string& name, Texture value) {
 }
 
 void MaterialInternal::SetVector3(const std::string& name, const glm::vec3& value) {
-	Uniform* u = GetUniform(name, UniformVector3);
+	Uniform* u = GetUniform(name, VariantVector3);
 	if (u != nullptr && u->value.GetVector3() != value) {
 		SetUniform(u, &value);
 	}
 }
 
 void MaterialInternal::SetMatrix4(const std::string& name, const glm::mat4& value) {
-	Uniform* u = GetUniform(name, UniformMatrix4);
+	Uniform* u = GetUniform(name, VariantMatrix4);
 	if (u != nullptr && u->value.GetMatrix4() != value) {
 		SetUniform(u, &value);
 	}
 }
 
 int MaterialInternal::GetInt(const std::string& name) {
-	Uniform* u = GetUniform(name, UniformInt);
+	Uniform* u = GetUniform(name, VariantInt);
 	if (u == nullptr) {
 		return 0;
 	}
@@ -69,7 +69,7 @@ int MaterialInternal::GetInt(const std::string& name) {
 }
 
 float MaterialInternal::GetFloat(const std::string& name) {
-	Uniform* u = GetUniform(name, UniformFloat);
+	Uniform* u = GetUniform(name, VariantFloat);
 	if (u == nullptr) {
 		return 0.f;
 	}
@@ -78,7 +78,7 @@ float MaterialInternal::GetFloat(const std::string& name) {
 }
 
 Texture MaterialInternal::GetTexture(const std::string& name) {
-	Uniform* u = GetUniform(name, UniformTexture);
+	Uniform* u = GetUniform(name, VariantTexture);
 	if (u == nullptr) {
 		return Texture();
 	}
@@ -87,7 +87,7 @@ Texture MaterialInternal::GetTexture(const std::string& name) {
 }
 
 glm::mat4 MaterialInternal::GetMatrix4(const std::string& name) {
-	Uniform* u = GetUniform(name, UniformMatrix4);
+	Uniform* u = GetUniform(name, VariantMatrix4);
 	if (u == nullptr) {
 		return glm::mat4(1);
 	}
@@ -96,7 +96,7 @@ glm::mat4 MaterialInternal::GetMatrix4(const std::string& name) {
 }
 
 glm::vec3 MaterialInternal::GetVector3(const std::string& name) {
-	Uniform* u = GetUniform(name, UniformVector3);
+	Uniform* u = GetUniform(name, VariantVector3);
 	if (u == nullptr) {
 		return glm::vec3(0);
 	}
@@ -122,7 +122,7 @@ void MaterialInternal::Define(const std::string& name) {
 void MaterialInternal::Undefine(const std::string& name) {
 }
 
-Uniform* MaterialInternal::GetUniform(const std::string& name, UniformType type) {
+MaterialInternal::Uniform* MaterialInternal::GetUniform(const std::string& name, VariantType type) {
 	Uniform* ans = nullptr;
 	if (!uniforms_.get(name, ans)) {
 		static int variablePrefixLength = strlen(VARIABLE_PREFIX);
@@ -134,7 +134,7 @@ Uniform* MaterialInternal::GetUniform(const std::string& name, UniformType type)
 	}
 
 	if (ans->value.GetType() != type) {
-		Debug::LogError("uniform " + name + "does not defined as " + UniformVariable::UniformTypeToName(type));
+		Debug::LogError("uniform " + name + "does not defined as " + Variant::TypeString(type));
 		return false;
 	}
 
@@ -167,7 +167,7 @@ void MaterialInternal::BindTextures() {
 	// TODO: traversal...
 	for (UniformContainer::iterator ite = uniforms_.begin(); ite != uniforms_.end(); ++ite) {
 		Uniform* uniform = ite->second;
-		if (uniform->value.GetType() == UniformTexture && uniform->value.GetTexture()) {
+		if (uniform->value.GetType() == VariantTexture && uniform->value.GetTexture()) {
 			uniform->value.GetTexture()->Bind(GL_TEXTURE0 + uniform->value.GetTextureIndex());
 		}
 	}
@@ -177,7 +177,7 @@ void MaterialInternal::UnbindTextures() {
 	// TODO: traversal...
 	for (UniformContainer::iterator ite = uniforms_.begin(); ite != uniforms_.end(); ++ite) {
 		Uniform* uniform = ite->second;
-		if (uniform->value.GetType() == UniformTexture && uniform->value.GetTexture()) {
+		if (uniform->value.GetType() == VariantTexture && uniform->value.GetTexture()) {
 			uniform->value.GetTexture()->Unbind();
 		}
 	}

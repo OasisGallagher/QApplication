@@ -1,6 +1,5 @@
 #include "internal/memory/factory.h"
 
-#include "internal/base/meshinternal.h"
 #include "internal/base/shaderinternal.h"
 #include "internal/base/surfaceinternal.h"
 #include "internal/base/textureinternal.h"

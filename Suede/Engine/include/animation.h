@@ -2,6 +2,7 @@
 #include <vector>
 #include "object.h"
 
+class ISkeleton;
 class IAnimation;
 class IAnimationClip;
 class IAnimationKeys;
@@ -9,6 +10,7 @@ class IAnimationCurve;
 class IAnimationState;
 class IAnimationKeyframe;
 
+typedef std::shared_ptr<ISkeleton> Skeleton;
 typedef std::shared_ptr<IAnimation> Animation;
 typedef std::shared_ptr<IAnimationClip> AnimationClip;
 typedef std::shared_ptr<IAnimationKeys> AnimationKeys;
@@ -16,26 +18,44 @@ typedef std::shared_ptr<IAnimationCurve> AnimationCurve;
 typedef std::shared_ptr<IAnimationState> AnimationState;
 typedef std::shared_ptr<IAnimationKeyframe> AnimationKeyframe;
 
-struct Bone {
+struct SkeletonBone {
+	std::string name;
 	glm::mat4 localToBoneSpaceMatrix;
-	glm::mat4 boneToRootSpaceMatrix;
 };
 
-struct Skeleton {
-	enum {
-		MaxBoneCount = 128
-	};
+struct SkeletonNode {
+	std::string name;
+	glm::mat4 matrix;
+	AnimationCurve curve;
 
-	int boneCount;
-	Bone bones[MaxBoneCount];
+	SkeletonNode* parent;
+	std::vector<SkeletonNode*> children;
+};
+
+class ISkeleton : virtual public IObject {
+public:
+	virtual bool AddBone(const SkeletonBone& bone) = 0;
+	virtual SkeletonBone* GetBone(int index) = 0;
+	virtual SkeletonBone* GetBone(const std::string& name) = 0;
+
+	virtual SkeletonNode* CreateNode(const std::string& name, const glm::mat4& matrix, AnimationCurve curve) = 0;
+	virtual void AddNode(SkeletonNode* parent, SkeletonNode* child) = 0;
+	virtual SkeletonNode* GetRootNode() = 0;
+	
+	virtual void SetBoneToRootSpaceMatrix(int index, const glm::mat4& value) = 0;
+	virtual glm::mat4* GetBoneToRootSpaceMatrices() = 0;
+
+	virtual int GetBoneIndex(const std::string& name) = 0;
+	virtual int GetBoneCount() = 0;
 };
 
 class ENGINE_EXPORT IAnimationClip : virtual public IObject {
 public:
 	virtual void SetDuration(float value) = 0;
 	virtual float GetDuration() = 0;
-	virtual void SetCurve(AnimationCurve value) = 0;
-	virtual void Sample(float time, glm::mat4& matrix) = 0;
+	virtual void SetAnimation(Animation value) = 0;
+	virtual Animation GetAnimation() = 0;
+	virtual void Sample(float time) = 0;
 };
 
 class ENGINE_EXPORT IAnimationState : virtual public IObject {
@@ -54,14 +74,30 @@ public:
 	virtual void ToKeyframes(std::vector<AnimationKeyframe>& keyframes) = 0;
 };
 
+enum {
+	KeyframeAttributePosition,
+	KeyframeAttributeRotation,
+	KeyframeAttributeScale,
+
+	KeyframeAttributeUser = 8,
+};
+
 class ENGINE_EXPORT IAnimationKeyframe : virtual public IObject {
 public:
-	virtual void Set(float time, const glm::vec3& position, const glm::quat& rotation, const glm::vec3& scale) = 0;
+	virtual void SetTime(float value) = 0;
+	virtual float GetTime() = 0;
+
+	virtual void SetVector3(int id, const glm::vec3& value) = 0;
+	virtual void SetQuaternion(int id, const glm::quat& value) = 0;
+
+	virtual glm::vec3 GetVector3(int id) = 0;
+	virtual glm::quat GetQuaternion(int id) = 0;
 };
 
 class ENGINE_EXPORT IAnimationCurve : virtual public IObject {
 public:
-	virtual void SetKeyframes(const std::vector<AnimationKeyframe>& keyframes) = 0;
+	virtual void SetKeyframes(const std::vector<AnimationKeyframe>& value) = 0;
+	// TODO: Generic version.
 	virtual void Sample(float time, glm::vec3& position, glm::quat& rotation, glm::vec3& scale) = 0;
 };
 
@@ -70,6 +106,8 @@ public:
 	virtual void AddClip(const std::string& name, AnimationClip value) = 0;
 	virtual AnimationClip GetClip(const std::string& name) = 0;
 
+	virtual void SetSkeleton(Skeleton value) = 0;
+	virtual Skeleton GetSkeleton() = 0;
 	virtual void SetRootTransform(const glm::mat4& value) = 0;
 
 	virtual bool Play(const std::string& name) = 0;

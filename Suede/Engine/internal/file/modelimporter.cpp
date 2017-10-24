@@ -11,7 +11,6 @@
 #include "modelimporter.h"
 #include "internal/memory/memory.h"
 #include "internal/memory/factory.h"
-#include "internal/base/meshinternal.h"
 #include "internal/base/shaderinternal.h"
 #include "internal/base/textureinternal.h"
 #include "internal/base/surfaceinternal.h"
@@ -68,12 +67,11 @@ bool ModelImporter::Import(const std::string& path, int mask) {
 }
 
 void ModelImporter::Clear() {
-	skeleton_.boneCount = 0;
 	path_.clear();
 	scene_ = nullptr;
-	boneMap_.clear();
 	surface_.reset();
 	renderer_.reset();
+	skeleton_.reset();
 	animation_.reset();
 }
 
@@ -186,25 +184,20 @@ void ModelImporter::ImportMeshAttributes(const aiMesh* aimesh, int nm, SurfaceAt
 }
 
 void ModelImporter::ImportBoneAttributes(const aiMesh* aimesh, int nm, Surface surface, SurfaceAttribute& attribute) {
-	for (unsigned i = 0; i < aimesh->mNumBones; ++i) {
-		unsigned index = 0;
+	for (int i = 0; i < aimesh->mNumBones; ++i) {
+		if (!skeleton_) { skeleton_ = Factory::Create<SkeletonInternal>(); }
 		std::string name(aimesh->mBones[i]->mName.data);
 
-		if (boneMap_.find(name) == boneMap_.end()) {
-			Bone bone;
+		int index = skeleton_->GetBoneIndex(name);
+		if (index < 0) {
+			SkeletonBone bone;
+			bone.name = name;
 			AIMaterixToGLM(bone.localToBoneSpaceMatrix, aimesh->mBones[i]->mOffsetMatrix);
-			skeleton_.bones[skeleton_.boneCount] = bone;
-			boneMap_[name] = skeleton_.boneCount;
-			++skeleton_.boneCount;
-		}
-		else {
-			index = boneMap_[name];
+			index = skeleton_->GetBoneCount();
+			skeleton_->AddBone(bone);
 		}
 
-		for (unsigned j = 0; j < aimesh->mBones[i]->mNumWeights; ++j) {
-			// Since vertex IDs are relevant to a single mesh and we store all meshes
-			// in a single vector we add the base vertex ID of the current aiMesh to 
-			// vertex ID from the mWeights array to get the absolute vertex ID.
+		for (int j = 0; j < aimesh->mBones[i]->mNumWeights; ++j) {
 			unsigned vertexCount, baseVertex, baseIndex;
 			surface->GetMesh(nm)->GetTriangles(vertexCount, baseVertex, baseIndex);
 			unsigned vertexID = baseVertex + aimesh->mBones[i]->mWeights[j].mVertexId;
@@ -239,14 +232,21 @@ bool ModelImporter::ImportAnimation(Animation& animation) {
 		animation->AddClip(name, clip);
 	}
 
+	animation->SetSkeleton(skeleton_);
+
 	return true;
 }
 
 void ModelImporter::ImportAnimationClip(const aiAnimation* anim, AnimationClip clip) {
 	clip->SetDuration((float)anim->mDuration);
-	const aiNode* root = scene_->mRootNode;
-	const aiNodeAnim* channel = FindChannel(anim, root->mName.C_Str());
 
+	ImportAnimationNode(anim, scene_->mRootNode, nullptr);
+}
+
+void ModelImporter::ImportAnimationNode(const aiAnimation* anim, const aiNode* paiNode, SkeletonNode* pskNode) {
+	const aiNodeAnim* channel = FindChannel(anim, paiNode->mName.C_Str());
+
+	AnimationCurve curve;
 	AnimationKeys keys = Factory::Create<AnimationKeysInternal>();
 	if (channel != nullptr) {
 		for (int i = 0; i < channel->mNumPositionKeys; ++i) {
@@ -266,15 +266,21 @@ void ModelImporter::ImportAnimationClip(const aiAnimation* anim, AnimationClip c
 			glm::vec3 scale;
 			keys->AddScale((float)key.mTime, AIVector3ToGLM(scale, key.mValue));
 		}
+
+		std::vector<AnimationKeyframe> keyframes;
+		keys->ToKeyframes(keyframes);
+
+		AnimationCurve curve = Factory::Create<AnimationCurveInternal>();
+		curve->SetKeyframes(keyframes);
 	}
 
-	std::vector<AnimationKeyframe> keyframes;
-	keys->ToKeyframes(keyframes);
+	glm::mat4 matrix;
+	SkeletonNode* child = skeleton_->CreateNode(paiNode->mName.C_Str(), AIMaterixToGLM(matrix, paiNode->mTransformation), curve);
+	skeleton_->AddNode(pskNode, child);
 
-	AnimationCurve curve = Factory::Create<AnimationCurveInternal>();
-	curve->SetKeyframes(keyframes);
-
-	clip->SetCurve(curve);
+	for (int i = 0; i < paiNode->mNumChildren; ++i) {
+		ImportAnimationNode(anim, paiNode->mChildren[i], child);
+	}
 }
 
 const aiNodeAnim* ModelImporter::FindChannel(const aiAnimation* anim, const char* name) {
@@ -294,6 +300,7 @@ bool ModelImporter::InitRenderer(Animation animation, Renderer& renderer) {
 	else {
 		SkinnedSurfaceRenderer skinnedSurfaceRenderer;
 		renderer = skinnedSurfaceRenderer = Factory::Create<SkinnedSurfaceRendererInternal>();
+		skinnedSurfaceRenderer->SetSkeleton(skeleton_);
 	}
 
 	renderer->SetRenderState(Cull, Off);

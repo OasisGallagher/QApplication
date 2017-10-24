@@ -4,6 +4,7 @@
 
 #include "tools/mathf.h"
 #include "tools/string.h"
+#include "internal/file/modelimporter.h"
 #include "internal/world/worldinternal.h"
 #include "internal/sprites/spriteinternal.h"
 
@@ -14,6 +15,19 @@ SpriteInternal::SpriteInternal(ObjectType spriteType)
 	: ObjectInternal(spriteType), dirtyFlag_(0), localScale_(1), worldScale_(1) {
 	AssertX(spriteType >= ObjectTypeSprite && spriteType < ObjectTypeCount, "invalid sprite type " + std::to_string(spriteType));
 	name_ = String::Format("%s (%u)", SpriteTypeToString(GetType()), GetInstanceID());
+}
+
+bool SpriteInternal::LoadModel(const std::string & path) {
+	ModelImporter importer;
+	if (!importer.Import(path)) {
+		return false;
+	}
+
+	SetSurface(importer.GetSurface());
+	SetAnimation(importer.GetAnimation());
+	SetRenderer(importer.GetRenderer());
+
+	return true;
 }
 
 void SpriteInternal::AddChild(Sprite child) {

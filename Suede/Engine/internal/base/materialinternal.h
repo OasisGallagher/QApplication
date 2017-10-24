@@ -1,7 +1,8 @@
 #pragma once
 
 #include "material.h"
-#include "internal/base/uniform.h"
+#include "internal/containers/ptrmap.h"
+#include "internal/containers/variant.h"
 #include "internal/base/objectinternal.h"
 
 enum VertexAttributeIndex {
@@ -43,6 +44,16 @@ public:
 	virtual glm::vec3 GetVector3(const std::string& name);
 
 private:
+	struct Uniform {
+		GLenum type;
+		union { GLuint offset, location; };
+		GLuint size, stride;
+		Variant value;
+	};
+
+	typedef PtrMap<Uniform> UniformContainer;
+
+private:
 	bool IsSampler(int type);
 
 	void UpdateVariables();
@@ -57,7 +68,7 @@ private:
 	GLuint GetSizeOfType(GLint type);
 	GLuint GetUniformSize(GLint uniformType, GLint uniformSize, GLint uniformOffset, GLint uniformMatrixStride, GLint uniformArrayStride);
 
-	Uniform* GetUniform(const std::string& name, UniformType type);
+	Uniform* GetUniform(const std::string& name, VariantType type);
 
 	void SetUniform(struct Uniform* u, const void* value);
 

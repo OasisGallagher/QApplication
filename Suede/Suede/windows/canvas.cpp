@@ -139,7 +139,6 @@ void Canvas::createScene() {
 	sprite->SetPosition(glm::vec3(0, 0, -18));
 	sprite->SetEulerAngles(glm::vec3(-60, 180, 0));
 
-	Surface surface = dsp_cast<Surface>(world->Create(ObjectTypeSurface));
 	/* Mesh.
 	Mesh mesh = dynamic_ptr_cast<Mesh>(world->Create("Mesh"));
 	SurfaceAttribute attribute;
@@ -155,22 +154,25 @@ void Canvas::createScene() {
 	surface->AddMesh(mesh);
 	*/
 	
-	sprite->LoadModel("models/room_thickwalls.obj");
-	Texture2D albedo = dsp_cast<Texture2D>(world->Create(ObjectTypeTexture2D));
-	albedo->Load("textures/room_uvmap.dds");
+	sprite->LoadModel("models/boblampclean.md5mesh");
+	
+	Surface surface = sprite->GetSurface();
+
+	//Texture2D albedo = dsp_cast<Texture2D>(world->Create(ObjectTypeTexture2D));
+	//albedo->Load("textures/room_uvmap.dds");
 
 	//Texture2D bump = dsp_cast<Texture2D>(world->Create(ObjectTypeTexture2D));
 	//bump->Load("textures/bump.bmp");
 
-	MaterialTextures& textures = surface->GetMesh(0)->GetMaterialTextures();
-	textures.albedo = albedo;
+	//MaterialTextures& textures = surface->GetMesh(0)->GetMaterialTextures();
+	//textures.albedo = albedo;
 	//textures.bump = bump;
 
-	Renderer renderer = sprite->GetRenderer();
+	/*Renderer renderer = sprite->GetRenderer();
 	renderer->SetRenderState(Cull, Off);
 	renderer->SetRenderState(DepthTest, LessEqual);
 
 	Shader shader = dsp_cast<Shader>(world->Create(ObjectTypeShader));
 	shader->Load("buildin/shaders/texture");
-	renderer->GetMaterial(0)->SetShader(shader);
+	renderer->GetMaterial(0)->SetShader(shader);*/
 }

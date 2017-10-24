@@ -3,6 +3,7 @@
 #include "object.h"
 #include "surface.h"
 #include "material.h"
+#include "animation.h"
 
 enum RenderQueue {
 	Background = 1000,
@@ -70,11 +71,9 @@ class ENGINE_EXPORT ISurfaceRenderer : virtual public IRenderer {
 
 };
 
-struct Skeleton;
-
 class ENGINE_EXPORT ISkinnedSurfaceRenderer : virtual public IRenderer {
 public:
-	virtual void SetSkeleton(const Skeleton* value) = 0;
+	virtual void SetSkeleton(Skeleton value) = 0;
 };
 
 typedef std::shared_ptr<IRenderer> Renderer;

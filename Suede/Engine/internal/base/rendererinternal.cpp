@@ -3,7 +3,6 @@
 #include "rendererinternal.h"
 
 RendererInternal::RendererInternal(ObjectType type) : ObjectInternal(type), queue_(Geometry) {
-	states_ = Memory::CreateArray<RenderState*>(RenderStateCount);
 	std::fill(states_, states_ + RenderStateCount, nullptr);
 }
 
@@ -11,8 +10,6 @@ RendererInternal::~RendererInternal() {
 	for (int i = 0; i < RenderStateCount; ++i) {
 		Memory::Release(states_[i]);
 	}
-
-	Memory::ReleaseArray(states_);
 }
 
 void RendererInternal::Render(Surface surface) {
@@ -98,5 +95,9 @@ void RendererInternal::UnbindRenderStates() {
 }
 
 void SkinnedSurfaceRendererInternal::Render(Surface surface) {
+	for (int i = 0; i < GetMaterialCount(); ++i) {
+		GetMaterial(i)->SetMatrix4(Variables::bones, *skeleton_->GetBoneToRootSpaceMatrices());
+	}
+
 	RendererInternal::Render(surface);
 }

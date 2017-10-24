@@ -1,26 +1,27 @@
 #pragma once
 #include <gl/glew.h>
 #include <glm/glm.hpp>
+#include <glm/gtc/quaternion.hpp>
 
 #include "texture.h"
-#include "internal/containers/ptrmap.h"
 
-enum UniformType {
-	UniformNone,
-	UniformInt,
-	UniformBool,
-	UniformFloat,
-	UniformMatrix4,
-	UniformVector3,
-	UniformTexture,
+enum VariantType {
+	VariantNone,
+	VariantInt,
+	VariantBool,
+	VariantFloat,
+	VariantMatrix4,
+	VariantVector3,
+	VariantTexture,
+	VariantQuaternion,
 };
 
-class UniformVariable {
+class Variant {
 public:
-	UniformVariable():type_(UniformNone) {}
+	Variant() :type_(VariantNone) {}
 
 public:
-	static std::string UniformTypeToName(UniformType type);
+	static std::string TypeString(VariantType type);
 
 public:
 	int GetInt();
@@ -28,16 +29,18 @@ public:
 	float GetFloat();
 	glm::mat4 GetMatrix4();
 	glm::vec3 GetVector3();
+	glm::quat GetQuaternion();
 	Texture GetTexture();
 	int GetTextureIndex();
 
-	UniformType GetType() { return type_; }
+	VariantType GetType() { return type_; }
 
 	void SetInt(int value);
 	void SetBool(bool value);
 	void SetFloat(float value);
 	void SetMatrix4(const glm::mat4& value);
 	void SetVector3(const glm::vec3& value);
+	void SetQuaternion(const glm::quat& value);
 	void SetTexture(Texture value);
 	void SetTextureLocation(GLenum value);
 
@@ -49,18 +52,9 @@ private:
 		glm::mat4 mat4Value_;
 		glm::vec3 vector3Value_;
 		int textureIndex_;
+		glm::quat quaternionValue_;
 	};
 
 	Texture texture_;
-
-	UniformType type_;
+	VariantType type_;
 };
-
-struct Uniform {
-	GLenum type;
-	union { GLuint offset, location; };
-	GLuint size, stride;
-	UniformVariable value;
-};
-
-typedef PtrMap<Uniform> UniformContainer;

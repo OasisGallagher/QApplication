@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <glm/glm.hpp>
+#include <glm/gtc/quaternion.hpp>
 
 template<class CountofType, size_t sizeOfArray>
 inline char(*__countof_helper(CountofType(&_Array)[sizeOfArray]))[sizeOfArray] {
@@ -21,6 +22,9 @@ public:
 
 	static glm::vec3 Degrees(const glm::vec3& radians);
 	static glm::vec3 Radians(const glm::vec3& degrees);
+
+	static glm::vec3 Lerp(const glm::vec3& from, const glm::vec3& to, float t);
+	static glm::quat Lerp(const glm::quat& from, const glm::quat& to, float t);
 
 	static bool Approximately(float x, float y = 0.f);
 
@@ -55,6 +59,14 @@ inline glm::vec3 Mathf::Degrees(const glm::vec3 & radians) {
 
 inline glm::vec3 Mathf::Radians(const glm::vec3 & degrees) {
 	return glm::vec3(Radians(degrees.x), Radians(degrees.y), Radians(degrees.z));
+}
+
+inline glm::vec3 Mathf::Lerp(const glm::vec3& from, const glm::vec3& to, float t) {
+	return from + (to - from) * t;
+}
+
+inline glm::quat Mathf::Lerp(const glm::quat& from, const glm::quat& to, float t) {
+	return glm::lerp(from, to, t);
 }
 
 inline bool Mathf::Approximately(float x, float y) {
