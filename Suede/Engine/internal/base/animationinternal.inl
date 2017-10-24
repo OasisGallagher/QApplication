@@ -17,3 +17,32 @@ void AnimationKeysInternal::RemoveKey(std::vector<KeyType>& container, float tim
 		container.erase(ite);
 	}
 }
+
+template <class KeyType>
+void AnimationKeysInternal::SmoothKey(std::vector<KeyType>& container, float time) {
+	std::vector<KeyType>::iterator pos = std::lower_bound(container.begin(), container.end(), time, KeyComparer());
+	if (pos != container.end() && Mathf::Approximately(pos->time, time)) {
+		return;
+	}
+
+	KeyType key;
+	if (pos == container.end()) {
+		key.time = time;
+		key.value = container.back();
+	}
+	else {
+		KeyType key;
+		key.time = time;
+		if (pos == container.begin()) {
+			key.value = container.front();
+		}
+		else {
+			std::vector<KeyType>::iterator prev = pos;
+			--prev;
+
+			key.value = Mathf::Lerp(prev->value, pos->value, time - prev->time / (pos->time - prev->time));
+		}
+	}
+
+	container.insert(pos, key);
+}

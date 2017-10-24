@@ -121,33 +121,11 @@ void AnimationKeysInternal::ToKeyframes(std::vector<AnimationKeyframe>& keyframe
 		times.insert(positionKeys_[i].time);
 	}
 
-	for (std::set<float>::iterator ite = times.begin(); ite != times.end(); ++i) {
+	for (std::set<float>::iterator ite = times.begin(); ite != times.end(); ++ite) {
 		float time = *ite;
-		std::vector<ScaleKey> pos = std::lower_bound(scaleKeys_.begin(), scaleKeys_.end(), *ite, KeyComparer());
-		if (pos != scaleKeys_.end() && Mathf::Approximately(pos->time, time)) {
-			continue;
-		}
-
-		ScaleKey key;
-		if (pos == scaleKeys_.end()) {
-			key.time = time;
-			key.value = scaleKeys_.back();
-		}
-		else {
-			ScaleKey key;
-			key.time = time;
-			if (pos == scaleKeys_.begin()) {
-				key.value = scaleKeys_.front();
-			}
-			else {
-				std::vector<ScaleKey>::iterator prev = pos;
-				--prev;
-
-				key.value = Mathf::Lerp(prev->value, pos->value, time - prev->time / (pos->time - prev->time));
-			}
-		}
-
-		scaleKeys_.insert(pos, key);
+		SmoothKey(positionKeys_, time);
+		SmoothKey(rotationKeys_, time);
+		SmoothKey(scaleKeys_, time);
 	}
 }
 

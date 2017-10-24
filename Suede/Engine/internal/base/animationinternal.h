@@ -122,6 +122,9 @@ private:
 	template <class KeyType>
 	void RemoveKey(std::vector<KeyType>& container, float time);
 
+	template <class KeyType>
+	void SmoothKey(std::vector<KeyType>& container, float time);
+
 private:
 	std::vector<ScaleKey> scaleKeys_;
 	std::vector<RotationKey> rotationKeys_;
