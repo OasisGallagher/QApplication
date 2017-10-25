@@ -41,8 +41,10 @@ static glm::vec3& AIVector3ToGLM(glm::vec3& answer, const aiVector3D& vec) {
 
 bool ModelImporter::Import(const std::string& path, int mask) {
 	Assimp::Importer importer;
-	unsigned flags = aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_CalcTangentSpace;
-	std::string fpath = "resources/" + path;
+	unsigned flags = aiProcess_Triangulate | aiProcess_JoinIdenticalVertices 
+		| aiProcess_GenSmoothNormals | aiProcess_CalcTangentSpace | aiProcess_FlipUVs;
+
+	std::string fpath = Path::GetResourceRootDirectory() + path;
 	const aiScene* scene = importer.ReadFile(fpath.c_str(), flags);
 
 	AssertX(scene != nullptr, "failed to read file " + fpath + ": " + importer.GetErrorString());
@@ -76,7 +78,7 @@ void ModelImporter::Clear() {
 }
 
 bool ModelImporter::ImportSurface(Surface& surface) {
-	surface = Factory::Create<SurfaceInternal>();
+	surface = CREATE_OBJECT(Surface);
 
 	MaterialTextures* textures = Memory::CreateArray<MaterialTextures>(scene_->mNumMaterials);
 	ImportTextures(textures);
@@ -95,42 +97,48 @@ void ModelImporter::ImportTextures(MaterialTextures* textures) {
 	for (unsigned i = 0; i < scene_->mNumMaterials; ++i) {
 		const aiMaterial* mat = scene_->mMaterials[i];
 
-		aiString dpath;
-		std::string prefix = "textures/";
-		if (mat->GetTextureCount(aiTextureType_NORMALS) > 0) {
-			if (mat->GetTexture(aiTextureType_NORMALS, 0, &dpath) == AI_SUCCESS) {
-				Texture2D texture = Factory::Create<Texture2DInternal>();
-				if (texture->Load(prefix + dpath.data)) {
-					textures[i].bump = texture;
-				}
-			}
-		}
+		ImportTexture(mat, textures[i].bump, aiTextureType_NORMALS);
+		ImportTexture(mat, textures[i].albedo, aiTextureType_DIFFUSE);
+		ImportTexture(mat, textures[i].specular, aiTextureType_SPECULAR);
+	}
+}
 
-		if (mat->GetTextureCount(aiTextureType_DIFFUSE) > 0) {
-			if (mat->GetTexture(aiTextureType_DIFFUSE, 0, &dpath) == AI_SUCCESS) {
-				Texture2D texture = Factory::Create<Texture2DInternal>();
-				if (texture->Load(prefix + dpath.data)) {
-					textures[i].albedo = texture;
-				}
-			}
-		}
-
-		if (mat->GetTextureCount(aiTextureType_SPECULAR) > 0) {
-			if (mat->GetTexture(aiTextureType_SPECULAR, 0, &dpath) == AI_SUCCESS) {
-				Texture2D texture = Factory::Create<Texture2DInternal>();
-				if (texture->Load(prefix + dpath.data)) {
-					textures[i].specular = texture;
-				}
-			}
+void ModelImporter::ImportTexture(const aiMaterial* mat, Texture& dest, int textureType) {
+	aiString dpath;
+	std::string prefix = "textures/";
+	if (mat->GetTextureCount((aiTextureType)textureType) > 0 && mat->GetTexture((aiTextureType)textureType, 0, &dpath) == AI_SUCCESS) {
+		Texture2D texture = CREATE_OBJECT(Texture2D);
+		if (texture->Load(prefix + dpath.data)) {
+			dest = texture;
 		}
 	}
 }
 
 void ModelImporter::ImportSurfaceAttributes(Surface surface, SurfaceAttribute& attribute, MaterialTextures* textures) {
-	unsigned vertexCount = 0, indexCount = 0;
+	MeshSize size;
+	ImportMeshes(surface, textures, size);
+
+	attribute.positions.reserve(size.vertexCount);
+	attribute.normals.reserve(size.vertexCount);
+	attribute.texCoords.reserve(size.vertexCount);
+	attribute.tangents.reserve(size.vertexCount);
+	attribute.indexes.reserve(size.indexCount);
+	attribute.blendAttrs.resize(size.vertexCount);
+
+	for (int i = 0; i < size.vertexCount; ++i) {
+		memset(&attribute.blendAttrs[i], 0, sizeof(BlendAttribute));
+	}
 
 	for (unsigned i = 0; i < scene_->mNumMeshes; ++i) {
-		Mesh mesh = Factory::Create<MeshInternal>();
+		ImportMeshAttributes(scene_->mMeshes[i], i, attribute);
+		ImportBoneAttributes(scene_->mMeshes[i], i, surface, attribute);
+	}
+}
+
+void ModelImporter::ImportMeshes(Surface surface, MaterialTextures* textures, MeshSize& size) {
+	unsigned vertexCount = 0, indexCount = 0;
+	for (unsigned i = 0; i < scene_->mNumMeshes; ++i) {
+		Mesh mesh = CREATE_OBJECT(Mesh);
 		mesh->SetTriangles(scene_->mMeshes[i]->mNumFaces * 3, vertexCount, indexCount);
 
 		if (scene_->mMeshes[i]->mMaterialIndex < scene_->mNumMaterials) {
@@ -143,21 +151,8 @@ void ModelImporter::ImportSurfaceAttributes(Surface surface, SurfaceAttribute& a
 		surface->AddMesh(mesh);
 	}
 
-	attribute.positions.reserve(vertexCount);
-	attribute.normals.reserve(vertexCount);
-	attribute.texCoords.reserve(vertexCount);
-	attribute.tangents.reserve(vertexCount);
-	attribute.indexes.reserve(indexCount);
-	attribute.blendAttrs.resize(vertexCount);
-
-	for (int i = 0; i < vertexCount; ++i) {
-		memset(&attribute.blendAttrs[i], 0, sizeof(BlendAttribute));
-	}
-
-	for (unsigned i = 0; i < scene_->mNumMeshes; ++i) {
-		ImportMeshAttributes(scene_->mMeshes[i], i, attribute);
-		ImportBoneAttributes(scene_->mMeshes[i], i, surface, attribute);
-	}
+	size.vertexCount = vertexCount;
+	size.indexCount = indexCount;
 }
 
 void ModelImporter::ImportMeshAttributes(const aiMesh* aimesh, int nm, SurfaceAttribute& attribute) {
@@ -185,7 +180,7 @@ void ModelImporter::ImportMeshAttributes(const aiMesh* aimesh, int nm, SurfaceAt
 
 void ModelImporter::ImportBoneAttributes(const aiMesh* aimesh, int nm, Surface surface, SurfaceAttribute& attribute) {
 	for (int i = 0; i < aimesh->mNumBones; ++i) {
-		if (!skeleton_) { skeleton_ = Factory::Create<SkeletonInternal>(); }
+		if (!skeleton_) { skeleton_ = CREATE_OBJECT(Skeleton); }
 		std::string name(aimesh->mBones[i]->mName.data);
 
 		int index = skeleton_->GetBoneIndex(name);
@@ -218,7 +213,7 @@ bool ModelImporter::ImportAnimation(Animation& animation) {
 		return true;
 	}
 	
-	animation = Factory::Create<AnimationInternal>();
+	animation = CREATE_OBJECT(Animation);
 
 	glm::mat4 rootTransform;
 	animation->SetRootTransform(AIMaterixToGLM(rootTransform, scene_->mRootNode->mTransformation.Inverse()));
@@ -227,7 +222,7 @@ bool ModelImporter::ImportAnimation(Animation& animation) {
 		aiAnimation* anim = scene_->mAnimations[i];
 		std::string name = anim->mName.C_Str();
 
-		AnimationClip clip = Factory::Create<AnimationClipInternal>();
+		AnimationClip clip = CREATE_OBJECT(AnimationClip);
 		ImportAnimationClip(anim, clip);
 		animation->AddClip(name, clip);
 	}
@@ -238,8 +233,8 @@ bool ModelImporter::ImportAnimation(Animation& animation) {
 }
 
 void ModelImporter::ImportAnimationClip(const aiAnimation* anim, AnimationClip clip) {
+	clip->SetTicksPerSecond((float)anim->mTicksPerSecond);
 	clip->SetDuration((float)anim->mDuration);
-
 	ImportAnimationNode(anim, scene_->mRootNode, nullptr);
 }
 
@@ -247,7 +242,7 @@ void ModelImporter::ImportAnimationNode(const aiAnimation* anim, const aiNode* p
 	const aiNodeAnim* channel = FindChannel(anim, paiNode->mName.C_Str());
 
 	AnimationCurve curve;
-	AnimationKeys keys = Factory::Create<AnimationKeysInternal>();
+	AnimationKeys keys = CREATE_OBJECT(AnimationKeys);
 	if (channel != nullptr) {
 		for (int i = 0; i < channel->mNumPositionKeys; ++i) {
 			const aiVectorKey& key = channel->mPositionKeys[i];
@@ -270,7 +265,7 @@ void ModelImporter::ImportAnimationNode(const aiAnimation* anim, const aiNode* p
 		std::vector<AnimationKeyframe> keyframes;
 		keys->ToKeyframes(keyframes);
 
-		AnimationCurve curve = Factory::Create<AnimationCurveInternal>();
+		curve = CREATE_OBJECT(AnimationCurve);
 		curve->SetKeyframes(keyframes);
 	}
 
@@ -295,21 +290,21 @@ const aiNodeAnim* ModelImporter::FindChannel(const aiAnimation* anim, const char
 
 bool ModelImporter::InitRenderer(Animation animation, Renderer& renderer) {
 	if (!animation) {
-		renderer = Factory::Create<SurfaceRendererInternal>();
+		renderer = CREATE_OBJECT(SurfaceRenderer);
 	}
 	else {
 		SkinnedSurfaceRenderer skinnedSurfaceRenderer;
-		renderer = skinnedSurfaceRenderer = Factory::Create<SkinnedSurfaceRendererInternal>();
+		renderer = skinnedSurfaceRenderer = CREATE_OBJECT(SkinnedSurfaceRenderer);
 		skinnedSurfaceRenderer->SetSkeleton(skeleton_);
 	}
 
 	renderer->SetRenderState(Cull, Off);
 	renderer->SetRenderState(DepthTest, LessEqual);
 
-	Shader shader = Factory::Create<ShaderInternal>();
+	Shader shader = CREATE_OBJECT(Shader);
 	shader->Load("buildin/shaders/texture");
 
-	Material material = Factory::Create<MaterialInternal>();
+	Material material = CREATE_OBJECT(Material);
 	material->SetShader(shader);
 	renderer->AddMaterial(material);
 

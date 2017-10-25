@@ -6,9 +6,9 @@
 #include "animation.h"
 
 enum RenderQueue {
-	Background = 1000,
-	Geometry = 2000,
-	Transparent = 4000,
+	RenderQueueBackground = 1000,
+	RenderQueueGeometry = 2000,
+	RenderQueueTransparent = 4000,
 };
 
 enum RenderStateType {

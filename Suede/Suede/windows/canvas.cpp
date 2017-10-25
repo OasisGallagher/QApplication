@@ -129,15 +129,15 @@ void Canvas::createScene() {
 	
 	RenderTexture renderTexture = dsp_cast<RenderTexture>(world->Create(ObjectTypeRenderTexture));
 
-	renderTexture->Load(Rgba, width(), height());
+	renderTexture->Load(RenderTextureFormatRgba, width(), height());
 	//camera->SetRenderTexture(renderTexture);
 	//camera->SetClearColor(glm::vec3(0.0f, 0.0f, 0.4f));
 
 	Sprite sprite = dsp_cast<Sprite>(world->Create(ObjectTypeSprite));
 	//sprite->SetParent(camera);
 	//light->SetParent(camera);
-	sprite->SetPosition(glm::vec3(0, 0, -18));
-	sprite->SetEulerAngles(glm::vec3(-60, 180, 0));
+	sprite->SetPosition(glm::vec3(0, -35, -70));
+	sprite->SetEulerAngles(glm::vec3(-90, 0, 0));
 
 	/* Mesh.
 	Mesh mesh = dynamic_ptr_cast<Mesh>(world->Create("Mesh"));
@@ -156,7 +156,7 @@ void Canvas::createScene() {
 	
 	sprite->LoadModel("models/boblampclean.md5mesh");
 	
-	Surface surface = sprite->GetSurface();
+	//Surface surface = sprite->GetSurface();
 
 	//Texture2D albedo = dsp_cast<Texture2D>(world->Create(ObjectTypeTexture2D));
 	//albedo->Load("textures/room_uvmap.dds");

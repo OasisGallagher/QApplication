@@ -1,12 +1,13 @@
 #include "textloader.h"
 #include "shadercompiler.h"
+#include "tools/path.h"
 #include "tools/debug.h"
 #include "tools/string.h"
 #include "internal/base/glsldefines.h"
 
 bool ShaderCompiler::Compile(const std::string& path, const std::string& defines, std::string(&answer)[ShaderTypeCount]) {
 	std::vector<std::string> lines;
-	if (!TextLoader::Load("resources/" + path, lines)) {
+	if (!TextLoader::Load(Path::GetResourceRootDirectory() + path, lines)) {
 		return false;
 	}
 
@@ -142,7 +143,7 @@ bool ShaderCompiler::PreprocessShader(const std::string& parameter) {
 bool ShaderCompiler::PreprocessInclude(const std::string& parameter) {
 	std::vector<std::string> lines;
 	std::string path = parameter.substr(1, parameter.length() - 2);
-	if (!TextLoader::Load("resources/" + path, lines)) {
+	if (!TextLoader::Load(Path::GetResourceRootDirectory() + path, lines)) {
 		return false;
 	}
 

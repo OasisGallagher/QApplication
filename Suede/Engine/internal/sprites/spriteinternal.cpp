@@ -52,7 +52,7 @@ void SpriteInternal::SetParent(Sprite value) {
 	}
 
 	std::weak_ptr<Sprite::element_type> old = parent_;
-	// old parent.
+	// Save old parent.
 	Sprite sprite = old.lock();
 	if (sprite == value) { return; }
 
@@ -76,6 +76,9 @@ void SpriteInternal::SetParent(Sprite value) {
 }
 
 void SpriteInternal::Update() {
+	if (animation_) {
+		animation_->Update();
+	}
 }
 
 void SpriteInternal::SetScale(const glm::vec3& value) {

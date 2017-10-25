@@ -14,12 +14,12 @@ bool SkyboxInternal::Load(const std::string(&textures)[6]) {
 		return false;
 	}
 
-	TextureCube texture = Factory::Create<TextureCubeInternal>();
+	TextureCube texture = CREATE_OBJECT(TextureCube);
 	if (!texture->Load(textures)) {
 		return false;
 	}
 
-	Shader shader = Factory::Create<ShaderInternal>();
+	Shader shader = CREATE_OBJECT(Shader);
 	if (!shader->Load("buildin/shaders/skybox")) {
 		return false;
 	}
@@ -28,7 +28,7 @@ bool SkyboxInternal::Load(const std::string(&textures)[6]) {
 	materialTextures.albedo = texture;
 
 	Renderer renderer = GetRenderer();
-	renderer->SetRenderQueue(Background);
+	renderer->SetRenderQueue(RenderQueueBackground);
 	renderer->SetRenderState(Cull, Front);
 	renderer->SetRenderState(DepthTest, LessEqual);
 	renderer->GetMaterial(0)->SetShader(shader);

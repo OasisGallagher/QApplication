@@ -47,4 +47,4 @@ private:
 	FactoryMethod methodArray_[ObjectTypeCount];
 };
 
-#define FactoryCreate(type)	Factory::Create<type ## Internal>()
+#define CREATE_OBJECT(type)	Factory::Create<type ## Internal>()

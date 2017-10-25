@@ -5,6 +5,7 @@
 struct aiNode;
 struct aiMesh;
 struct aiScene;
+struct aiMaterial;
 struct aiNodeAnim;
 struct aiAnimation;
 
@@ -30,8 +31,17 @@ private:
 
 	bool ImportSurface(Surface& surface);
 	void ImportTextures(MaterialTextures* textures);
+	void ImportTexture(const aiMaterial* mat, Texture& dest, int textureType);
+
 	void ImportMeshAttributes(const aiMesh* aimesh, int nm, SurfaceAttribute& attribute);
 	void ImportSurfaceAttributes(Surface surface, SurfaceAttribute& attribute, MaterialTextures* textures);
+
+	struct MeshSize {
+		unsigned vertexCount = 0;
+		unsigned indexCount = 0;
+	};
+
+	void ImportMeshes(Surface surface, MaterialTextures* textures, MeshSize& size);
 	void ImportBoneAttributes(const aiMesh* aimesh, int nm, Surface surface, SurfaceAttribute& attribute);
 
 	bool ImportAnimation(Animation& animation);

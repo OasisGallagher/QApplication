@@ -26,15 +26,13 @@ void AnimationKeysInternal::SmoothKey(std::vector<KeyType>& container, float tim
 	}
 
 	KeyType key;
+	key.time = time;
 	if (pos == container.end()) {
-		key.time = time;
-		key.value = container.back();
+		key.value = container.back().value;
 	}
 	else {
-		KeyType key;
-		key.time = time;
 		if (pos == container.begin()) {
-			key.value = container.front();
+			key.value = container.front().value;
 		}
 		else {
 			std::vector<KeyType>::iterator prev = pos;

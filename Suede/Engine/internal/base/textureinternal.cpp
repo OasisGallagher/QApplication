@@ -1,5 +1,6 @@
 #include <glm/glm.hpp>
 
+#include "tools/path.h"
 #include "tools/debug.h"
 #include "textureinternal.h"
 #include "internal/file/imagecodec.h"
@@ -42,7 +43,7 @@ Texture2DInternal::~Texture2DInternal() {
 
 bool Texture2DInternal::Load(const std::string& path) {
 	int width, height;
-	const void* data = ImageCodec::Decode("resources/" + path, width, height);
+	const void* data = ImageCodec::Decode(Path::GetResourceRootDirectory() + path, width, height);
 	if (data == nullptr) {
 		return false;
 	}
@@ -103,7 +104,7 @@ bool TextureCubeInternal::Load(const std::string(&textures)[6]) {
 
 	for (int i = 0; i < 6; ++i) {
 		int width, height;
-		const void* data = ImageCodec::Decode("resources/" + textures[i], width, height);
+		const void* data = ImageCodec::Decode(Path::GetResourceRootDirectory() + textures[i], width, height);
 
 		if (data == nullptr) {
 			DestroyTexture();
@@ -145,7 +146,7 @@ bool RenderTextureInternal::Load(RenderTextureFormat format, int width, int heig
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-	if (format == Shadow) {
+	if (format == RenderTextureFormatShadow) {
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
 	}
@@ -161,14 +162,14 @@ void RenderTextureInternal::RenderTextureFormatToGLEnum(RenderTextureFormat rend
 	GLenum type = GL_UNSIGNED_BYTE;
 
 	switch (renderTextureFormat) {
-		case  Rgba:
+		case  RenderTextureFormatRgba:
 			internalFormat = GL_RGBA;
 			break;
-		case RgbaHdr:
+		case RenderTextureFormatRgbaHdr:
 			internalFormat = GL_RGBA32F;
 			break;
-		case Depth:
-		case Shadow:
+		case RenderTextureFormatDepth:
+		case RenderTextureFormatShadow:
 			internalFormat = GL_DEPTH_COMPONENT24;
 			format = GL_DEPTH_COMPONENT;
 			type = GL_FLOAT;

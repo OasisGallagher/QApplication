@@ -106,9 +106,9 @@ void CameraInternal::Render() {
 
 	RenderShadowPass(sprites, forwardBase);
 
-	//Renderer renderer = Factory::Create<SurfaceRendererInternal>();
-	//Material material = Factory::Create<MaterialInternal>();
-	//Shader shader = Factory::Create<ShaderInternal>();
+	//Renderer renderer = FactoryCreate(SurfaceRenderer);
+	//Material material = FactoryCreate(Material);
+	//Shader shader = FactoryCreate(Shader);
 	//shader->Load("buildin/shaders/blit");
 	//material->SetShader(shader);
 	//renderer->AddMaterial(material);
@@ -140,7 +140,7 @@ Texture2D CameraInternal::Capture() {
 	std::vector<unsigned char> data;
 	fb0_->ReadBuffer(data);
 
-	Texture2D tex = Factory::Create<Texture2DInternal>();
+	Texture2D tex = CREATE_OBJECT(Texture2D);
 	tex->Load(&data[0], fb0_->GetWidth(), fb0_->GetHeight());
 
 	return tex;
@@ -155,35 +155,35 @@ void CameraInternal::CreateFramebuffers() {
 
 	fbDepth_ = Memory::Create<Framebuffer>();
 	fbDepth_->Create(w, h);
-	RenderTexture depthTexture = Factory::Create<RenderTextureInternal>();
-	depthTexture->Load(Depth, w, h);
+	RenderTexture depthTexture = CREATE_OBJECT(RenderTexture);
+	depthTexture->Load(RenderTextureFormatDepth, w, h);
 	fbDepth_->SetDepthTexture(depthTexture);
 
 	fbShadow_ = Memory::Create<Framebuffer>();
 	fbShadow_->Create(w, h);
-	RenderTexture shadowTexture = Factory::Create<RenderTextureInternal>();
-	shadowTexture->Load(Shadow, w, h);
+	RenderTexture shadowTexture = CREATE_OBJECT(RenderTexture);
+	shadowTexture->Load(RenderTextureFormatShadow, w, h);
 	fbShadow_->SetDepthTexture(shadowTexture);
 
 	fbRenderTexture_ = Memory::Create<Framebuffer>();
 	fbRenderTexture_->Create(w, h);
-	renderTexture_ = Factory::Create<RenderTextureInternal>();
-	renderTexture_->Load(Rgba, w, h);
+	renderTexture_ = CREATE_OBJECT(RenderTexture);
+	renderTexture_->Load(RenderTextureFormatRgba, w, h);
 	fbRenderTexture_->SetRenderTexture(renderTexture_);
 	
 	fbRenderTexture2_ = Memory::Create<Framebuffer>();
 	fbRenderTexture2_->Create(w, h);
-	renderTexture2_ = Factory::Create<RenderTextureInternal>();
-	renderTexture2_->Load(Rgba, w, h);
+	renderTexture2_ = CREATE_OBJECT(RenderTexture);
+	renderTexture2_->Load(RenderTextureFormatRgba, w, h);
 	fbRenderTexture2_->SetRenderTexture(renderTexture2_);
 }
 
 void CameraInternal::CreateDepthRenderer() {
-	depthRenderer_ = Factory::Create<SurfaceRendererInternal>();
-	Shader shader = Factory::Create<ShaderInternal>();
+	depthRenderer_ = CREATE_OBJECT(SurfaceRenderer);
+	Shader shader = CREATE_OBJECT(Shader);
 	shader->Load("buildin/shaders/depth");
 
-	Material material = Factory::Create<MaterialInternal>();
+	Material material = CREATE_OBJECT(Material);
 	material->SetShader(shader);
 
 	depthRenderer_->AddMaterial(material);
@@ -193,11 +193,11 @@ void CameraInternal::CreateDepthRenderer() {
 }
 
 void CameraInternal::CreateShadowRenderer() {
-	directionalLightShadowRenderer_ = Factory::Create<SurfaceRendererInternal>();
-	Shader shader = Factory::Create<ShaderInternal>();
+	directionalLightShadowRenderer_ = CREATE_OBJECT(SurfaceRenderer);
+	Shader shader = CREATE_OBJECT(Shader);
 	shader->Load("buildin/shaders/directional_light_depth");
 
-	Material material = Factory::Create<MaterialInternal>();
+	Material material = CREATE_OBJECT(Material);
 	material->SetShader(shader);
 
 	directionalLightShadowRenderer_->AddMaterial(material);
@@ -284,7 +284,7 @@ void CameraInternal::RenderShadowPass(const std::vector<Sprite>& sprites, Light 
 
 	for (int i = 0; i < sprites.size(); ++i) {
 		Sprite sprite = sprites[i];
-		if (sprite->GetRenderer()->GetRenderQueue() < Geometry) {
+		if (sprite->GetRenderer()->GetRenderQueue() < RenderQueueGeometry) {
 			continue;
 		}
 
@@ -318,7 +318,7 @@ void CameraInternal::RenderDepthPass(const std::vector<Sprite>& sprites) {
 
 	for (int i = 0; i < sprites.size(); ++i) {
 		Sprite sprite = sprites[i];
-		if (sprite->GetRenderer()->GetRenderQueue() < Geometry) {
+		if (sprite->GetRenderer()->GetRenderQueue() < RenderQueueGeometry) {
 			continue;
 		}
 
@@ -387,7 +387,7 @@ bool CameraInternal::IsRenderable(Sprite sprite) {
 bool CameraInternal::GetRenderableSprites(std::vector<Sprite>& sprites) {
 	worldInstance->GetSprites(ObjectTypeSprite, sprites);
 
-	// sort sprites by render queue.
+	// Sort sprites by render queue.
 	int p = 0;
 	for (int i = 0; i < sprites.size(); ++i) {
 		Sprite key = sprites[i];

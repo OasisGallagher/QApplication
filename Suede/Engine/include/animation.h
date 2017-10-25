@@ -49,12 +49,28 @@ public:
 	virtual int GetBoneCount() = 0;
 };
 
+enum AnimationWrapMode {
+	AnimationWrapModeOnce,
+	AnimationWrapModeLoop,
+	AnimationWrapModePingPong,
+	AnimationWrapModeClampForever,
+};
+
 class ENGINE_EXPORT IAnimationClip : virtual public IObject {
 public:
+	virtual void SetWrapMode(AnimationWrapMode value) = 0;
+	virtual AnimationWrapMode GetWrapMode() = 0;
+
+	virtual void SetTicksPerSecond(float value) = 0;
+	virtual float GetTicksPerSecond() = 0;
+
+	// Duration of the animation in ticks.
 	virtual void SetDuration(float value) = 0;
 	virtual float GetDuration() = 0;
+
 	virtual void SetAnimation(Animation value) = 0;
 	virtual Animation GetAnimation() = 0;
+
 	virtual void Sample(float time) = 0;
 };
 
@@ -108,7 +124,11 @@ public:
 
 	virtual void SetSkeleton(Skeleton value) = 0;
 	virtual Skeleton GetSkeleton() = 0;
+	
 	virtual void SetRootTransform(const glm::mat4& value) = 0;
+	virtual glm::mat4 GetRootTransform() = 0;
 
 	virtual bool Play(const std::string& name) = 0;
+
+	virtual void Update() = 0;
 };

@@ -2,7 +2,7 @@
 #include "renderstate.h"
 #include "rendererinternal.h"
 
-RendererInternal::RendererInternal(ObjectType type) : ObjectInternal(type), queue_(Geometry) {
+RendererInternal::RendererInternal(ObjectType type) : ObjectInternal(type), queue_(RenderQueueGeometry) {
 	std::fill(states_, states_ + RenderStateCount, nullptr);
 }
 

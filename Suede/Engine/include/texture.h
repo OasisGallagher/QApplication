@@ -29,10 +29,10 @@ public:
 };
 
 enum RenderTextureFormat {
-	Rgba,
-	RgbaHdr,
-	Depth,
-	Shadow,
+	RenderTextureFormatRgba,
+	RenderTextureFormatRgbaHdr,
+	RenderTextureFormatDepth,
+	RenderTextureFormatShadow,
 };
 
 class ENGINE_EXPORT IRenderTexture : virtual public ITexture {

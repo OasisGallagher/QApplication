@@ -6,12 +6,12 @@
 #include "internal/base/objectinternal.h"
 
 enum VertexAttributeIndex {
-	IndexPosition,
-	IndexTexCoord,
-	IndexNormal,
-	IndexTangent,
-	IndexBoneIndexes,
-	IndexBoneWeights,
+	VertexAttributeIndexPosition,
+	VertexAttributeIndexTexCoord,
+	VertexAttributeIndexNormal,
+	VertexAttributeIndexTangent,
+	VertexAttributeIndexBoneIndexes,
+	VertexAttributeIndexBoneWeights,
 };
 
 class MaterialInternal : public IMaterial, public ObjectInternal {

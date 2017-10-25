@@ -5,8 +5,8 @@
 #include "sprite.h"
 
 enum LightImportance {
-	NotImportant,
-	Important,
+	LightImportanceNotImportant,
+	LightImportanceImportant,
 };
 
 class ILight : virtual public ISprite {

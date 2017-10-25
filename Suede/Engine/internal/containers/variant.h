@@ -6,19 +6,19 @@
 #include "texture.h"
 
 enum VariantType {
-	VariantNone,
-	VariantInt,
-	VariantBool,
-	VariantFloat,
-	VariantMatrix4,
-	VariantVector3,
-	VariantTexture,
-	VariantQuaternion,
+	VariantTypeNone,
+	VariantTypeInt,
+	VariantTypeBool,
+	VariantTypeFloat,
+	VariantTypeMatrix4,
+	VariantTypeVector3,
+	VariantTypeTexture,
+	VariantTypeQuaternion,
 };
 
 class Variant {
 public:
-	Variant() :type_(VariantNone) {}
+	Variant() :type_(VariantTypeNone) {}
 
 public:
 	static std::string TypeString(VariantType type);

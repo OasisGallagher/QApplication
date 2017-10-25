@@ -4,7 +4,7 @@
 #include "internal/sprites/spriteinternal.h"
 #include "internal/world/environmentinternal.h"
 
-World worldInstance(Factory::Create<WorldInternal>());
+World worldInstance(CREATE_OBJECT(World));
 
 bool WorldInternal::LightComparer::operator()(const Light & lhs, const Light & rhs) const {
 	// Directional light > Importance > Luminance.
@@ -28,7 +28,7 @@ bool WorldInternal::CameraComparer::operator() (const Camera& lhs, const Camera&
 WorldInternal::WorldInternal()
 	: ObjectInternal(ObjectTypeWorld)
 	, environment_(Memory::Create<EnvironmentInternal>())
-	, root_(Factory::Create<SpriteInternal>()) {
+	, root_(CREATE_OBJECT(Sprite)) {
 	root_->SetName("root");
 }
 

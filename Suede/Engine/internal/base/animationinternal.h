@@ -49,6 +49,12 @@ public:
 	AnimationClipInternal() : ObjectInternal(ObjectTypeAnimationClip) {}
 
 public:
+	virtual void SetWrapMode(AnimationWrapMode value) { wrapMode_ = value; }
+	virtual AnimationWrapMode GetWrapMode() { return wrapMode_; }
+
+	virtual void SetTicksPerSecond(float value);
+	virtual float GetTicksPerSecond() { return ticksInSecond_; }
+
 	virtual void SetDuration(float value) { duration_ = value; }
 	virtual float GetDuration() { return duration_; }
 
@@ -62,6 +68,8 @@ private:
 
 private:
 	float duration_;
+	float ticksInSecond_;
+	AnimationWrapMode wrapMode_;
 	std::weak_ptr<Animation::element_type> animation_;
 };
 
@@ -88,6 +96,9 @@ public:
 	virtual void RemoveScale(float time) { RemoveKey(scaleKeys_, time); }
 
 	virtual void ToKeyframes(std::vector<AnimationKeyframe>& keyframes);
+
+private:
+	void SmoothKeys();
 
 private:
 	struct Key {
@@ -126,6 +137,7 @@ private:
 	void SmoothKey(std::vector<KeyType>& container, float time);
 
 private:
+	// TODO: sorted list.
 	std::vector<ScaleKey> scaleKeys_;
 	std::vector<RotationKey> rotationKeys_;
 	std::vector<PositionKey> positionKeys_;
@@ -135,14 +147,18 @@ class AnimationInternal : public IAnimation, public ObjectInternal {
 	DEFINE_FACTORY_METHOD(Animation)
 
 public:
-	AnimationInternal() : ObjectInternal(ObjectTypeAnimation) {}
+	AnimationInternal() : ObjectInternal(ObjectTypeAnimation), time_(0) {}
 
 public:
 	virtual void AddClip(const std::string& name, AnimationClip value);
 	virtual AnimationClip GetClip(const std::string& name);
 
 	virtual void SetRootTransform(const glm::mat4& value) { rootTransform_ = value; }
+	virtual glm::mat4 GetRootTransform() { return rootTransform_; }
+
 	virtual bool Play(const std::string& name);
+
+	virtual void Update();
 
 	virtual void SetSkeleton(Skeleton value) { skeleton_ = value; }
 	virtual Skeleton GetSkeleton() { return skeleton_; }
@@ -161,6 +177,11 @@ public:
 private:
 	Skeleton skeleton_;
 	glm::mat4 rootTransform_;
+
+	float time_;
+	AnimationClip current_;
+
+	// TODO: sorted list.
 	std::vector<Key> clips_;
 };
 
@@ -192,6 +213,7 @@ private:
 	};
 
 	float time_;
+	// TODO: sorted list.
 	std::vector<Key> attributes_;
 };
 

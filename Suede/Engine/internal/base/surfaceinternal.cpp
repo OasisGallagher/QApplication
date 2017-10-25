@@ -51,40 +51,40 @@ void SurfaceInternal::UpdateGLBuffers(const SurfaceAttribute& attribute) {
 	if (!attribute.positions.empty()) {
 		glBindBuffer(GL_ARRAY_BUFFER, vbos_[VBOPositions]);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * attribute.positions.size(), &attribute.positions[0], GL_STATIC_DRAW);
-		glEnableVertexAttribArray(IndexPosition);
-		glVertexAttribPointer(IndexPosition, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+		glEnableVertexAttribArray(VertexAttributeIndexPosition);
+		glVertexAttribPointer(VertexAttributeIndexPosition, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 	}
 
 	if (!attribute.texCoords.empty()) {
 		glBindBuffer(GL_ARRAY_BUFFER, vbos_[VBOTexCoords]);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2) * attribute.texCoords.size(), &attribute.texCoords[0], GL_STATIC_DRAW);
-		glEnableVertexAttribArray(IndexTexCoord);
-		glVertexAttribPointer(IndexTexCoord, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
+		glEnableVertexAttribArray(VertexAttributeIndexTexCoord);
+		glVertexAttribPointer(VertexAttributeIndexTexCoord, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
 	}
 
 	if (!attribute.normals.empty()) {
 		glBindBuffer(GL_ARRAY_BUFFER, vbos_[VBONormals]);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * attribute.normals.size(), &attribute.normals[0], GL_STATIC_DRAW);
-		glEnableVertexAttribArray(IndexNormal);
-		glVertexAttribPointer(IndexNormal, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+		glEnableVertexAttribArray(VertexAttributeIndexNormal);
+		glVertexAttribPointer(VertexAttributeIndexNormal, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 	}
 
 	if (!attribute.tangents.empty()) {
 		glBindBuffer(GL_ARRAY_BUFFER, vbos_[VBOTangents]);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * attribute.tangents.size(), &attribute.tangents[0], GL_STATIC_DRAW);
-		glEnableVertexAttribArray(IndexTangent);
-		glVertexAttribPointer(IndexTangent, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+		glEnableVertexAttribArray(VertexAttributeIndexTangent);
+		glVertexAttribPointer(VertexAttributeIndexTangent, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 	}
 
 	if (!attribute.blendAttrs.empty()) {
 		glBindBuffer(GL_ARRAY_BUFFER, vbos_[VBOBones]);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(BlendAttribute)* attribute.blendAttrs.size(), &attribute.blendAttrs[0], GL_STATIC_DRAW);
 
-		glEnableVertexAttribArray(IndexBoneIndexes);
-		glVertexAttribIPointer(IndexBoneIndexes, 4, GL_INT, sizeof(BlendAttribute), nullptr);
+		glEnableVertexAttribArray(VertexAttributeIndexBoneIndexes);
+		glVertexAttribIPointer(VertexAttributeIndexBoneIndexes, 4, GL_INT, sizeof(BlendAttribute), nullptr);
 
-		glEnableVertexAttribArray(IndexBoneWeights);
-		glVertexAttribPointer(IndexBoneWeights, 4, GL_FLOAT, GL_FALSE, sizeof(BlendAttribute), (const GLvoid*)(sizeof(unsigned) * BlendAttribute::Quality));
+		glEnableVertexAttribArray(VertexAttributeIndexBoneWeights);
+		glVertexAttribPointer(VertexAttributeIndexBoneWeights, 4, GL_FLOAT, GL_FALSE, sizeof(BlendAttribute), (const GLvoid*)(sizeof(unsigned) * BlendAttribute::Quality));
 	}
 
 	if (!attribute.indexes.empty()) {

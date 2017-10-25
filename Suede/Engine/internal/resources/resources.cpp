@@ -16,7 +16,7 @@ Shader Resources::FindShader(const std::string& path) {
 		return ite->second;
 	}
 
-	Shader shader = Factory::Create<ShaderInternal>();
+	Shader shader = CREATE_OBJECT(Shader);
 	shaders.insert(std::make_pair(path, shader));
 	if (shader->Load(path + GLSL_POSTFIX)) {
 		return shader;

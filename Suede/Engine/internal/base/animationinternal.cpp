@@ -2,8 +2,12 @@
 #include <algorithm>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "timef.h"
 #include "tools/mathf.h"
 #include "animationinternal.h"
+
+#define DEFAULT_TICKS_PER_SECOND	25
+extern Time timeInstance;
 
 bool SkeletonInternal::AddBone(const SkeletonBone& bone) {
 	if (GetBone(bone.name) != nullptr) {
@@ -78,7 +82,18 @@ void SkeletonInternal::DestroyNodeHierarchy(SkeletonNode*& node) {
 	node = nullptr;
 }
 
+void AnimationClipInternal::SetTicksPerSecond(float value) {
+	if (Mathf::Approximately(value)) {
+		value = DEFAULT_TICKS_PER_SECOND;
+	}
+
+	ticksInSecond_ = value;
+}
+
 void AnimationClipInternal::Sample(float time) {
+	time *= GetTicksPerSecond();
+	time = fmod(time, GetDuration());
+
 	Skeleton skeleton = GetAnimation()->GetSkeleton();
 	SkeletonNode* root = skeleton->GetRootNode();
 	SampleHierarchy(time, root, glm::mat4(1));
@@ -99,6 +114,7 @@ void AnimationClipInternal::SampleHierarchy(float time, SkeletonNode* node, cons
 	Skeleton skeleton = GetAnimation()->GetSkeleton();
 	int index = skeleton->GetBoneIndex(node->name);
 	if (index >= 0) {
+		transform = GetAnimation()->GetRootTransform() * transform * skeleton->GetBone(index)->localToBoneSpaceMatrix;
 		skeleton->SetBoneToRootSpaceMatrix(index, transform);
 	}
 
@@ -108,6 +124,21 @@ void AnimationClipInternal::SampleHierarchy(float time, SkeletonNode* node, cons
 }
 
 void AnimationKeysInternal::ToKeyframes(std::vector<AnimationKeyframe>& keyframes) {
+	SmoothKeys();
+
+	Assert(positionKeys_.size() == rotationKeys_.size() && rotationKeys_.size() == scaleKeys_.size());
+	for (int i = 0; i < positionKeys_.size(); ++i) {
+		AnimationKeyframe keyframe = CREATE_OBJECT(AnimationKeyframe);
+		keyframe->SetTime(positionKeys_[i].time);
+		keyframe->SetVector3(KeyframeAttributePosition, positionKeys_[i].value);
+		keyframe->SetQuaternion(KeyframeAttributeRotation, rotationKeys_[i].value);
+		keyframe->SetVector3(KeyframeAttributeScale, scaleKeys_[i].value);
+
+		keyframes.push_back(keyframe);
+	}
+}
+
+void AnimationKeysInternal::SmoothKeys() {
 	std::set<float> times;
 	for (int i = 0; i < scaleKeys_.size(); ++i) {
 		times.insert(scaleKeys_[i].time);
@@ -138,6 +169,12 @@ void AnimationInternal::AddClip(const std::string& name, AnimationClip value) {
 		Key key{ name, value };
 		clips_.insert(ite, key);
 	}
+
+	value->SetAnimation(dsp_cast<Animation>(shared_from_this()));
+
+	if (!current_) {
+		current_ = value;
+	}
 }
 
 AnimationClip AnimationInternal::GetClip(const std::string& name) {
@@ -150,7 +187,23 @@ AnimationClip AnimationInternal::GetClip(const std::string& name) {
 }
 
 bool AnimationInternal::Play(const std::string& name) {
-	return false;
+	AnimationClip clip = GetClip(name);
+	if (!clip) {
+		Debug::LogWarning("can not find animation clip " + name);
+		return false;
+	}
+
+	time_ = 0;
+	current_ = clip;
+
+	return true;
+}
+
+void AnimationInternal::Update() {
+	if (current_) {
+		time_ += timeInstance->GetDeltaTime();
+		current_->Sample(time_);
+	}
 }
 
 void AnimationCurveInternal::Sample(float time, glm::vec3& position, glm::quat& rotation, glm::vec3& scale) {
@@ -183,25 +236,25 @@ int AnimationCurveInternal::FindInterpolateIndex(float time) {
 
 void AnimationKeyframeInternal::SetVector3(int id, const glm::vec3& value) {
 	std::vector<Key>::iterator ite = std::lower_bound(attributes_.begin(), attributes_.end(), id, KeyComparer());
-	if (ite->id == id) {
-		ite->value.SetVector3(value);
-	}
-	else {
+	if (ite == attributes_.end() || ite->id != id) {
 		Key key = { id };
 		key.value.SetVector3(value);
 		attributes_.insert(ite, key);
+	}
+	else {
+		ite->value.SetVector3(value);
 	}
 }
 
 void AnimationKeyframeInternal::SetQuaternion(int id, const glm::quat& value) {
 	std::vector<Key>::iterator ite = std::lower_bound(attributes_.begin(), attributes_.end(), id, KeyComparer());
-	if (ite->id == id) {
-		ite->value.SetQuaternion(value);
-	}
-	else {
+	if (ite == attributes_.end() || ite->id != id) {
 		Key key = { id };
 		key.value.SetQuaternion(value);
 		attributes_.insert(ite, key);
+	}
+	else {
+		ite->value.SetQuaternion(value);
 	}
 }
 
