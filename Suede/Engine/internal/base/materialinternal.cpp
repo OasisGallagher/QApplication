@@ -232,13 +232,13 @@ void MaterialInternal::AddAllUniforms() {
 
 	GLenum type;
 	GLuint location = 0;
-	GLint size, count, maxLength, length, stride;
+	GLint size, count, maxLength, length;
 
 	GLuint program = shader_->GetNativePointer();
 	glGetProgramiv(program, GL_ACTIVE_UNIFORMS, &count);
 	glGetProgramiv(program, GL_ACTIVE_UNIFORM_MAX_LENGTH, &maxLength);
 
-	char* name = new char[maxLength];
+	char* name = Memory::CreateArray<char>(maxLength);
 	for (int i = 0; i < count; ++i) {
 		glGetActiveUniform(program, i, maxLength, &length, &size, &type, name);
 
@@ -250,41 +250,45 @@ void MaterialInternal::AddAllUniforms() {
 			continue;
 		}
 
-		stride = -1;
+		// TODO: uniform array.
+		char* ptr = strrchr(name, '[');
+		if (ptr != nullptr) {
+			*ptr = 0;
+		}
 
-		// 当shader中有uniform array时, GL_INVALID_OPERATION.
-		//glGetActiveUniformsiv(program, 1, &location, GL_UNIFORM_ARRAY_STRIDE, &stride);
-
-		Uniform* uniform = uniforms_[name];
-		uniform->type = type;
-		uniform->location = location;
-		uniform->size = size;
-		uniform->stride = stride;
-		if (type == GL_INT) {
-			uniform->value.SetInt(0);
-		}
-		else if (type == GL_FLOAT) {
-			uniform->value.SetFloat(0);
-		}
-		else if (type == GL_FLOAT_MAT4) {
-			uniform->value.SetMatrix4(glm::mat4(1));
-		}
-		else if (type == GL_BOOL) {
-			uniform->value.SetBool(false);
-		}
-		else if (type == GL_FLOAT_VEC3) {
-			uniform->value.SetVector3(glm::vec3(0));
-		}
-		else if (IsSampler(type)) {
-			AssertX(textureUnitIndex_ < maxTextureUnits_, "too many textures.");
-			uniform->value.SetTextureLocation(textureUnitIndex_++);
-		}
-		else {
-			Debug::LogError(String::Format("undefined uniform type 0x%x.", type));
-		}
+		AddUniform(name, type, location, size);
 	}
 
-	delete[] name;
+	Memory::ReleaseArray(name);
+}
+
+void MaterialInternal::AddUniform(const char* name, GLenum type, GLuint location, GLint size) {
+	Uniform* uniform = uniforms_[name];
+	uniform->type = type;
+	uniform->location = location;
+	uniform->size = size;
+	if (type == GL_INT) {
+		uniform->value.SetInt(0);
+	}
+	else if (type == GL_FLOAT) {
+		uniform->value.SetFloat(0);
+	}
+	else if (type == GL_FLOAT_MAT4) {
+		uniform->value.SetMatrix4(glm::mat4(1));
+	}
+	else if (type == GL_BOOL) {
+		uniform->value.SetBool(false);
+	}
+	else if (type == GL_FLOAT_VEC3) {
+		uniform->value.SetVector3(glm::vec3(0));
+	}
+	else if (IsSampler(type)) {
+		AssertX(textureUnitIndex_ < maxTextureUnits_, "too many textures.");
+		uniform->value.SetTextureLocation(textureUnitIndex_++);
+	}
+	else {
+		Debug::LogError(String::Format("undefined uniform type 0x%x.", type));
+	}
 }
 
 GLuint MaterialInternal::GetUniformSize(GLint uniformType, GLint uniformSize,
@@ -329,6 +333,10 @@ GLuint MaterialInternal::GetUniformSize(GLint uniformType, GLint uniformSize,
 }
 
 GLuint MaterialInternal::GetSizeOfType(GLint type) {
+	if (IsSampler(type)) {
+		return sizeof(int);
+	}
+
 	switch (type) {
 		case GL_FLOAT:
 			return sizeof(float);
@@ -355,45 +363,9 @@ GLuint MaterialInternal::GetSizeOfType(GLint type) {
 		case GL_DOUBLE_VEC4:
 			return sizeof(double) * 4;
 
-			// Samplers, Ints and Bools
-		case GL_SAMPLER_1D:
-		case GL_SAMPLER_2D:
-		case GL_SAMPLER_3D:
-		case GL_SAMPLER_CUBE:
-		case GL_SAMPLER_1D_SHADOW:
-		case GL_SAMPLER_2D_SHADOW:
-		case GL_SAMPLER_1D_ARRAY:
-		case GL_SAMPLER_2D_ARRAY:
-		case GL_SAMPLER_1D_ARRAY_SHADOW:
-		case GL_SAMPLER_2D_ARRAY_SHADOW:
-		case GL_SAMPLER_2D_MULTISAMPLE:
-		case GL_SAMPLER_2D_MULTISAMPLE_ARRAY:
-		case GL_SAMPLER_CUBE_SHADOW:
-		case GL_SAMPLER_BUFFER:
-		case GL_SAMPLER_2D_RECT:
-		case GL_SAMPLER_2D_RECT_SHADOW:
-		case GL_INT_SAMPLER_1D:
-		case GL_INT_SAMPLER_2D:
-		case GL_INT_SAMPLER_3D:
-		case GL_INT_SAMPLER_CUBE:
-		case GL_INT_SAMPLER_1D_ARRAY:
-		case GL_INT_SAMPLER_2D_ARRAY:
-		case GL_INT_SAMPLER_2D_MULTISAMPLE:
-		case GL_INT_SAMPLER_2D_MULTISAMPLE_ARRAY:
-		case GL_INT_SAMPLER_BUFFER:
-		case GL_INT_SAMPLER_2D_RECT:
-		case GL_UNSIGNED_INT_SAMPLER_1D:
-		case GL_UNSIGNED_INT_SAMPLER_2D:
-		case GL_UNSIGNED_INT_SAMPLER_3D:
-		case GL_UNSIGNED_INT_SAMPLER_CUBE:
-		case GL_UNSIGNED_INT_SAMPLER_1D_ARRAY:
-		case GL_UNSIGNED_INT_SAMPLER_2D_ARRAY:
-		case GL_UNSIGNED_INT_SAMPLER_2D_MULTISAMPLE:
-		case GL_UNSIGNED_INT_SAMPLER_2D_MULTISAMPLE_ARRAY:
-		case GL_UNSIGNED_INT_SAMPLER_BUFFER:
-		case GL_UNSIGNED_INT_SAMPLER_2D_RECT:
-		case GL_BOOL:
+			// ints and bools.
 		case GL_INT:
+		case GL_BOOL:
 			return sizeof(int);
 
 		case GL_BOOL_VEC2:

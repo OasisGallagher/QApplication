@@ -96,7 +96,7 @@ void RendererInternal::UnbindRenderStates() {
 
 void SkinnedSurfaceRendererInternal::Render(Surface surface) {
 	for (int i = 0; i < GetMaterialCount(); ++i) {
-		GetMaterial(i)->SetMatrix4(Variables::bones, *skeleton_->GetBoneToRootSpaceMatrices());
+		GetMaterial(i)->SetMatrix4(Variables::boneToRootSpaceMatrices, *skeleton_->GetBoneToRootSpaceMatrices());
 	}
 
 	RendererInternal::Render(surface);

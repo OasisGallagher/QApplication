@@ -26,6 +26,8 @@ public:
 private:
 	Debug();
 
+	static void BreakMessage(const std::string& message);
+
 private:
 	static int length_;
 	static std::stack<std::string> samples_;

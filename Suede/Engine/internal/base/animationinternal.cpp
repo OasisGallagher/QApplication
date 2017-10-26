@@ -14,7 +14,7 @@ bool SkeletonInternal::AddBone(const SkeletonBone& bone) {
 		return false;
 	}
 
-	Assert(current_ < GLSL_MAX_BONE_COUNT);
+	Assert(current_ < C_MAX_BONE_COUNT);
 	bones_[current_] = bone;
 
 	boneMap_.insert(std::make_pair(bone.name, current_));
@@ -114,8 +114,10 @@ void AnimationClipInternal::SampleHierarchy(float time, SkeletonNode* node, cons
 	Skeleton skeleton = GetAnimation()->GetSkeleton();
 	int index = skeleton->GetBoneIndex(node->name);
 	if (index >= 0) {
-		transform = GetAnimation()->GetRootTransform() * transform * skeleton->GetBone(index)->localToBoneSpaceMatrix;
-		skeleton->SetBoneToRootSpaceMatrix(index, transform);
+		glm::mat4 boneToRootSpaceMatrix = GetAnimation()->GetRootTransform();
+		boneToRootSpaceMatrix *= transform * skeleton->GetBone(index)->localToBoneSpaceMatrix;
+
+		skeleton->SetBoneToRootSpaceMatrix(index, boneToRootSpaceMatrix);
 	}
 
 	for (int i = 0; i < node->children.size(); ++i) {

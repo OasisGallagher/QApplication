@@ -75,8 +75,8 @@ void CameraController::moveCamera(const QPoint& mousePos) {
 	glm::vec3 up = camera_->GetUp();
 	glm::vec3 right = camera_->GetRight();
 
-	up *= 0.005f * (float)delta.y();
-	right *= 0.005f * (float)delta.x();
+	up *= 0.05f * (float)delta.y();
+	right *= 0.05f * (float)delta.x();
 
 	camera_->SetPosition(camera_->GetPosition() + up + right);
 }

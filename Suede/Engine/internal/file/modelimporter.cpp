@@ -289,6 +289,7 @@ const aiNodeAnim* ModelImporter::FindChannel(const aiAnimation* anim, const char
 }
 
 bool ModelImporter::InitRenderer(Animation animation, Renderer& renderer) {
+	std::string shaderName = "lit_texture";
 	if (!animation) {
 		renderer = CREATE_OBJECT(SurfaceRenderer);
 	}
@@ -296,13 +297,14 @@ bool ModelImporter::InitRenderer(Animation animation, Renderer& renderer) {
 		SkinnedSurfaceRenderer skinnedSurfaceRenderer;
 		renderer = skinnedSurfaceRenderer = CREATE_OBJECT(SkinnedSurfaceRenderer);
 		skinnedSurfaceRenderer->SetSkeleton(skeleton_);
+		shaderName = "lit_animated_texture";
 	}
 
 	renderer->SetRenderState(Cull, Off);
 	renderer->SetRenderState(DepthTest, LessEqual);
 
 	Shader shader = CREATE_OBJECT(Shader);
-	shader->Load("buildin/shaders/texture");
+	shader->Load("buildin/shaders/" + shaderName);
 
 	Material material = CREATE_OBJECT(Material);
 	material->SetShader(shader);

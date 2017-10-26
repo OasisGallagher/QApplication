@@ -47,7 +47,7 @@ private:
 	struct Uniform {
 		GLenum type;
 		union { GLuint offset, location; };
-		GLuint size, stride;
+		GLuint size;
 		Variant value;
 	};
 
@@ -61,7 +61,8 @@ private:
 	void UpdateFragmentAttributes();
 	
 	void AddAllUniforms();
-	
+	void AddUniform(const char* name, GLenum type, GLuint location, GLint size);
+
 	void BindTextures();
 	void UnbindTextures();
 	

@@ -45,7 +45,7 @@ public:
 	void SetTextureLocation(GLenum value);
 
 private:
-	union {
+	union { // pod only.
 		int intValue_;
 		bool boolValue_;
 		float floatValue_;
@@ -55,6 +55,8 @@ private:
 		glm::quat quaternionValue_;
 	};
 
+	// none-pod data.
 	Texture texture_;
+
 	VariantType type_;
 };

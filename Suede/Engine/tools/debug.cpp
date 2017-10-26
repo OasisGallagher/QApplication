@@ -42,14 +42,25 @@ void Debug::Break(const std::string& expression, const char* file, int line) {
 	std::ostringstream oss;
 	oss << expression << "\n";
 	oss << "at " << file << ":" << line;
-	if (callback_ != nullptr) { callback_->OnEngineLogMessage(LogLevelFatal, oss.str().c_str()); }
+
+	BreakMessage(oss.str());
 }
 
 void Debug::Break(const std::string& expression, const std::string& message, const char* file, int line) {
 	std::ostringstream oss;
 	oss << /*expression + ":\n" + */message << "\n";
 	oss << "at " << file << ":" << line;
-	if (callback_ != nullptr) { callback_->OnEngineLogMessage(LogLevelFatal, oss.str().c_str()); }
+
+	BreakMessage(oss.str());
+}
+
+void Debug::BreakMessage(const std::string& message) {
+	// TODO: platform.
+#if defined(_WIN32) || defined(_WIN64)
+	__debugbreak();
+#else
+	if (callback_ != nullptr) { callback_->OnEngineLogMessage(LogLevelFatal, message.c_str()); }
+#endif
 }
 
 void Debug::EnableMemoryLeakCheck() {

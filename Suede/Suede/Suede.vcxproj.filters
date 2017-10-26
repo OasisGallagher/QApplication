@@ -144,9 +144,6 @@
     <None Include="resources\buildin\shaders\skybox.glsl">
       <Filter>resources\buildin\shaders</Filter>
     </None>
-    <None Include="resources\buildin\shaders\texture.glsl">
-      <Filter>resources\buildin\shaders</Filter>
-    </None>
     <None Include="resources\buildin\shaders\blit.glsl">
       <Filter>resources\buildin\shaders</Filter>
     </None>
@@ -164,6 +161,15 @@
     </None>
     <None Include="resources\shaders\include\post_effect_vertex.inc">
       <Filter>resources\shaders\include</Filter>
+    </None>
+    <None Include="resources\buildin\shaders\lit_animated_texture.glsl">
+      <Filter>resources\buildin\shaders</Filter>
+    </None>
+    <None Include="resources\buildin\shaders\lit_bumped_texture.glsl">
+      <Filter>resources\buildin\shaders</Filter>
+    </None>
+    <None Include="resources\buildin\shaders\lit_texture.glsl">
+      <Filter>resources\buildin\shaders</Filter>
     </None>
   </ItemGroup>
 </Project>

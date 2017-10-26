@@ -2,6 +2,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 
+#include "variables.h"
 #include "animation.h"
 #include "glsldefines.h"
 #include "internal/containers/variant.h"
@@ -34,8 +35,8 @@ private:
 
 private:
 	int current_;
-	SkeletonBone bones_[GLSL_MAX_BONE_COUNT];
-	glm::mat4 boneToRootSpaceMatrices_[GLSL_MAX_BONE_COUNT];
+	SkeletonBone bones_[C_MAX_BONE_COUNT];
+	glm::mat4 boneToRootSpaceMatrices_[C_MAX_BONE_COUNT];
 
 	SkeletonNode* root_;
 

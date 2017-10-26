@@ -1,6 +1,8 @@
 #pragma once
-#define VARIABLE_PREFIX			"c_"
-#define DEFINE_VARIABLE(name)	static const char* name = VARIABLE_PREFIX #name
+#define VARIABLE_PREFIX					"c_"
+#define DEFINE_VARIABLE(name)			static const char* name = VARIABLE_PREFIX #name
+
+#define C_MAX_BONE_COUNT				128
 
 namespace Variables {
 	DEFINE_VARIABLE(position);
@@ -10,7 +12,7 @@ namespace Variables {
 	DEFINE_VARIABLE(boneIndexes);
 	DEFINE_VARIABLE(boneWeights);
 
-	DEFINE_VARIABLE(bones);
+	DEFINE_VARIABLE(boneToRootSpaceMatrices);
 
 	DEFINE_VARIABLE(fragColor);
 	DEFINE_VARIABLE(depth);

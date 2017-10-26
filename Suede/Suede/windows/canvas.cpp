@@ -111,6 +111,8 @@ void Canvas::createScene() {
 	//glm::quat q(glm::lookAt(glm::vec3(0, 1, 5), glm::vec3(0), glm::vec3(0, 1, 0)));
 	//camera->SetRotation(q);
 
+	camera->SetPosition(glm::vec3(0, 25, 0));
+
 	camera->SetClearType(ClearTypeSkybox);
 	//camera->SetClearColor(glm::vec3(0, 0, 0.4f));
 
@@ -136,8 +138,8 @@ void Canvas::createScene() {
 	Sprite sprite = dsp_cast<Sprite>(world->Create(ObjectTypeSprite));
 	//sprite->SetParent(camera);
 	//light->SetParent(camera);
-	sprite->SetPosition(glm::vec3(0, -35, -70));
-	sprite->SetEulerAngles(glm::vec3(-90, 0, 0));
+	sprite->SetPosition(glm::vec3(0, 0, -70));
+	sprite->SetEulerAngles(glm::vec3(270, 180, 180));
 
 	/* Mesh.
 	Mesh mesh = dynamic_ptr_cast<Mesh>(world->Create("Mesh"));
@@ -154,7 +156,7 @@ void Canvas::createScene() {
 	surface->AddMesh(mesh);
 	*/
 	
-	sprite->LoadModel("models/boblampclean.md5mesh");
+	sprite->LoadModel("models/teddy_bear.fbx");// boblampclean.md5mesh");
 	
 	//Surface surface = sprite->GetSurface();
 
@@ -173,6 +175,6 @@ void Canvas::createScene() {
 	renderer->SetRenderState(DepthTest, LessEqual);
 
 	Shader shader = dsp_cast<Shader>(world->Create(ObjectTypeShader));
-	shader->Load("buildin/shaders/texture");
+	shader->Load("buildin/shaders/lit_texture");
 	renderer->GetMaterial(0)->SetShader(shader);*/
 }

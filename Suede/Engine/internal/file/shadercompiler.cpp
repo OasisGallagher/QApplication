@@ -1,3 +1,4 @@
+#include "variables.h"
 #include "textloader.h"
 #include "shadercompiler.h"
 #include "tools/path.h"
@@ -27,7 +28,7 @@ void ShaderCompiler::Clear() {
 
 bool ShaderCompiler::CompileShaderSource(const std::vector<std::string>& lines, const std::string& defines) {
 	globals_ = "#version " GLSL_VERSION "\n";
-	globals_ += "#define GLSL_MAX_BONE_COUNT " + std::to_string(GLSL_MAX_BONE_COUNT) + "\n";
+	globals_ += "#define C_MAX_BONE_COUNT " + std::to_string(C_MAX_BONE_COUNT) + "\n";
 	globals_ += FormatDefines(defines);
 	ReadShaderSource(lines);
 
