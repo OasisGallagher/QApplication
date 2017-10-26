@@ -156,7 +156,7 @@ void Canvas::createScene() {
 	surface->AddMesh(mesh);
 	*/
 	
-	sprite->LoadModel("models/teddy_bear.fbx");// boblampclean.md5mesh");
+	sprite->LoadModel("models/boblampclean.md5mesh");
 	
 	//Surface surface = sprite->GetSurface();
 

@@ -1,5 +1,7 @@
 #include "timef.h"
 
+extern Time timeInstance;
+
 class TimeInternal : public ITime {
 public:
 	TimeInternal();

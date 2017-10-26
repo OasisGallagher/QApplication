@@ -2,12 +2,11 @@
 #include <algorithm>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "timef.h"
 #include "tools/mathf.h"
 #include "animationinternal.h"
+#include "internal/misc/timefinternal.h"
 
 #define DEFAULT_TICKS_PER_SECOND	25
-extern Time timeInstance;
 
 bool SkeletonInternal::AddBone(const SkeletonBone& bone) {
 	if (GetBone(bone.name) != nullptr) {
@@ -92,7 +91,7 @@ void AnimationClipInternal::SetTicksPerSecond(float value) {
 
 void AnimationClipInternal::Sample(float time) {
 	time *= GetTicksPerSecond();
-	time = fmod(time, GetDuration());
+	time = Mathf::Repeat(time, GetDuration());
 
 	Skeleton skeleton = GetAnimation()->GetSkeleton();
 	SkeletonNode* root = skeleton->GetRootNode();
@@ -129,6 +128,8 @@ void AnimationKeysInternal::ToKeyframes(std::vector<AnimationKeyframe>& keyframe
 	SmoothKeys();
 
 	Assert(positionKeys_.size() == rotationKeys_.size() && rotationKeys_.size() == scaleKeys_.size());
+	keyframes.reserve(positionKeys_.size());
+
 	for (int i = 0; i < positionKeys_.size(); ++i) {
 		AnimationKeyframe keyframe = CREATE_OBJECT(AnimationKeyframe);
 		keyframe->SetTime(positionKeys_[i].time);

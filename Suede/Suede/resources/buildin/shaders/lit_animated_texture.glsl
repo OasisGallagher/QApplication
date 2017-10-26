@@ -48,4 +48,3 @@ void main() {
 	float visibility = 1; //calculateShadowVisibility();
 	c_fragColor = albedo * vec4(calculateDirectionalLight(worldPos, normalize(normal), visibility), 1);
 }
-

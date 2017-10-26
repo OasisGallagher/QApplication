@@ -26,6 +26,12 @@ public:
 	static glm::vec3 Lerp(const glm::vec3& from, const glm::vec3& to, float t);
 	static glm::quat Lerp(const glm::quat& from, const glm::quat& to, float t);
 
+	static float Repeat(float t, float length);
+	static float PingPong(float t, float length);
+
+	template <class Ty>
+	static Ty Clamp(Ty value, Ty min, Ty max);
+
 	static bool Approximately(float x, float y = 0.f);
 
 	static float Luminance(const glm::vec3& color);
@@ -67,6 +73,24 @@ inline glm::vec3 Mathf::Lerp(const glm::vec3& from, const glm::vec3& to, float t
 
 inline glm::quat Mathf::Lerp(const glm::quat& from, const glm::quat& to, float t) {
 	return glm::lerp(from, to, t);
+}
+
+inline float Mathf::Repeat(float t, float length) {
+	return fmod(t, length);
+}
+
+inline float Mathf::PingPong(float t, float length) {
+	float L = 2 * length;
+	float T = fmod(t, L);
+	if (T >= 0 && T < length) { return T; }
+	return L - T;
+}
+
+template <class Ty>
+inline Ty Mathf::Clamp(Ty value, Ty min, Ty max) {
+	if (value < min) { value = min; }
+	if (value > max) { value = max; }
+	return value;
 }
 
 inline bool Mathf::Approximately(float x, float y) {
