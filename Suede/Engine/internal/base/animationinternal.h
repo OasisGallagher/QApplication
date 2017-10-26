@@ -47,10 +47,10 @@ class AnimationClipInternal : public IAnimationClip, public ObjectInternal {
 	DEFINE_FACTORY_METHOD(AnimationClip)
 
 public:
-	AnimationClipInternal() : ObjectInternal(ObjectTypeAnimationClip) {}
+	AnimationClipInternal();
 
 public:
-	virtual void SetWrapMode(AnimationWrapMode value) { wrapMode_ = value; }
+	virtual void SetWrapMode(AnimationWrapMode value);
 	virtual AnimationWrapMode GetWrapMode() { return wrapMode_; }
 
 	virtual void SetTicksPerSecond(float value);
@@ -62,14 +62,15 @@ public:
 	virtual void SetAnimation(Animation value) { animation_ = value; }
 	virtual Animation GetAnimation() { return animation_.lock(); }
 
-	virtual void Sample(float time);
+	virtual bool Sample(float time);
 
 private:
-	void SampleHierarchy(float time, SkeletonNode* node, const glm::mat4& matrix);
+	bool SampleHierarchy(float time, SkeletonNode* node, const glm::mat4& matrix);
 
 private:
 	float duration_;
 	float ticksInSecond_;
+	float(*fnWrap_)(float, float);
 	AnimationWrapMode wrapMode_;
 	std::weak_ptr<Animation::element_type> animation_;
 };
@@ -148,7 +149,7 @@ class AnimationInternal : public IAnimation, public ObjectInternal {
 	DEFINE_FACTORY_METHOD(Animation)
 
 public:
-	AnimationInternal() : ObjectInternal(ObjectTypeAnimation), time_(0) {}
+	AnimationInternal() : ObjectInternal(ObjectTypeAnimation), time_(0), playing_(false) {}
 
 public:
 	virtual void AddClip(const std::string& name, AnimationClip value);
@@ -156,6 +157,8 @@ public:
 
 	virtual void SetRootTransform(const glm::mat4& value) { rootTransform_ = value; }
 	virtual glm::mat4 GetRootTransform() { return rootTransform_; }
+
+	virtual void SetWrapMode(AnimationWrapMode value);
 
 	virtual bool Play(const std::string& name);
 
@@ -180,6 +183,8 @@ private:
 	glm::mat4 rootTransform_;
 
 	float time_;
+
+	bool playing_;
 	AnimationClip current_;
 
 	// TODO: sorted list.
@@ -226,10 +231,12 @@ public:
 
 public:
 	virtual void SetKeyframes(const std::vector<AnimationKeyframe>& value) { keyframes_ = value; }
-	virtual void Sample(float time, glm::vec3& position, glm::quat& rotation, glm::vec3& scale);
+	virtual bool Sample(float time, glm::vec3& position, glm::quat& rotation, glm::vec3& scale);
 
 private:
 	int FindInterpolateIndex(float time);
+	void SampleLastFrame(glm::vec3& position, glm::quat& rotation, glm::vec3& scale);
+	void Interpolate(int index, float time, glm::vec3& position, glm::quat& rotation, glm::vec3& scale);
 
 private:
 	std::vector<AnimationKeyframe> keyframes_;

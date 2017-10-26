@@ -55,7 +55,7 @@ private:
 		glm::quat quaternionValue_;
 	};
 
-	// none-pod data.
+	// non-pod data.
 	Texture texture_;
 
 	VariantType type_;

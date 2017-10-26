@@ -30,6 +30,12 @@ public:
 	static float PingPong(float t, float length);
 
 	template <class Ty>
+	static Ty Min(Ty x, Ty y);
+
+	template <class Ty>
+	static Ty Max(Ty x, Ty y);
+
+	template <class Ty>
 	static Ty Clamp(Ty value, Ty min, Ty max);
 
 	static bool Approximately(float x, float y = 0.f);
@@ -75,9 +81,7 @@ inline glm::quat Mathf::Lerp(const glm::quat& from, const glm::quat& to, float t
 	return glm::lerp(from, to, t);
 }
 
-inline float Mathf::Repeat(float t, float length) {
-	return fmod(t, length);
-}
+inline float Mathf::Repeat(float t, float length) { return fmod(t, length); }
 
 inline float Mathf::PingPong(float t, float length) {
 	float L = 2 * length;
@@ -85,6 +89,12 @@ inline float Mathf::PingPong(float t, float length) {
 	if (T >= 0 && T < length) { return T; }
 	return L - T;
 }
+
+template <class Ty>
+inline Ty Mathf::Min(Ty x, Ty y) { return x > y ? y : x; }
+
+template <class Ty>
+inline Ty Mathf::Max(Ty x, Ty y) { return x > y ? x : y; }
 
 template <class Ty>
 inline Ty Mathf::Clamp(Ty value, Ty min, Ty max) {

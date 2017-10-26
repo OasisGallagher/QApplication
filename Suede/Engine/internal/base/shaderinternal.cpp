@@ -36,6 +36,7 @@ bool ShaderInternal::Load(const std::string& path) {
 		}
 	}
 
+	shaderPath_ = path;
 	ClearIntermediateShaders();
 
 	return true;
@@ -65,14 +66,14 @@ bool ShaderInternal::Link() {
 	glGetProgramiv(program_, GL_LINK_STATUS, &status);
 
 	if (status != GL_TRUE) {
-		Debug::LogError("failed to link shader.");
+		Debug::LogError("failed to link shader " + shaderPath_);
 		return false;
 	}
 
 	glValidateProgram(program_);
 	glGetProgramiv(program_, GL_VALIDATE_STATUS, &status);
 	if (status != GL_TRUE) {
-		Debug::LogError("failed to validate shader.");
+		Debug::LogError("failed to validate shader " + shaderPath_);
 		return false;
 	}
 

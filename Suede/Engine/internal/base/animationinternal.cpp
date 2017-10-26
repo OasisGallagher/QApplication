@@ -81,6 +81,24 @@ void SkeletonInternal::DestroyNodeHierarchy(SkeletonNode*& node) {
 	node = nullptr;
 }
 
+AnimationClipInternal::AnimationClipInternal() : ObjectInternal(ObjectTypeAnimationClip), fnWrap_(Mathf::Min) {
+}
+
+void AnimationClipInternal::SetWrapMode(AnimationWrapMode value) {
+	switch (wrapMode_ = value) {
+	case AnimationWrapModeLoop:
+		fnWrap_ = Mathf::Repeat;
+		break;
+	case AnimationWrapModePingPong:
+		fnWrap_ = Mathf::PingPong;
+		break;
+	case AnimationWrapModeOnce:
+	case AnimationWrapModeClampForever:
+		fnWrap_ = Mathf::Min;
+		break;
+	}
+}
+
 void AnimationClipInternal::SetTicksPerSecond(float value) {
 	if (Mathf::Approximately(value)) {
 		value = DEFAULT_TICKS_PER_SECOND;
@@ -89,21 +107,22 @@ void AnimationClipInternal::SetTicksPerSecond(float value) {
 	ticksInSecond_ = value;
 }
 
-void AnimationClipInternal::Sample(float time) {
-	time *= GetTicksPerSecond();
-	time = Mathf::Repeat(time, GetDuration());
+bool AnimationClipInternal::Sample(float time) {
+	time = fnWrap_(time * GetTicksPerSecond(), GetDuration());
 
 	Skeleton skeleton = GetAnimation()->GetSkeleton();
 	SkeletonNode* root = skeleton->GetRootNode();
-	SampleHierarchy(time, root, glm::mat4(1));
+
+	return SampleHierarchy(time, root, glm::mat4(1));
 }
 
-void AnimationClipInternal::SampleHierarchy(float time, SkeletonNode* node, const glm::mat4& matrix) {
+bool AnimationClipInternal::SampleHierarchy(float time, SkeletonNode* node, const glm::mat4& matrix) {
+	bool lastFrame = true;
 	glm::mat4 transform = node->matrix;
 	if (node->curve) {
 		glm::quat rotation;
 		glm::vec3 position, scale;
-		node->curve->Sample(time, position, rotation, scale);
+		lastFrame = node->curve->Sample(time, position, rotation, scale);
 		glm::mat4 identity;
 		transform = glm::translate(identity, position) * glm::mat4(rotation) * glm::scale(identity, scale);
 	}
@@ -120,8 +139,10 @@ void AnimationClipInternal::SampleHierarchy(float time, SkeletonNode* node, cons
 	}
 
 	for (int i = 0; i < node->children.size(); ++i) {
-		SampleHierarchy(time, node->children[i], transform);
+		lastFrame = SampleHierarchy(time, node->children[i], transform) && lastFrame;
 	}
+
+	return lastFrame;
 }
 
 void AnimationKeysInternal::ToKeyframes(std::vector<AnimationKeyframe>& keyframes) {
@@ -174,10 +195,6 @@ void AnimationInternal::AddClip(const std::string& name, AnimationClip value) {
 	}
 
 	value->SetAnimation(dsp_cast<Animation>(shared_from_this()));
-
-	if (!current_) {
-		current_ = value;
-	}
 }
 
 AnimationClip AnimationInternal::GetClip(const std::string& name) {
@@ -189,6 +206,12 @@ AnimationClip AnimationInternal::GetClip(const std::string& name) {
 	return ite->value;
 }
 
+void AnimationInternal::SetWrapMode(AnimationWrapMode value) {
+	for (int i = 0; i < clips_.size(); ++i) {
+		clips_[i].value->SetWrapMode(value);
+	}
+}
+
 bool AnimationInternal::Play(const std::string& name) {
 	AnimationClip clip = GetClip(name);
 	if (!clip) {
@@ -198,43 +221,66 @@ bool AnimationInternal::Play(const std::string& name) {
 
 	time_ = 0;
 	current_ = clip;
+	playing_ = true;
 
 	return true;
 }
 
 void AnimationInternal::Update() {
-	if (current_) {
-		time_ += timeInstance->GetDeltaTime();
-		current_->Sample(time_);
+	if (!playing_ || !current_) { return; }
+
+	time_ += timeInstance->GetDeltaTime();
+	
+	if (current_->Sample(time_) && current_->GetWrapMode() == AnimationWrapModeOnce) {
+		current_->Sample(0);
+		playing_ = false;
 	}
 }
 
-void AnimationCurveInternal::Sample(float time, glm::vec3& position, glm::quat& rotation, glm::vec3& scale) {
+bool AnimationCurveInternal::Sample(float time, glm::vec3& position, glm::quat& rotation, glm::vec3& scale) {
 	int index = FindInterpolateIndex(time);
-	if (index < 0) { return; }
+	if (index + 1 >= keyframes_.size()) {
+		SampleLastFrame(position, rotation, scale);
+		return true;
+	}
 
+	Interpolate(index, time, position, rotation, scale);
+	return false;
+}
+
+int AnimationCurveInternal::FindInterpolateIndex(float time) {
+	int pos = 0;
+	for (; pos < (int)keyframes_.size() - 1; ++pos) {
+		if (time < keyframes_[pos + 1]->GetTime()) {
+			break;
+		}
+	}
+
+	return pos;
+}
+
+void AnimationCurveInternal::SampleLastFrame(glm::vec3& position, glm::quat& rotation, glm::vec3& scale) {
+	if (!keyframes_.empty()) {
+		AnimationKeyframe& frame = keyframes_.back();
+		position = frame->GetVector3(KeyframeAttributePosition);
+		rotation = frame->GetQuaternion(KeyframeAttributeRotation);
+		scale = frame->GetVector3(KeyframeAttributeScale);
+	}
+}
+
+void AnimationCurveInternal::Interpolate(int index, float time, glm::vec3& position, glm::quat& rotation, glm::vec3& scale) {
 	int next = index + 1;
 
 	float deltaTime = keyframes_[next]->GetTime() - keyframes_[index]->GetTime();
 	float factor = (time - keyframes_[index]->GetTime()) / deltaTime;
 
-	Assert(factor >= 0 && factor <= 1);
+	factor = Mathf::Clamp(factor, 0.f, 1.f);
 
 	const int p = KeyframeAttributePosition, r = KeyframeAttributeRotation, s = KeyframeAttributeScale;
 
 	position = Mathf::Lerp(keyframes_[index]->GetVector3(p), keyframes_[next]->GetVector3(p), factor);
 	rotation = Mathf::Lerp(keyframes_[index]->GetQuaternion(r), keyframes_[next]->GetQuaternion(r), factor);
 	scale = Mathf::Lerp(keyframes_[index]->GetVector3(s), keyframes_[next]->GetVector3(s), factor);
-}
-
-int AnimationCurveInternal::FindInterpolateIndex(float time) {
-	for (int i = 0; i < keyframes_.size(); ++i) {
-		if (time < keyframes_[i + 1]->GetTime()) {
-			return i;
-		}
-	}
-
-	return -1;
 }
 
 void AnimationKeyframeInternal::SetVector3(int id, const glm::vec3& value) {

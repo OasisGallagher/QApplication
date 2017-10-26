@@ -46,5 +46,7 @@ private:
 	GLuint program_;
 	GLuint shaderObjs_[ShaderTypeCount];
 
+	std::string shaderPath_;
+
 	static ShaderDescription descriptions_[ShaderTypeCount];
 };

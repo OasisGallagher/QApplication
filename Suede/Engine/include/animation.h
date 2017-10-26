@@ -71,7 +71,7 @@ public:
 	virtual void SetAnimation(Animation value) = 0;
 	virtual Animation GetAnimation() = 0;
 
-	virtual void Sample(float time) = 0;
+	virtual bool Sample(float time) = 0;
 };
 
 class ENGINE_EXPORT IAnimationState : virtual public IObject {
@@ -114,7 +114,7 @@ class ENGINE_EXPORT IAnimationCurve : virtual public IObject {
 public:
 	virtual void SetKeyframes(const std::vector<AnimationKeyframe>& value) = 0;
 	// TODO: Generic version.
-	virtual void Sample(float time, glm::vec3& position, glm::quat& rotation, glm::vec3& scale) = 0;
+	virtual bool Sample(float time, glm::vec3& position, glm::quat& rotation, glm::vec3& scale) = 0;
 };
 
 class ENGINE_EXPORT IAnimation : virtual public IObject {
@@ -127,6 +127,8 @@ public:
 	
 	virtual void SetRootTransform(const glm::mat4& value) = 0;
 	virtual glm::mat4 GetRootTransform() = 0;
+
+	virtual void SetWrapMode(AnimationWrapMode value) = 0;
 
 	virtual bool Play(const std::string& name) = 0;
 

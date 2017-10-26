@@ -235,6 +235,7 @@ bool ModelImporter::ImportAnimation(Animation& animation) {
 void ModelImporter::ImportAnimationClip(const aiAnimation* anim, AnimationClip clip) {
 	clip->SetTicksPerSecond((float)anim->mTicksPerSecond);
 	clip->SetDuration((float)anim->mDuration);
+	clip->SetWrapMode(AnimationWrapModeLoop);
 	ImportAnimationNode(anim, scene_->mRootNode, nullptr);
 }
 

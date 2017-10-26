@@ -157,7 +157,8 @@ void Canvas::createScene() {
 	*/
 	
 	sprite->LoadModel("models/boblampclean.md5mesh");
-	
+	sprite->GetAnimation()->SetWrapMode(AnimationWrapModeOnce);
+	sprite->GetAnimation()->Play("");
 	//Surface surface = sprite->GetSurface();
 
 	//Texture2D albedo = dsp_cast<Texture2D>(world->Create(ObjectTypeTexture2D));
