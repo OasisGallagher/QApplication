@@ -283,6 +283,12 @@
     <ClInclude Include="internal\containers\sortedvector.h">
       <Filter>internal\containers\include</Filter>
     </ClInclude>
+    <ClInclude Include="include\particlesystem.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="internal\sprites\particlesysteminternal.h">
+      <Filter>internal\sprites\include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="internal\base\objectinternal.cpp">
@@ -392,6 +398,9 @@
     </ClCompile>
     <ClCompile Include="internal\containers\variant.cpp">
       <Filter>internal\containers\src</Filter>
+    </ClCompile>
+    <ClCompile Include="internal\sprites\particlesysteminternal.cpp">
+      <Filter>internal\sprites\src</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

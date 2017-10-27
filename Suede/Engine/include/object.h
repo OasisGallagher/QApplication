@@ -30,6 +30,7 @@ enum ObjectType {
 	ObjectTypeSpotLight,
 	ObjectTypePointLight,
 	ObjectTypeDirectionalLight,
+	ObjectTypeParticleSystem,
 
 	ObjectTypeCount,
 

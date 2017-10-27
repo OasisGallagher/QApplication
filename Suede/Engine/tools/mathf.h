@@ -38,6 +38,9 @@ public:
 	template <class Ty>
 	static Ty Clamp(Ty value, Ty min, Ty max);
 
+	template <class Ty>
+	static Ty Clamp01(Ty value);
+
 	static bool Approximately(float x, float y = 0.f);
 
 	static float Luminance(const glm::vec3& color);
@@ -100,6 +103,13 @@ template <class Ty>
 inline Ty Mathf::Clamp(Ty value, Ty min, Ty max) {
 	if (value < min) { value = min; }
 	if (value > max) { value = max; }
+	return value;
+}
+
+template <class Ty>
+inline Ty Mathf::Clamp01(Ty value) {
+	if (value < 0) { value = 0; }
+	if (value > 1) { value = 1; }
 	return value;
 }
 

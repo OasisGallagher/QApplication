@@ -218,16 +218,22 @@ bool ModelImporter::ImportAnimation(Animation& animation) {
 	glm::mat4 rootTransform;
 	animation->SetRootTransform(AIMaterixToGLM(rootTransform, scene_->mRootNode->mTransformation.Inverse()));
 
+	const char* defaultClipName = nullptr;
 	for (int i = 0; i < scene_->mNumAnimations; ++i) {
 		aiAnimation* anim = scene_->mAnimations[i];
 		std::string name = anim->mName.C_Str();
 
 		AnimationClip clip = CREATE_OBJECT(AnimationClip);
+		if (defaultClipName == nullptr) {
+			defaultClipName = anim->mName.C_Str();
+		}
+
 		ImportAnimationClip(anim, clip);
 		animation->AddClip(name, clip);
 	}
 
 	animation->SetSkeleton(skeleton_);
+	animation->Play(defaultClipName);
 
 	return true;
 }

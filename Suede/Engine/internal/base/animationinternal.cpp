@@ -81,20 +81,20 @@ void SkeletonInternal::DestroyNodeHierarchy(SkeletonNode*& node) {
 	node = nullptr;
 }
 
-AnimationClipInternal::AnimationClipInternal() : ObjectInternal(ObjectTypeAnimationClip), fnWrap_(Mathf::Min) {
+AnimationClipInternal::AnimationClipInternal() : ObjectInternal(ObjectTypeAnimationClip), wrapper_(Mathf::Min) {
 }
 
 void AnimationClipInternal::SetWrapMode(AnimationWrapMode value) {
 	switch (wrapMode_ = value) {
 	case AnimationWrapModeLoop:
-		fnWrap_ = Mathf::Repeat;
+		wrapper_ = Mathf::Repeat;
 		break;
 	case AnimationWrapModePingPong:
-		fnWrap_ = Mathf::PingPong;
+		wrapper_ = Mathf::PingPong;
 		break;
 	case AnimationWrapModeOnce:
 	case AnimationWrapModeClampForever:
-		fnWrap_ = Mathf::Min;
+		wrapper_ = Mathf::Min;
 		break;
 	}
 }
@@ -108,7 +108,7 @@ void AnimationClipInternal::SetTicksPerSecond(float value) {
 }
 
 bool AnimationClipInternal::Sample(float time) {
-	time = fnWrap_(time * GetTicksPerSecond(), GetDuration());
+	time = wrapper_(time * GetTicksPerSecond(), GetDuration());
 
 	Skeleton skeleton = GetAnimation()->GetSkeleton();
 	SkeletonNode* root = skeleton->GetRootNode();
@@ -143,6 +143,42 @@ bool AnimationClipInternal::SampleHierarchy(float time, SkeletonNode* node, cons
 	}
 
 	return lastFrame;
+}
+
+void AnimationKeysInternal::AddPosition(float time, const glm::vec3& value) {
+	PositionKey key;
+	key.time = time, key.value = value;
+	positionKeys_.insert(key);
+}
+
+void AnimationKeysInternal::AddRotation(float time, const glm::quat& value) {
+	RotationKey key;
+	key.time = time, key.value = value;
+	rotationKeys_.insert(key);
+}
+
+void AnimationKeysInternal::AddScale(float time, const glm::vec3 & value) {
+	ScaleKey key;
+	key.time = time, key.value = value;
+	scaleKeys_.insert(key);
+}
+
+void AnimationKeysInternal::RemovePosition(float time) {
+	PositionKey key;
+	key.time = time;
+	positionKeys_.remove(key);
+}
+
+void AnimationKeysInternal::RemoveRotation(float time) {
+	RotationKey key;
+	key.time = time;
+	rotationKeys_.remove(key);
+}
+
+void AnimationKeysInternal::RemoveScale(float time) {
+	ScaleKey key;
+	key.time = time;
+	scaleKeys_.remove(key);
 }
 
 void AnimationKeysInternal::ToKeyframes(std::vector<AnimationKeyframe>& keyframes) {
@@ -185,25 +221,17 @@ void AnimationKeysInternal::SmoothKeys() {
 }
 
 void AnimationInternal::AddClip(const std::string& name, AnimationClip value) {
-	std::vector<Key>::iterator ite = std::lower_bound(clips_.begin(), clips_.end(), name, KeyComparer());
-	if(ite != clips_.end()){
-		ite->value = value;
-	}
-	else {
-		Key key{ name, value };
-		clips_.insert(ite, key);
-	}
+	Key key{ name, value };
+	clips_.insert(key);
 
 	value->SetAnimation(dsp_cast<Animation>(shared_from_this()));
 }
 
 AnimationClip AnimationInternal::GetClip(const std::string& name) {
-	std::vector<Key>::iterator ite = std::lower_bound(clips_.begin(), clips_.end(), name, KeyComparer());
-	if (ite == clips_.end()) {
-		return nullptr;
-	}
+	Key key{ name };
+	if (!clips_.get(key)) { return nullptr; }
 
-	return ite->value;
+	return key.value;
 }
 
 void AnimationInternal::SetWrapMode(AnimationWrapMode value) {
@@ -274,7 +302,7 @@ void AnimationCurveInternal::Interpolate(int index, float time, glm::vec3& posit
 	float deltaTime = keyframes_[next]->GetTime() - keyframes_[index]->GetTime();
 	float factor = (time - keyframes_[index]->GetTime()) / deltaTime;
 
-	factor = Mathf::Clamp(factor, 0.f, 1.f);
+	factor = Mathf::Clamp01(factor);
 
 	const int p = KeyframeAttributePosition, r = KeyframeAttributeRotation, s = KeyframeAttributeScale;
 
@@ -284,37 +312,33 @@ void AnimationCurveInternal::Interpolate(int index, float time, glm::vec3& posit
 }
 
 void AnimationKeyframeInternal::SetVector3(int id, const glm::vec3& value) {
-	std::vector<Key>::iterator ite = std::lower_bound(attributes_.begin(), attributes_.end(), id, KeyComparer());
-	if (ite == attributes_.end() || ite->id != id) {
-		Key key = { id };
-		key.value.SetVector3(value);
-		attributes_.insert(ite, key);
-	}
-	else {
-		ite->value.SetVector3(value);
-	}
+	Key key = { id };
+	key.value.SetVector3(value);
+	attributes_.insert(key);
 }
 
 void AnimationKeyframeInternal::SetQuaternion(int id, const glm::quat& value) {
-	std::vector<Key>::iterator ite = std::lower_bound(attributes_.begin(), attributes_.end(), id, KeyComparer());
-	if (ite == attributes_.end() || ite->id != id) {
-		Key key = { id };
-		key.value.SetQuaternion(value);
-		attributes_.insert(ite, key);
-	}
-	else {
-		ite->value.SetQuaternion(value);
-	}
+	Key key = { id };
+	key.value.SetQuaternion(value);
+	attributes_.insert(key);
 }
 
 glm::vec3 AnimationKeyframeInternal::GetVector3(int id) {
-	std::vector<Key>::iterator ite = std::lower_bound(attributes_.begin(), attributes_.end(), id, KeyComparer());
-	AssertX(ite->id == id, "Animation keyframe attribute for id " + std::to_string(id) + " does not exist");
-	return ite->value.GetVector3();
+	Key key{ id };
+	if (!attributes_.get(key)) {
+		Debug::LogError("Animation keyframe attribute for id " + std::to_string(id) + " does not exist");
+		return glm::vec3(0);
+	}
+
+	return key.value.GetVector3();
 }
 
 glm::quat AnimationKeyframeInternal::GetQuaternion(int id) {
-	std::vector<Key>::iterator ite = std::lower_bound(attributes_.begin(), attributes_.end(), id, KeyComparer());
-	AssertX(ite->id == id, "Animation keyframe attribute for id " + std::to_string(id) + " does not exist");
-	return ite->value.GetQuaternion();
+	Key key{ id };
+	if (!attributes_.get(key)) {
+		Debug::LogError("Animation keyframe attribute for id " + std::to_string(id) + " does not exist");
+		return glm::quat();
+	}
+
+	return key.value.GetQuaternion();
 }

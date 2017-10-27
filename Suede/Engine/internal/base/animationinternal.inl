@@ -1,32 +1,15 @@
 #include "tools/mathf.h"
 
-template <class KeyType>
-void AnimationKeysInternal::AddKey(std::vector<KeyType>& container, float time, const typename KeyType::T & value) {
-	std::vector<KeyType>::iterator ite = std::lower_bound(container.begin(), container.end(), time, KeyComparer());
-	AssertX(ite == container.end() || !Mathf::Approximately(ite->time, time), "duplicate key " + std::to_string(time));
+template <class Cont>
+void AnimationKeysInternal::SmoothKey(Cont& container, float time) {
+	Cont::value_type key;
+	key.time = time;
 
-	KeyType key;
-	key.time = time, key.value = value;
-	container.insert(ite, key);
-}
-
-template <class KeyType>
-void AnimationKeysInternal::RemoveKey(std::vector<KeyType>& container, float time) {
-	std::vector<KeyType>::iterator ite = std::lower_bound(container.begin(), container.end(), time, KeyComparer());
-	if (Mathf::Approximately(ite->time, time)) {
-		container.erase(ite);
-	}
-}
-
-template <class KeyType>
-void AnimationKeysInternal::SmoothKey(std::vector<KeyType>& container, float time) {
-	std::vector<KeyType>::iterator pos = std::lower_bound(container.begin(), container.end(), time, KeyComparer());
+	Cont::iterator pos = container.find(key);
 	if (pos != container.end() && Mathf::Approximately(pos->time, time)) {
 		return;
 	}
 
-	KeyType key;
-	key.time = time;
 	if (pos == container.end()) {
 		key.value = container.back().value;
 	}
@@ -35,12 +18,13 @@ void AnimationKeysInternal::SmoothKey(std::vector<KeyType>& container, float tim
 			key.value = container.front().value;
 		}
 		else {
-			std::vector<KeyType>::iterator prev = pos;
+			Cont::iterator prev = pos;
 			--prev;
 
-			key.value = Mathf::Lerp(prev->value, pos->value, time - prev->time / (pos->time - prev->time));
+			float t = Mathf::Clamp01((time - prev->time) / (pos->time - prev->time));
+			key.value = Mathf::Lerp(prev->value, pos->value, t);
 		}
 	}
 
-	container.insert(pos, key);
+	container.insert(key);
 }

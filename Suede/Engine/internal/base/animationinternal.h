@@ -7,6 +7,7 @@
 #include "glsldefines.h"
 #include "internal/containers/variant.h"
 #include "internal/base/objectinternal.h"
+#include "internal/containers/sortedvector.h"
 
 class SkeletonInternal : public ISkeleton, public ObjectInternal {
 	DEFINE_FACTORY_METHOD(Skeleton)
@@ -70,7 +71,7 @@ private:
 private:
 	float duration_;
 	float ticksInSecond_;
-	float(*fnWrap_)(float, float);
+	float(*wrapper_)(float, float);
 	AnimationWrapMode wrapMode_;
 	std::weak_ptr<Animation::element_type> animation_;
 };
@@ -89,13 +90,13 @@ public:
 	AnimationKeysInternal() :ObjectInternal(ObjectTypeAnimationKeys) {}
 
 public:
-	virtual void AddPosition(float time, const glm::vec3& value) { AddKey(positionKeys_, time, value); }
-	virtual void AddRotation(float time, const glm::quat& value) { AddKey(rotationKeys_, time, value); }
-	virtual void AddScale(float time, const glm::vec3& value) { AddKey(scaleKeys_, time, value); }
+	virtual void AddPosition(float time, const glm::vec3& value);
+	virtual void AddRotation(float time, const glm::quat& value);
+	virtual void AddScale(float time, const glm::vec3& value);
 
-	virtual void RemovePosition(float time) { RemoveKey(positionKeys_, time); }
-	virtual void RemoveRotation(float time) { RemoveKey(rotationKeys_, time); }
-	virtual void RemoveScale(float time) { RemoveKey(scaleKeys_, time); }
+	virtual void RemovePosition(float time);
+	virtual void RemoveRotation(float time);
+	virtual void RemoveScale(float time);
 
 	virtual void ToKeyframes(std::vector<AnimationKeyframe>& keyframes);
 
@@ -105,11 +106,9 @@ private:
 private:
 	struct Key {
 		float time;
-	};
 
-	struct KeyComparer {
-		bool operator () (const Key& key, float time) const {
-			return key.time < time;
+		bool operator < (const Key& other) const {
+			return time < other.time;
 		}
 	};
 
@@ -129,20 +128,13 @@ private:
 	};
 
 private:
-	template <class KeyType>
-	void AddKey(std::vector<KeyType>& container, float time, const typename KeyType::T& value);
-
-	template <class KeyType>
-	void RemoveKey(std::vector<KeyType>& container, float time);
-
-	template <class KeyType>
-	void SmoothKey(std::vector<KeyType>& container, float time);
+	template <class Cont>
+	void SmoothKey(Cont& container, float time);
 
 private:
-	// TODO: sorted list.
-	std::vector<ScaleKey> scaleKeys_;
-	std::vector<RotationKey> rotationKeys_;
-	std::vector<PositionKey> positionKeys_;
+	sorted_vector<ScaleKey> scaleKeys_;
+	sorted_vector<RotationKey> rotationKeys_;
+	sorted_vector<PositionKey> positionKeys_;
 };
 
 class AnimationInternal : public IAnimation, public ObjectInternal {
@@ -170,11 +162,8 @@ public:
 	struct Key {
 		std::string name;
 		AnimationClip value;
-	};
-
-	struct KeyComparer {
-		bool operator ()(const Key& key, const std::string& name) {
-			return key.name < name;
+		bool operator < (const Key& other) const {
+			return name < other.name;
 		}
 	};
 
@@ -187,8 +176,7 @@ private:
 	bool playing_;
 	AnimationClip current_;
 
-	// TODO: sorted list.
-	std::vector<Key> clips_;
+	sorted_vector<Key> clips_;
 };
 
 class AnimationKeyframeInternal : public IAnimationKeyframe, public ObjectInternal {
@@ -210,17 +198,14 @@ private:
 	struct Key {
 		int id;
 		Variant value;
-	};
 
-	struct KeyComparer {
-		bool operator () (const Key& key, int id) const {
-			return key.id < id;
+		bool operator < (const Key& other) const {
+			return id < other.id;
 		}
 	};
 
 	float time_;
-	// TODO: sorted list.
-	std::vector<Key> attributes_;
+	sorted_vector<Key> attributes_;
 };
 
 class AnimationCurveInternal : public IAnimationCurve, public ObjectInternal {
