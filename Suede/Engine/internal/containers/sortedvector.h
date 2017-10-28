@@ -4,20 +4,20 @@
 
 template <class Ty, class Comp = std::less<Ty> > 
 class sorted_vector {
-public:
+	typedef std::vector<Ty> container_type;
 
+public:
 	typedef Ty value_type;
 	typedef Comp comparer_type;
 
-	typedef std::vector<value_type> _Cont;
-	typedef typename _Cont::iterator iterator;
-	typedef typename _Cont::const_iterator const_iterator;
-	typedef typename _Cont::reference reference;
-	typedef typename _Cont::const_reference const_reference;
+	typedef typename container_type::iterator iterator;
+	typedef typename container_type::const_iterator const_iterator;
+	typedef typename container_type::reference reference;
+	typedef typename container_type::const_reference const_reference;
 
 public:
 	void insert(const value_type& value) {
-		_Cont::iterator ite = std::lower_bound(container_.begin(), container_.end(), value, comp_);
+		iterator ite = find(value);
 		if (ite != container_.end() && !comp_(*ite, value)) {
 			*ite = value;
 		}
@@ -31,21 +31,21 @@ public:
 	}
 
 	bool get(value_type& value) {
-		_Cont::iterator ite = std::lower_bound(container_.begin(), container_.end(), value, comp_);
+		iterator ite = find(value);
 		if (ite == container_.end()) { return false; }
 		value = *ite;
 		return true;
 	}
 
 	void remove(const value_type& value) {
-		_Cont::iterator ite = std::lower_bound(container_.begin(), container_.end(), value, comp_);
+		iterator ite = find(value);
 		if (!comp_(value, *ite)) {
 			container_.erase(ite);
 		}
 	}
 
 	void contains(const value_type& value) {
-		_Cont::iterator ite = std::lower_bound(container_.begin(), container_.end(), value, comp_);
+		iterator ite = find(value);
 		return ite != container_.end() && !comp(value, *ite);
 	}
 
@@ -60,6 +60,6 @@ public:
 	reference operator[] (size_t i) { return container_[i]; }
 
 private:
-	_Cont container_;
 	comparer_type comp_;
+	container_type container_;
 };

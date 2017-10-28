@@ -277,14 +277,13 @@ bool AnimationCurveInternal::Sample(float time, glm::vec3& position, glm::quat& 
 }
 
 int AnimationCurveInternal::FindInterpolateIndex(float time) {
-	int pos = 0;
-	for (; pos < (int)keyframes_.size() - 1; ++pos) {
-		if (time < keyframes_[pos + 1]->GetTime()) {
-			break;
+	struct Comparerer {
+		bool operator ()(AnimationKeyframe& lhs, float time) const {
+			return lhs->GetTime() < time;
 		}
-	}
+	};
 
-	return pos;
+	return (int)std::distance(std::lower_bound(keyframes_.begin(), keyframes_.end(), time, Comparerer()), keyframes_.end());
 }
 
 void AnimationCurveInternal::SampleLastFrame(glm::vec3& position, glm::quat& rotation, glm::vec3& scale) {
