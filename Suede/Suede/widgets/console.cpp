@@ -1,34 +1,30 @@
 #include "console.h"
 #include <QSplitter>
 #include <QHeaderView>
-#include <QTableWidget>
-#include <QTextBrowser>
 
-Console::Console(QWidget* parent) : QWidget(parent) {
+Console* Console::get() {
+	static Console instance;
+	return &instance;
 }
 
 void Console::initialize() {
-	view_ = findChild<QTableWidget*>("view", Qt::FindDirectChildrenOnly);
-	view_->horizontalHeader()->setStretchLastSection(true);
-	view_->setColumnCount(2);
+	table_ = view_->findChild<QTableWidget*>("table", Qt::FindDirectChildrenOnly);
+	table_->horizontalHeader()->setStretchLastSection(true);
+	table_->horizontalHeader()->setVisible(false);
+	table_->setColumnCount(2);
 }
 
 void Console::addMessage(MessageType type, const QString& message) {
-	//if (messages_.contains(QString::number(type) + message)) {
-	//	return;
-	//}
-
-	//messages_.insert(QString::number(type) + message);
-	int r = view_->rowCount();
-	view_->insertRow(r);
-	view_->setRowHeight(r, 20);
-	view_->setColumnWidth(0, 24);
+	int r = table_->rowCount();
+	table_->insertRow(r);
+	table_->setRowHeight(r, 20);
+	table_->setColumnWidth(0, 24);
 
 	QTableWidgetItem* icon = new QTableWidgetItem(QIcon(messageIconPath(type)), "");
 	QTableWidgetItem* text = new QTableWidgetItem(message);
-	view_->setItem(r, 0, icon);
-	view_->setItem(r, 1, text);
-	view_->scrollToBottom();
+	table_->setItem(r, 0, icon);
+	table_->setItem(r, 1, text);
+	table_->scrollToBottom();
 }
 
 const char* Console::messageIconPath(MessageType type) {

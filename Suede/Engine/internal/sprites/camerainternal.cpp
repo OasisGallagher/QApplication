@@ -98,7 +98,7 @@ void CameraInternal::Render() {
 		return;
 	}
 
-	RenderDepthPass(sprites);
+	//RenderDepthPass(sprites);
 
 	Light forwardBase;
 	std::vector<Light> forwardAdd;

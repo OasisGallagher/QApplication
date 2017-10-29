@@ -31,17 +31,8 @@
     <Filter Include="resources\buildin\shaders">
       <UniqueIdentifier>{7799e13f-e719-497a-b633-ff8c543af3e9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="windows">
-      <UniqueIdentifier>{b2387caa-cad8-41c5-b0b7-574d52dbdb14}</UniqueIdentifier>
-    </Filter>
     <Filter Include="scripts">
       <UniqueIdentifier>{d9d38ab5-25a0-4526-8735-dbceb209adba}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="windows\include">
-      <UniqueIdentifier>{a8b8c673-6a4b-4d6f-ad47-694561ff1ff6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="windows\src">
-      <UniqueIdentifier>{b3748fa1-e9cd-4486-a2ca-fee7ab76f9af}</UniqueIdentifier>
     </Filter>
     <Filter Include="scripts\include">
       <UniqueIdentifier>{82c9ccf8-a40a-49f9-bdf3-b19e9dbf76ef}</UniqueIdentifier>
@@ -58,16 +49,19 @@
     <Filter Include="resources\shaders\include">
       <UniqueIdentifier>{293ae9ed-e6bb-4edb-878e-204ffb3e8ba9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="widgets">
+      <UniqueIdentifier>{b2387caa-cad8-41c5-b0b7-574d52dbdb14}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="widgets\include">
+      <UniqueIdentifier>{a8b8c673-6a4b-4d6f-ad47-694561ff1ff6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="widgets\src">
+      <UniqueIdentifier>{b3748fa1-e9cd-4486-a2ca-fee7ab76f9af}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GeneratedFiles\qrc_suede.cpp">
       <Filter>Generated Files</Filter>
-    </ClCompile>
-    <ClCompile Include="windows\canvas.cpp">
-      <Filter>windows\src</Filter>
-    </ClCompile>
-    <ClCompile Include="windows\console.cpp">
-      <Filter>windows\src</Filter>
     </ClCompile>
     <ClCompile Include="scripts\cameracontroller.cpp">
       <Filter>scripts\src</Filter>
@@ -78,46 +72,76 @@
     <ClCompile Include="GeneratedFiles\Debug\moc_canvas.cpp">
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_console.cpp">
+    <ClCompile Include="GeneratedFiles\Debug\moc_game.cpp">
       <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="windows\hierarchy.cpp">
-      <Filter>windows\src</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_hierarchy.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_hierarchy.cpp">
-      <Filter>Generated Files\Release</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_suede.cpp">
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_suede.cpp">
-      <Filter>Generated Files\Release</Filter>
+    <ClCompile Include="widgets\canvas.cpp">
+      <Filter>widgets\src</Filter>
     </ClCompile>
-    <ClCompile Include="windows\suede.cpp">
-      <Filter>windows\src</Filter>
+    <ClCompile Include="widgets\console.cpp">
+      <Filter>widgets\src</Filter>
+    </ClCompile>
+    <ClCompile Include="widgets\game.cpp">
+      <Filter>widgets\src</Filter>
+    </ClCompile>
+    <ClCompile Include="widgets\hierarchy.cpp">
+      <Filter>widgets\src</Filter>
+    </ClCompile>
+    <ClCompile Include="widgets\suede.cpp">
+      <Filter>widgets\src</Filter>
+    </ClCompile>
+    <ClCompile Include="widgets\window.cpp">
+      <Filter>widgets\src</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_console.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_window.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_hierarchy.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="widgets\inspector.cpp">
+      <Filter>widgets\src</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_inspector.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_inspector.cpp">
+      <Filter>Generated Files\Release</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="suede.qrc">
       <Filter>resources</Filter>
     </CustomBuild>
-    <CustomBuild Include="windows\canvas.h">
-      <Filter>windows\include</Filter>
-    </CustomBuild>
-    <CustomBuild Include="windows\console.h">
-      <Filter>windows\include</Filter>
-    </CustomBuild>
-    <CustomBuild Include="windows\hierarchy.h">
-      <Filter>windows\include</Filter>
-    </CustomBuild>
-    <CustomBuild Include="windows\suede.h">
-      <Filter>windows\include</Filter>
-    </CustomBuild>
     <CustomBuild Include="ui\suede.ui">
       <Filter>ui</Filter>
+    </CustomBuild>
+    <CustomBuild Include="widgets\canvas.h">
+      <Filter>widgets\include</Filter>
+    </CustomBuild>
+    <CustomBuild Include="widgets\game.h">
+      <Filter>widgets\include</Filter>
+    </CustomBuild>
+    <CustomBuild Include="widgets\suede.h">
+      <Filter>widgets\include</Filter>
+    </CustomBuild>
+    <CustomBuild Include="widgets\console.h">
+      <Filter>widgets\include</Filter>
+    </CustomBuild>
+    <CustomBuild Include="widgets\window.h">
+      <Filter>widgets\include</Filter>
+    </CustomBuild>
+    <CustomBuild Include="widgets\hierarchy.h">
+      <Filter>widgets\include</Filter>
+    </CustomBuild>
+    <CustomBuild Include="widgets\inspector.h">
+      <Filter>widgets\include</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
@@ -135,6 +159,9 @@
     </ClInclude>
     <ClInclude Include="resources\buildin\shaders\include\light_fragment.inc">
       <Filter>resources\buildin\shaders\include</Filter>
+    </ClInclude>
+    <ClInclude Include="widgets\view.h">
+      <Filter>widgets\include</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

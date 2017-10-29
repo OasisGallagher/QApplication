@@ -14,12 +14,10 @@ enum {
 	LogLevelFatal,
 };
 
-class EngineLogCallback {
+class EngineLogReceiver {
 public:
 	virtual void OnEngineLogMessage(int level, const char* message) = 0;
 };
-
-class EngineLogCallback;
 
 class ENGINE_EXPORT Engine {
 public:
@@ -32,7 +30,7 @@ public:
 	bool initialize();
 	void release();
 
-	void setLogCallback(EngineLogCallback* callback);
+	void setLogReceiver(EngineLogReceiver* receiver);
 
 	void update();
 	void resize(int w, int h);

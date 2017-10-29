@@ -50,8 +50,8 @@ bool Engine::initialize() {
 void Engine::release() {
 }
 
-void Engine::setLogCallback(EngineLogCallback* callback) {
-	Debug::SetLogCallback(callback);
+void Engine::setLogReceiver(EngineLogReceiver* receiver) {
+	Debug::SetLogReceiver(receiver);
 }
 
 void Engine::resize(int w, int h) {

@@ -47,6 +47,7 @@ void SurfaceInternal::SetAttribute(const SurfaceAttribute& value) {
 	UpdateGLBuffers(value);
 	Unbind();
 }
+
 void SurfaceInternal::UpdateGLBuffers(const SurfaceAttribute& attribute) {
 	if (!attribute.positions.empty()) {
 		glBindBuffer(GL_ARRAY_BUFFER, vbos_[VBOPositions]);

@@ -2,11 +2,11 @@
 #include <stack>
 #include <string>
 
-class EngineLogCallback;
+class EngineLogReceiver;
 
 class Debug {
 public:
-	static void SetLogCallback(EngineLogCallback* cb);
+	static void SetLogReceiver(EngineLogReceiver* cb);
 
 	static void Log(const std::string& message);
 	static void LogWarning(const std::string& message);
@@ -31,7 +31,7 @@ private:
 private:
 	static int length_;
 	static std::stack<std::string> samples_;
-	static EngineLogCallback* callback_;
+	static EngineLogReceiver* logReceiver_;
 };
 
 #define Verify(expression) \

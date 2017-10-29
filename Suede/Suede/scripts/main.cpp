@@ -1,4 +1,4 @@
-#include "windows/suede.h"
+#include "widgets/suede.h"
 #include <QtWidgets/QApplication>
 #include <memory>
 

@@ -12,24 +12,24 @@
 
 int Debug::length_ = 0;
 std::stack<std::string> Debug::samples_;
-EngineLogCallback* Debug::callback_;
+EngineLogReceiver* Debug::logReceiver_;
 
 std::ofstream debug("main/debug/debug.txt");
 
-void Debug::SetLogCallback(EngineLogCallback* cb) {
-	callback_ = cb;
+void Debug::SetLogReceiver(EngineLogReceiver* cb) {
+	logReceiver_ = cb;
 }
 
 void Debug::Log(const std::string& message) {
-	if (callback_ != nullptr) { callback_->OnEngineLogMessage(LogLevelDebug, message.c_str()); }
+	if (logReceiver_ != nullptr) { logReceiver_->OnEngineLogMessage(LogLevelDebug, message.c_str()); }
 }
 
 void Debug::LogWarning(const std::string& message) {
-	if (callback_ != nullptr) { callback_->OnEngineLogMessage(LogLevelWarning, message.c_str()); }
+	if (logReceiver_ != nullptr) { logReceiver_->OnEngineLogMessage(LogLevelWarning, message.c_str()); }
 }
 
 void Debug::LogError(const std::string& message) {
-	if (callback_ != nullptr) { callback_->OnEngineLogMessage(LogLevelError, message.c_str()); }
+	if (logReceiver_ != nullptr) { logReceiver_->OnEngineLogMessage(LogLevelError, message.c_str()); }
 }
 
 std::string Debug::Now() {
@@ -59,7 +59,7 @@ void Debug::BreakMessage(const std::string& message) {
 #if defined(_WIN32) || defined(_WIN64)
 	__debugbreak();
 #else
-	if (callback_ != nullptr) { callback_->OnEngineLogMessage(LogLevelFatal, message.c_str()); }
+	if (logReceiver_ != nullptr) { logReceiver_->OnEngineLogMessage(LogLevelFatal, message.c_str()); }
 #endif
 }
 

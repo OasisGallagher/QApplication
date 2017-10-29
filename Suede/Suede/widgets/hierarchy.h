@@ -1,16 +1,16 @@
 #pragma once
-#include <QTreeView>
-
 #include "sprite.h"
+#include "window.h"
 
+class QTreeView;
 class QStandardItem;
 class QStandardItemModel;
 
-class Hierarchy : public QTreeView {
+class Hierarchy : public Window {
 	Q_OBJECT
+
 public:
-	Hierarchy(QWidget* parent = Q_NULLPTR);
-	~Hierarchy();
+	static Hierarchy* get();
 
 public:
 	void update(Sprite root);
@@ -19,8 +19,12 @@ public:
 	bool selectedSprites(QList<Sprite>& sprites);
 
 private:
+	Hierarchy();
+
+	virtual void initialize();
 	void updateRecursively(Sprite pp, QStandardItem* pi);
 
 private:
+	QTreeView* tree_;
 	QStandardItemModel* model_;
 };

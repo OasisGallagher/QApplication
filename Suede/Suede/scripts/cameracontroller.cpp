@@ -2,8 +2,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "engine.h"
-#include "windows/suede.h"
 #include "cameracontroller.h"
+#include "widgets/hierarchy.h"
 
 CameraController::CameraController() : lpressed_(false), mpressed_(false), rpressed_(false) {
 }
@@ -84,7 +84,7 @@ void CameraController::moveCamera(const QPoint& mousePos) {
 // TODO: bug when set firstTime to 'true'.
 bool firstTime = false;
 void CameraController::rotateAroundSprite(const QPoint& mousePos) {
-	Sprite selected = Suede::get()->hierarchy()->selectedSprite();
+	Sprite selected = Hierarchy::get()->selectedSprite();
 	if (!selected || selected->GetPosition() == camera_->GetPosition()) { return; }
 	if (firstTime) {
 		glm::vec3 dir;

@@ -1,16 +1,12 @@
 #pragma once
-#include <QSet>
+#include <QMap>
 #include <QWidget>
+#include <QTableWidget>
 
-class QTableWidget;
-class QTextBrowser;
+#include "window.h"
 
-class Console : public QWidget {
+class Console : public Window {
 	Q_OBJECT
-
-public:
-	friend class Suede;
-	Console(QWidget* parent = Q_NULLPTR);
 
 public:
 	enum MessageType {
@@ -20,13 +16,17 @@ public:
 	};
 
 public:
+	static Console* get();
+
+public:
 	void addMessage(MessageType type, const QString& message);
 
 private:
-	void initialize();
+	Console() { }
+	virtual void initialize();
+
 	const char* messageIconPath(MessageType type);
 
 private:
-	QTableWidget* view_;
-	QSet<QString> messages_;
+	QTableWidget* table_;
 };

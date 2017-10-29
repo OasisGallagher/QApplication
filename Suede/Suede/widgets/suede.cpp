@@ -3,33 +3,33 @@
 #include <QKeyEvent>
 #include <QFileDialog>
 
+#include "game.h"
 #include "suede.h"
-#include "camera.h"
 #include "canvas.h"
 #include "console.h"
+#include "inspector.h"
+#include "hierarchy.h"
 
-static Suede* instance_;
+#include "camera.h"
 
 Suede::Suede(QWidget *parent)
 	: QMainWindow(parent) {
-	instance_ = this;
+	Engine::get()->setLogReceiver(this);
+
 	setupUI();
 
 	QMenu* fileMenu = menuBar()->findChild<QMenu*>("file");
 	QList<QAction*> actions = fileMenu->actions();
 
-	connect(canvas(), SIGNAL(onEngineLogReceived(int, const char*)), this, SLOT(onEngineLogReceived(int, const char*)));
+	//connect(canvas(), SIGNAL(onEngineLogReceived(int, const char*)), this, SLOT(onEngineLogReceived(int, const char*)));
+
 	connect(actions[0], SIGNAL(triggered()), this, SLOT(screenCapture()));
 	connect(actions[1], SIGNAL(triggered()), qApp, SLOT(quit()));
 
-	timer_ = startTimer(1000);
+	timer_ = startTimer(2000);
 }
 
 Suede::~Suede() {
-}
-
-Suede* Suede::get() {
-	return instance_;
 }
 
 void Suede::setupUI() {
@@ -38,28 +38,21 @@ void Suede::setupUI() {
 	QWidget* cw = takeCentralWidget();
 	cw->deleteLater();
 
-	console()->initialize();
+	addDockWidget(Qt::LeftDockWidgetArea, ui.inspector);
+	addDockWidget(Qt::RightDockWidgetArea, ui.game);
+	addDockWidget(Qt::RightDockWidgetArea, ui.console, Qt::Vertical);
+	addDockWidget(Qt::RightDockWidgetArea, ui.hierarchy, Qt::Horizontal);
 
-	QSplitter* hs = new QSplitter(Qt::Horizontal, this);
-	QSplitter* vs = new QSplitter(Qt::Vertical, this);
-
-	vs->addWidget(canvas());
-	vs->addWidget(console());
-	vs->setStretchFactor(0, 20);
-	vs->setStretchFactor(1, 1);
-
-	hs->addWidget(vs);
-	hs->addWidget(hierarchy());
-	hs->setStretchFactor(0, 10);
-	hs->setStretchFactor(1, 1);
-
-	setCentralWidget(hs);
+	Game::get()->setView(ui.gameWidget);
+	Console::get()->setView(ui.consoleWidget);
+	Inspector::get()->setView(ui.inspectorWidget);
+	Hierarchy::get()->setView(ui.hierarchyWidget);
 }
 
 void Suede::timerEvent(QTimerEvent *event) {
 	if (event->timerId() != timer_) { return; }
 	std::vector<Sprite> sprites;
-	hierarchy()->update(Engine::get()->world()->GetRootSprite());
+	Hierarchy::get()->update(Engine::get()->world()->GetRootSprite());
 	killTimer(timer_);
 }
 
@@ -95,19 +88,19 @@ void Suede::screenCapture() {
 	}
 }
 
-void Suede::onEngineLogReceived(int type, const char* message) {
+void Suede::OnEngineLogMessage(int type, const char* message) {
 	switch (type) {
 		case 0:
-			console()->addMessage(Console::Debug, message);
+			Console::get()->addMessage(Console::Debug, message);
 			break;
 
 		case 1:
-			console()->addMessage(Console::Warning, message);
+			Console::get()->addMessage(Console::Warning, message);
 			break;
 
 		case 2:
 		case 3:
-			console()->addMessage(Console::Error, message);
+			Console::get()->addMessage(Console::Error, message);
 			if (type == 3) { qFatal(message); }
 			break;
 	}
