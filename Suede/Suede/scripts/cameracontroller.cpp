@@ -2,8 +2,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "engine.h"
+#include "views/hierarchy.h"
 #include "cameracontroller.h"
-#include "widgets/hierarchy.h"
 
 CameraController::CameraController() : lpressed_(false), mpressed_(false), rpressed_(false) {
 }

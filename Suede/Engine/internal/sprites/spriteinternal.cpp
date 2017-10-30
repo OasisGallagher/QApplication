@@ -12,7 +12,7 @@ SpriteInternal::SpriteInternal() : SpriteInternal(ObjectTypeSprite) {
 }
 
 SpriteInternal::SpriteInternal(ObjectType spriteType)
-	: ObjectInternal(spriteType), dirtyFlag_(0), localScale_(1), worldScale_(1) {
+	: ObjectInternal(spriteType), dirtyFlag_(0), localScale_(1), worldScale_(1), active_(true) {
 	AssertX(spriteType >= ObjectTypeSprite && spriteType < ObjectTypeCount, "invalid sprite type " + std::to_string(spriteType));
 	name_ = String::Format("%s (%u)", SpriteTypeToString(GetType()), GetInstanceID());
 }

@@ -83,10 +83,14 @@ bool WorldInternal::GetSprites(ObjectType type, std::vector<Sprite>& sprites) {
 
 void WorldInternal::Update() {
 	for (SpriteContainer::iterator ite = sprites_.begin(); ite != sprites_.end(); ++ite) {
-		ite->second->Update();
+		if (ite->second->GetActive()) {
+			ite->second->Update();
+		}
 	}
 
 	for (CameraContainer::iterator ite = cameras_.begin(); ite != cameras_.end(); ++ite) {
-		(*ite)->Render();
+		if ((*ite)->GetActive()) {
+			(*ite)->Render();
+		}
 	}
 }

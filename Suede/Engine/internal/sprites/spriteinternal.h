@@ -13,6 +13,9 @@ public:
 	SpriteInternal();
 
 public:
+	virtual void SetActive(bool value) { active_ = value; }
+	virtual bool GetActive() { return active_; }
+
 	virtual bool LoadModel(const std::string& path);
 
 	virtual std::string GetName() { return name_; }
@@ -93,6 +96,8 @@ private:
 	const char* SpriteTypeToString(ObjectType type);
 
 private:
+	bool active_;
+
 	std::string name_;
 
 	Surface surface_;

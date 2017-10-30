@@ -11,6 +11,9 @@ typedef std::shared_ptr<ISprite> Sprite;
 
 class ENGINE_EXPORT ISprite : virtual public IObject {
 public:
+	virtual void SetActive(bool value) = 0;
+	virtual bool GetActive() = 0;
+
 	virtual bool LoadModel(const std::string& path) = 0;
 
 	virtual std::string GetName() = 0;

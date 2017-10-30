@@ -3,12 +3,13 @@
 #include <QKeyEvent>
 #include <QFileDialog>
 
-#include "game.h"
 #include "suede.h"
-#include "canvas.h"
-#include "console.h"
-#include "inspector.h"
-#include "hierarchy.h"
+
+#include "views/game.h"
+#include "views/canvas.h"
+#include "views/console.h"
+#include "views/inspector.h"
+#include "views/hierarchy.h"
 
 #include "camera.h"
 

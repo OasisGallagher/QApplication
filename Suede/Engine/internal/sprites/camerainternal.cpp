@@ -381,7 +381,7 @@ void CameraInternal::OnPostRender() {
 }
 
 bool CameraInternal::IsRenderable(Sprite sprite) {
-	return sprite->GetSurface() && sprite->GetRenderer();
+	return sprite->GetActive() && sprite->GetSurface() && sprite->GetRenderer();
 }
 
 bool CameraInternal::GetRenderableSprites(std::vector<Sprite>& sprites) {
