@@ -18,6 +18,8 @@
 #include "internal/misc/graphicsinternal.h"
 #include "internal/sprites/camerainternal.h"
 
+extern Time timeInstance;
+
 CameraInternal::CameraInternal() 
 	: SpriteInternal(ObjectTypeCamera), clearType_(ClearTypeColor)
 	, depth_(0), aspect_(1.3f), near_(1.f), far_(100.f)
@@ -413,6 +415,10 @@ void CameraInternal::RenderSprite(Sprite sprite, Renderer renderer) {
 	Surface surface = sprite->GetSurface();
 	
 	Material material = renderer->GetMaterial(0);
+
+	material->SetFloat(Variables::time, timeInstance->GetRealTimeSinceStartup());
+	material->SetFloat(Variables::deltaTime, timeInstance->GetDeltaTime());
+
 	glm::mat4 localToWorldMatrix = sprite->GetLocalToWorldMatrix();
 	glm::mat4 localToClipSpaceMatrix = projection_ * GetWorldToLocalMatrix() * localToWorldMatrix;
 	material->SetMatrix4(Variables::localToClipSpaceMatrix, localToClipSpaceMatrix);

@@ -18,27 +18,16 @@ void MeshInternal::GetTriangles(unsigned& vertexCount, unsigned& baseVertex, uns
 }
 
 SurfaceInternal::SurfaceInternal() 
-	: ObjectInternal(ObjectTypeSurface), vao_(0) {
-	std::fill(vbos_, vbos_ + CountOf(vbos_), 0);
-
-	glGenVertexArrays(1, &vao_);
-
-	Bind();
-	glGenBuffers(CountOf(vbos_), vbos_);
-	Unbind();
+	: ObjectInternal(ObjectTypeSurface) {
+	vao_.Create(VBOCount);
 }
 
 SurfaceInternal::~SurfaceInternal() {
-	Clear();
+	Destroy();
 }
 
-void SurfaceInternal::Clear() {
-	glDeleteVertexArrays(1, &vao_);
-	vao_ = 0;
-
-	glDeleteVertexArrays(CountOf(vbos_), vbos_);
-	std::fill(vbos_, vbos_ + CountOf(vbos_), 0);
-
+void SurfaceInternal::Destroy() {
+	vao_.Destroy();
 	meshes_.clear();
 }
 
@@ -50,35 +39,35 @@ void SurfaceInternal::SetAttribute(const SurfaceAttribute& value) {
 
 void SurfaceInternal::UpdateGLBuffers(const SurfaceAttribute& attribute) {
 	if (!attribute.positions.empty()) {
-		glBindBuffer(GL_ARRAY_BUFFER, vbos_[VBOPositions]);
+		glBindBuffer(GL_ARRAY_BUFFER, vao_.GetBuffer(VBOPositions));
 		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * attribute.positions.size(), &attribute.positions[0], GL_STATIC_DRAW);
 		glEnableVertexAttribArray(VertexAttributeIndexPosition);
 		glVertexAttribPointer(VertexAttributeIndexPosition, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 	}
 
 	if (!attribute.texCoords.empty()) {
-		glBindBuffer(GL_ARRAY_BUFFER, vbos_[VBOTexCoords]);
+		glBindBuffer(GL_ARRAY_BUFFER, vao_.GetBuffer(VBOTexCoords));
 		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2) * attribute.texCoords.size(), &attribute.texCoords[0], GL_STATIC_DRAW);
 		glEnableVertexAttribArray(VertexAttributeIndexTexCoord);
 		glVertexAttribPointer(VertexAttributeIndexTexCoord, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
 	}
 
 	if (!attribute.normals.empty()) {
-		glBindBuffer(GL_ARRAY_BUFFER, vbos_[VBONormals]);
+		glBindBuffer(GL_ARRAY_BUFFER, vao_.GetBuffer(VBONormals));
 		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * attribute.normals.size(), &attribute.normals[0], GL_STATIC_DRAW);
 		glEnableVertexAttribArray(VertexAttributeIndexNormal);
 		glVertexAttribPointer(VertexAttributeIndexNormal, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 	}
 
 	if (!attribute.tangents.empty()) {
-		glBindBuffer(GL_ARRAY_BUFFER, vbos_[VBOTangents]);
+		glBindBuffer(GL_ARRAY_BUFFER, vao_.GetBuffer(VBOTangents));
 		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * attribute.tangents.size(), &attribute.tangents[0], GL_STATIC_DRAW);
 		glEnableVertexAttribArray(VertexAttributeIndexTangent);
 		glVertexAttribPointer(VertexAttributeIndexTangent, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 	}
 
 	if (!attribute.blendAttrs.empty()) {
-		glBindBuffer(GL_ARRAY_BUFFER, vbos_[VBOBones]);
+		glBindBuffer(GL_ARRAY_BUFFER, vao_.GetBuffer(VBOBones));
 		glBufferData(GL_ARRAY_BUFFER, sizeof(BlendAttribute)* attribute.blendAttrs.size(), &attribute.blendAttrs[0], GL_STATIC_DRAW);
 
 		glEnableVertexAttribArray(VertexAttributeIndexBoneIndexes);
@@ -89,15 +78,15 @@ void SurfaceInternal::UpdateGLBuffers(const SurfaceAttribute& attribute) {
 	}
 
 	if (!attribute.indexes.empty()) {
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbos_[VBOIndexes]);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vao_.GetBuffer(VBOIndexes));
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned) * attribute.indexes.size(), &attribute.indexes[0], GL_STATIC_DRAW);
 	}
 }
 
 void SurfaceInternal::Bind() {
-	glBindVertexArray(vao_);
+	vao_.Bind();
 }
 
 void SurfaceInternal::Unbind() {
-	glBindVertexArray(0);
+	vao_.Unbind();
 }

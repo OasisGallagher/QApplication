@@ -22,8 +22,6 @@ Suede::Suede(QWidget *parent)
 	QMenu* fileMenu = menuBar()->findChild<QMenu*>("file");
 	QList<QAction*> actions = fileMenu->actions();
 
-	//connect(canvas(), SIGNAL(onEngineLogReceived(int, const char*)), this, SLOT(onEngineLogReceived(int, const char*)));
-
 	connect(actions[0], SIGNAL(triggered()), this, SLOT(screenCapture()));
 	connect(actions[1], SIGNAL(triggered()), qApp, SLOT(quit()));
 

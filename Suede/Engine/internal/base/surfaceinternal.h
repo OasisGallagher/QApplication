@@ -4,6 +4,7 @@
 #include <gl/glew.h>
 
 #include "surface.h"
+#include "vertexarray.h"
 #include "internal/base/objectinternal.h"
 
 class MeshInternal : public IMesh, public ObjectInternal {
@@ -53,11 +54,10 @@ private:
 		VBOCount,
 	};
 
-	void Clear();
+	void Destroy();
 	void UpdateGLBuffers(const SurfaceAttribute& attribute);
 
 private:
-	GLuint vao_;
-	GLuint vbos_[VBOCount];
+	VertexArray vao_;
 	std::vector<Mesh> meshes_;
 };

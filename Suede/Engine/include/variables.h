@@ -5,6 +5,9 @@
 #define C_MAX_BONE_COUNT				128
 
 namespace Variables {
+	DEFINE_VARIABLE(time);
+	DEFINE_VARIABLE(deltaTime);
+
 	DEFINE_VARIABLE(position);
 	DEFINE_VARIABLE(texCoord);
 	DEFINE_VARIABLE(normal);
