@@ -4,7 +4,7 @@
 #include <gl/glew.h>
 
 #include "surface.h"
-#include "vertexarray.h"
+#include "vertexarrayobject.h"
 #include "internal/base/objectinternal.h"
 
 class MeshInternal : public IMesh, public ObjectInternal {
@@ -58,6 +58,6 @@ private:
 	void UpdateGLBuffers(const SurfaceAttribute& attribute);
 
 private:
-	VertexArray vao_;
+	VertexArrayObject vao_;
 	std::vector<Mesh> meshes_;
 };

@@ -292,7 +292,7 @@
     <ClInclude Include="internal\base\transformfeedback.h">
       <Filter>internal\base\include</Filter>
     </ClInclude>
-    <ClInclude Include="internal\base\vertexarray.h">
+    <ClInclude Include="internal\base\vertexarrayobject.h">
       <Filter>internal\base\include</Filter>
     </ClInclude>
   </ItemGroup>
@@ -411,7 +411,7 @@
     <ClCompile Include="internal\base\transformfeedback.cpp">
       <Filter>internal\base\src</Filter>
     </ClCompile>
-    <ClCompile Include="internal\base\vertexarray.cpp">
+    <ClCompile Include="internal\base\vertexarrayobject.cpp">
       <Filter>internal\base\src</Filter>
     </ClCompile>
   </ItemGroup>

@@ -1,6 +1,6 @@
 #pragma once
 #include <gl/glew.h>
-#include "vertexarray.h"
+#include "vertexarrayobject.h"
 
 class TransformFeedback {
 public:
@@ -11,12 +11,14 @@ public:
 	void Create(size_t n, size_t size);
 	void Destroy();
 
-	void Bind();
+	void Bind(int tfbIndex, int vboIndex);
 	void Unbind();
 
 private:
 	size_t tfCount_;
-	VertexArray vao_;
+	VertexArrayObject vao_;
 
-	GLuint* tfs_;
+	GLuint* tfbs_;
+	GLuint oldTfb_;
+	int bindingVboIndex_;
 };

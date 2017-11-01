@@ -8,6 +8,7 @@
 #include "internal/memory/factory.h"
 #include "internal/file/imagecodec.h"
 #include "internal/base/framebuffer.h"
+#include "internal/misc/timefinternal.h"
 #include "internal/resources/resources.h"
 #include "internal/base/shaderinternal.h"
 #include "internal/world/worldinternal.h"
@@ -17,8 +18,6 @@
 #include "internal/base/rendererinternal.h"
 #include "internal/misc/graphicsinternal.h"
 #include "internal/sprites/camerainternal.h"
-
-extern Time timeInstance;
 
 CameraInternal::CameraInternal() 
 	: SpriteInternal(ObjectTypeCamera), clearType_(ClearTypeColor)

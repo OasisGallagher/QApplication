@@ -2,7 +2,7 @@
 #include "transformfeedback.h"
 #include "internal/memory/memory.h"
 
-TransformFeedback::TransformFeedback() : tfs_(nullptr), tfCount_(0) {
+TransformFeedback::TransformFeedback() : tfbs_(nullptr), tfCount_(0), bindingVboIndex_(-1) {
 }
 
 TransformFeedback::~TransformFeedback() {
@@ -18,17 +18,16 @@ void TransformFeedback::Create(size_t n, size_t size) {
 	vao_.Create(n);
 	vao_.Bind();
 
-	tfs_ = Memory::CreateArray<GLuint>(n);
-	glCreateTransformFeedbacks(n, tfs_);
-
+	tfbs_ = Memory::CreateArray<GLuint>(n);
+	glCreateTransformFeedbacks(n, tfbs_);
+	
 	for (size_t i = 0; i < n; ++i) {
-		glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, tfs_[i]);
-		glBindBuffer(GL_ARRAY_BUFFER, vao_.GetBuffer(i));
-		glBufferData(GL_ARRAY_BUFFER, size, nullptr, GL_DYNAMIC_DRAW);
+		glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, tfbs_[i]);
+		vao_.SetBuffer(i, GL_ARRAY_BUFFER, size, nullptr, GL_DYNAMIC_DRAW);
 
 		// This makes this buffer a transform feedback buffer and places it as index zero.
 		// We can have the primitives redirected into more than one buffer by binding several buffers at different indices. 
-		glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, vao_.GetBuffer(i));
+		glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, vao_.GetBufferNativePointer(i));
 
 		// Now we have two transform feedback objects with corresponding buffer objects that
 		// can serve both as vertex buffers as well as transform feedback buffers.
@@ -40,11 +39,29 @@ void TransformFeedback::Destroy() {
 		return;
 	}
 
-	glDeleteTransformFeedbacks(tfCount_, tfs_);
-	Memory::ReleaseArray(tfs_);
-	tfs_ = nullptr;
+	glDeleteTransformFeedbacks(tfCount_, tfbs_);
+	Memory::ReleaseArray(tfbs_);
+	tfbs_ = nullptr;
 
 	vao_.Destroy();
 
 	tfCount_ = 0;
+}
+
+void TransformFeedback::Bind(int tfbIndex, int vboIndex) {
+	Assert(tfbIndex >= 0 && tfbIndex < tfCount_);
+	Assert(vboIndex >= 0 && vboIndex < tfCount_);
+
+	vao_.BindBuffer(vboIndex);
+	bindingVboIndex_ = vboIndex;
+
+	glGetIntegerv(GL_TRANSFORM_FEEDBACK_BINDING, (GLint*)&oldTfb_);
+
+	glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, tfbs_[tfbIndex]);
+}
+
+void TransformFeedback::Unbind() {
+	glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, oldTfb_);
+	vao_.UnbindBuffer(bindingVboIndex_);
+	bindingVboIndex_ = -1;
 }
