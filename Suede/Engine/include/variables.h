@@ -1,6 +1,7 @@
 #pragma once
 #define VARIABLE_PREFIX					"c_"
-#define DEFINE_VARIABLE(name)			static const char* name = VARIABLE_PREFIX #name
+#define VARIABLE_NAME(name)				(VARIABLE_PREFIX #name)
+#define DEFINE_VARIABLE(name)			static const char* name = VARIABLE_NAME(name)
 
 #define C_MAX_BONE_COUNT				128
 

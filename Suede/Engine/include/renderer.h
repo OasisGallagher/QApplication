@@ -16,6 +16,7 @@ enum RenderStateType {
 	Blend,
 	DepthTest,
 	DepthWrite,
+	RasterizerDiscard,
 	RenderStateCount,
 };
 
@@ -63,11 +64,17 @@ public:
 	 * @param DepthWrite: On, Off
 	 * @param Blend0: Off, Zero, One, SrcColor, OneMinusSrcColor, SrcAlpha, OneMinusSrcAlpha, DestAlpha, OneMinusDestAlpha
 	 * @param Blend1: None, Zero, One, SrcColor, OneMinusSrcColor, SrcAlpha, OneMinusSrcAlpha, DestAlpha, OneMinusDestAlpha
+	 * @param RasterizerDiscard: On, Off
 	 */
 	virtual void SetRenderState(RenderStateType type, RenderStateParameter parameter0, RenderStateParameter parameter1 = (RenderStateParameter)None) = 0;
 };
 
 class ENGINE_EXPORT ISurfaceRenderer : virtual public IRenderer {
+
+};
+
+class ENGINE_EXPORT IParticleRenderer : virtual public IRenderer {
+public:
 
 };
 
@@ -78,4 +85,5 @@ public:
 
 typedef std::shared_ptr<IRenderer> Renderer;
 typedef std::shared_ptr<ISurfaceRenderer> SurfaceRenderer;
+typedef std::shared_ptr<IParticleRenderer> ParticleRenderer; 
 typedef std::shared_ptr<ISkinnedSurfaceRenderer> SkinnedSurfaceRenderer;

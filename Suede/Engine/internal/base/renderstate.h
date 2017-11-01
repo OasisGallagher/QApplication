@@ -36,7 +36,7 @@ public:
 	virtual void Unbind();
 
 private:
-	int oldMode_;
+	GLenum oldMode_;
 	GLboolean oldEnabled_;
 	RenderStateParameter parameter_;
 };
@@ -50,6 +50,18 @@ public:
 
 private:
 	GLint oldMask_;
+	RenderStateParameter parameter_;
+};
+
+class RasterizerDiscardState : public RenderState {
+public:
+	RasterizerDiscardState(RenderStateParameter parameter);
+
+	virtual void Bind();
+	virtual void Unbind();
+
+private:
+	GLboolean oldEnabled_;
 	RenderStateParameter parameter_;
 };
 

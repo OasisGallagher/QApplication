@@ -34,7 +34,7 @@ DepthTestState::DepthTestState(RenderStateParameter parameter) {
 
 void DepthTestState::Bind() {
 	oldEnabled_ = glIsEnabled(GL_DEPTH_TEST);
-	glGetIntegerv(GL_DEPTH_FUNC, &oldMode_);
+	glGetIntegerv(GL_DEPTH_FUNC, (GLint*)&oldMode_);
 
 	Enable(GL_DEPTH_TEST, parameter_ != Always);
 	glDepthFunc(RenderParamterToGLEnum(parameter_));
@@ -59,6 +59,22 @@ void DepthWriteState::Bind() {
 
 void DepthWriteState::Unbind() {
 	glDepthMask(oldMask_);
+}
+
+RasterizerDiscardState::RasterizerDiscardState(RenderStateParameter parameter) {
+	AssertX(IsValidParamter(parameter, 2,
+		On, Off
+	), "invalid paramter for 'RasterizerDiscard'.");
+	parameter_ = parameter;
+}
+
+void RasterizerDiscardState::Bind() {
+	oldEnabled_ = glIsEnabled(GL_RASTERIZER_DISCARD);
+	Enable(GL_RASTERIZER_DISCARD, parameter_ == On);
+}
+
+void RasterizerDiscardState::Unbind() {
+	Enable(GL_RASTERIZER_DISCARD, oldEnabled_);
 }
 
 BlendState::BlendState(RenderStateParameter src, RenderStateParameter dest) {

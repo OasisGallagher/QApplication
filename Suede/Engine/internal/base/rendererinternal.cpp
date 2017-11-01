@@ -33,6 +33,8 @@ void RendererInternal::SetRenderState(RenderStateType type, RenderStateParameter
 		case DepthWrite:
 			state = Memory::Create<DepthWriteState>(parameter0);
 			break;
+		case RasterizerDiscard:
+			state = Memory::Create<RasterizerDiscardState>(parameter0);
 		default:
 			Debug::LogError("invalid render capacity " + std::to_string(type));
 			break;

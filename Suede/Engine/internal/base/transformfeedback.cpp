@@ -1,29 +1,32 @@
 #include "tools/debug.h"
 #include "transformfeedback.h"
 #include "internal/memory/memory.h"
+#include "internal/base/vertexarrayobject.h"
 
 TransformFeedback::TransformFeedback() : tfbs_(nullptr), tfCount_(0), bindingVboIndex_(-1) {
+	vao_ = Memory::Create<VertexArrayObject>();
 }
 
 TransformFeedback::~TransformFeedback() {
 	Destroy();
+	Memory::Release(vao_);
 }
 
-void TransformFeedback::Create(size_t n, size_t size) {
+void TransformFeedback::Create(size_t n, size_t size, const void* data) {
 	Assert(n > 0 && size > 0);
 	Destroy();
 
 	tfCount_ = n;
 
-	vao_.Create(n);
-	vao_.Bind();
+	vao_->Create(n);
+	vao_->Bind();
 
 	tfbs_ = Memory::CreateArray<GLuint>(n);
 	glCreateTransformFeedbacks(n, tfbs_);
 	
 	for (size_t i = 0; i < n; ++i) {
 		glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, tfbs_[i]);
-		vao_.SetBuffer(i, GL_ARRAY_BUFFER, size, nullptr, GL_DYNAMIC_DRAW);
+		vao_->SetBuffer(i, GL_ARRAY_BUFFER, size, data, GL_DYNAMIC_DRAW);
 
 		// This makes this buffer a transform feedback buffer and places it as index zero.
 		// We can have the primitives redirected into more than one buffer by binding several buffers at different indices. 
@@ -43,7 +46,7 @@ void TransformFeedback::Destroy() {
 	Memory::ReleaseArray(tfbs_);
 	tfbs_ = nullptr;
 
-	vao_.Destroy();
+	vao_->Destroy();
 
 	tfCount_ = 0;
 }
@@ -62,6 +65,10 @@ void TransformFeedback::Bind(int tfbIndex, int vboIndex) {
 
 void TransformFeedback::Unbind() {
 	glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, oldTfb_);
-	vao_.UnbindBuffer(bindingVboIndex_);
+	vao_->UnbindBuffer(bindingVboIndex_);
 	bindingVboIndex_ = -1;
+}
+
+void TransformFeedback::SetVertexDataSource(int index, int location, int size, GLenum type, bool normalized, int stride, unsigned offset) {
+	vao_->SetVertexDataSource(index, location, size, type, normalized, stride, offset);
 }
