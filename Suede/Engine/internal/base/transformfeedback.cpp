@@ -30,7 +30,7 @@ void TransformFeedback::Create(size_t n, size_t size, const void* data) {
 
 		// This makes this buffer a transform feedback buffer and places it as index zero.
 		// We can have the primitives redirected into more than one buffer by binding several buffers at different indices. 
-		glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, vao_.GetBufferNativePointer(i));
+		glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, vao_->GetBufferNativePointer(i));
 
 		// Now we have two transform feedback objects with corresponding buffer objects that
 		// can serve both as vertex buffers as well as transform feedback buffers.
@@ -55,7 +55,7 @@ void TransformFeedback::Bind(int tfbIndex, int vboIndex) {
 	Assert(tfbIndex >= 0 && tfbIndex < tfCount_);
 	Assert(vboIndex >= 0 && vboIndex < tfCount_);
 
-	vao_.BindBuffer(vboIndex);
+	vao_->BindBuffer(vboIndex);
 	bindingVboIndex_ = vboIndex;
 
 	glGetIntegerv(GL_TRANSFORM_FEEDBACK_BINDING, (GLint*)&oldTfb_);

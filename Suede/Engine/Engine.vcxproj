@@ -261,9 +261,6 @@ copy $(TargetDir)$(TargetName).dll $(SolutionDir)$(SolutionName)\bin</Command>
     <ClInclude Include="tools\path.h" />
     <ClInclude Include="tools\string.h" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="internal\base\animationinternal.inl" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

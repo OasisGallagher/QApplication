@@ -3,10 +3,30 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "tools/mathf.h"
+#include "tools/debug.h"
 #include "animationinternal.h"
 #include "internal/misc/timefinternal.h"
 
 #define DEFAULT_TICKS_PER_SECOND	25
+
+static void LerpVariant(Variant& variant, Variant& lhs, Variant& rhs, float factor) {
+	AssertX(lhs.GetType() == rhs.GetType(), "variant type mismatch");
+	VariantType type = lhs.GetType();
+
+	switch (type) {
+		case VariantTypeFloat:
+			variant.SetFloat(Mathf::Lerp(lhs.GetFloat(), rhs.GetFloat(), factor));
+			break;
+		case VariantTypeVector3:
+			variant.SetVector3(Mathf::Lerp(lhs.GetVector3(), rhs.GetVector3(), factor));
+		case VariantTypeQuaternion:
+			variant.SetQuaternion(Mathf::Lerp(lhs.GetQuaternion(), rhs.GetQuaternion(), factor));
+			break;
+		default:
+			AssertX(false, "can not lerp attribute type " + std::to_string(type));
+			break;
+	}
+}
 
 bool SkeletonInternal::AddBone(const SkeletonBone& bone) {
 	if (GetBone(bone.name) != nullptr) {
@@ -120,9 +140,13 @@ bool AnimationClipInternal::SampleHierarchy(float time, SkeletonNode* node, cons
 	bool lastFrame = true;
 	glm::mat4 transform = node->matrix;
 	if (node->curve) {
-		glm::quat rotation;
-		glm::vec3 position, scale;
-		lastFrame = node->curve->Sample(time, position, rotation, scale);
+		AnimationFrame frame;
+		lastFrame = node->curve->Sample(time, frame);
+
+		glm::quat rotation = frame->GetQuaternion(FrameKeyRotation);
+		glm::vec3 position = frame->GetVector3(FrameKeyPosition);
+		glm::vec3 scale = frame->GetVector3(FrameKeyScale);
+
 		glm::mat4 identity;
 		transform = glm::translate(identity, position) * glm::mat4(rotation) * glm::scale(identity, scale);
 	}
@@ -145,79 +169,158 @@ bool AnimationClipInternal::SampleHierarchy(float time, SkeletonNode* node, cons
 	return lastFrame;
 }
 
-void AnimationKeysInternal::AddPosition(float time, const glm::vec3& value) {
-	PositionKey key;
-	key.time = time, key.value = value;
-	positionKeys_.insert(key);
+AnimationKeysInternal::AnimationKeysInternal() :ObjectInternal(ObjectTypeAnimationKeys) {
+	container_.resize(FrameKeyMaxCount);
 }
 
-void AnimationKeysInternal::AddRotation(float time, const glm::quat& value) {
-	RotationKey key;
-	key.time = time, key.value = value;
-	rotationKeys_.insert(key);
-}
-
-void AnimationKeysInternal::AddScale(float time, const glm::vec3 & value) {
-	ScaleKey key;
-	key.time = time, key.value = value;
-	scaleKeys_.insert(key);
-}
-
-void AnimationKeysInternal::RemovePosition(float time) {
-	PositionKey key;
-	key.time = time;
-	positionKeys_.remove(key);
-}
-
-void AnimationKeysInternal::RemoveRotation(float time) {
-	RotationKey key;
-	key.time = time;
-	rotationKeys_.remove(key);
-}
-
-void AnimationKeysInternal::RemoveScale(float time) {
-	ScaleKey key;
-	key.time = time;
-	scaleKeys_.remove(key);
-}
-
-void AnimationKeysInternal::ToKeyframes(std::vector<AnimationKeyframe>& keyframes) {
-	SmoothKeys();
-
-	Assert(positionKeys_.size() == rotationKeys_.size() && rotationKeys_.size() == scaleKeys_.size());
-	keyframes.reserve(positionKeys_.size());
-
-	for (int i = 0; i < positionKeys_.size(); ++i) {
-		AnimationKeyframe keyframe = CREATE_OBJECT(AnimationKeyframe);
-		keyframe->SetTime(positionKeys_[i].time);
-		keyframe->SetVector3(KeyframeAttributePosition, positionKeys_[i].value);
-		keyframe->SetQuaternion(KeyframeAttributeRotation, rotationKeys_[i].value);
-		keyframe->SetVector3(KeyframeAttributeScale, scaleKeys_[i].value);
-
-		keyframes.push_back(keyframe);
+AnimationKeysInternal::~AnimationKeysInternal() {
+	for (Container::iterator ite = container_.begin(); ite != container_.end(); ++ite) {
+		Memory::Release(*ite);
 	}
 }
 
-void AnimationKeysInternal::SmoothKeys() {
-	std::set<float> times;
-	for (int i = 0; i < scaleKeys_.size(); ++i) {
-		times.insert(scaleKeys_[i].time);
+void AnimationKeysInternal::AddFloat(int id, float time, float value) {
+	Key key{ id, time };
+	key.value.SetFloat(value);
+	InsertKey(id, key);
+}
+
+void AnimationKeysInternal::AddVector3(int id, float time, const glm::vec3& value) {
+	Key key{ id, time };
+	key.value.SetVector3(value);
+	InsertKey(id, key);
+}
+
+void AnimationKeysInternal::AddQuaternion(int id, float time, const glm::quat& value) {
+	Key key{ id, time };
+	key.value.SetQuaternion(value);
+	InsertKey(id, key);
+}
+
+void AnimationKeysInternal::Remove(int id, float time) {
+	Key key{ id, time };
+	RemoveKey(key);
+}
+
+void AnimationKeysInternal::ToKeyframes(std::vector<AnimationFrame>& keyframes) {
+	int count = SmoothKeys();
+	if (count != 0) {
+		InitializeKeyframes(count, keyframes);
+	}
+}
+
+void AnimationKeysInternal::InitializeKeyframes(int count, std::vector<AnimationFrame> &keyframes) {
+	keyframes.reserve(count);
+
+	for (int i = 0; i < count; ++i) {
+		AnimationFrame keyframe;
+
+		for (Container::iterator ite = container_.begin(); ite != container_.end(); ++ite) {
+			if (*ite == nullptr) { continue; }
+
+			Key& key = (*ite)->at(i);
+
+			if (!keyframe) {
+				keyframe = CREATE_OBJECT(AnimationFrame);
+				keyframe->SetTime(key.time);
+				keyframes.push_back(keyframe);
+			}
+
+			VariantType type = key.value.GetType();
+			switch (type) {
+				case VariantTypeFloat:
+					keyframe->SetFloat(key.id, key.value.GetFloat());
+					break;
+				case VariantTypeVector3:
+					keyframe->SetVector3(key.id, key.value.GetVector3());
+					break;
+				case VariantTypeQuaternion:
+					keyframe->SetQuaternion(key.id, key.value.GetQuaternion());
+					break;
+				default:
+					AssertX(false, "can not lerp attribute type " + std::to_string(type));
+					break;
+			}
+		}
+	}
+}
+
+int AnimationKeysInternal::SmoothKeys() {
+	typedef std::set<float> TimeLine;
+	TimeLine times;
+	for (Container::iterator ite = container_.begin(); ite != container_.end(); ++ite) {
+		if (*ite == nullptr) { continue; }
+		Keys* keys = (*ite);
+		for (Keys::iterator ite2 = keys->begin(); ite2 != keys->end(); ++ite2) {
+			times.insert(ite2->time);
+		}
 	}
 
-	for (int i = 0; i < rotationKeys_.size(); ++i) {
-		times.insert(rotationKeys_[i].time);
-	}
-
-	for (int i = 0; i < positionKeys_.size(); ++i) {
-		times.insert(positionKeys_[i].time);
-	}
-
-	for (std::set<float>::iterator ite = times.begin(); ite != times.end(); ++ite) {
+	for (TimeLine::iterator ite = times.begin(); ite != times.end(); ++ite) {
 		float time = *ite;
-		SmoothKey(positionKeys_, time);
-		SmoothKey(rotationKeys_, time);
-		SmoothKey(scaleKeys_, time);
+		for (Container::iterator ite = container_.begin(); ite != container_.end(); ++ite) {
+			if (*ite == nullptr) { continue; }
+			SmoothKey(*ite, time);
+		}
 	}
+
+	return times.size();
+}
+
+void AnimationKeysInternal::InsertKey(int id, const Key& key) {
+	AssertX(id >= 0 && id < FrameKeyMaxCount, "id must be less than " + std::to_string(FrameKeyMaxCount));
+
+	Keys* keys = container_[id];
+	if (container_[id] == nullptr) {
+		container_[id] = keys = Memory::Create<Keys>();
+	}
+
+	keys->insert(key);
+}
+
+void AnimationKeysInternal::RemoveKey(const Key& key) {
+	Keys* keys = container_[key.id];
+	if (keys == nullptr) {
+		return;
+	}
+
+	keys->remove(key);
+	if (keys->empty()) {
+		Memory::Release(keys);
+		container_[key.id] = nullptr;
+	}
+}
+
+void AnimationKeysInternal::SmoothKey(Keys* keys, float time) {
+	AssertX(!keys->empty(), "empty key container");
+
+	Keys::value_type key;
+	key.time = time;
+
+	Keys::iterator pos = keys->find(key);
+	if (pos != keys->end() && Mathf::Approximately(pos->time, time)) {
+		return;
+	}
+
+	key.id = keys->front().id;
+
+	if (pos == keys->end()) {
+		key.value = keys->back().value;
+	}
+	else {
+		if (pos == keys->begin()) {
+			key.value = keys->front().value;
+		}
+		else {
+			Keys::iterator prev = pos;
+			--prev;
+
+			float t = Mathf::Clamp01((time - prev->time) / (pos->time - prev->time));
+			LerpVariant(key.value, prev->value, pos->value, t);
+		}
+	}
+
+	keys->insert(key);
 }
 
 void AnimationInternal::AddClip(const std::string& name, AnimationClip value) {
@@ -265,20 +368,20 @@ void AnimationInternal::Update() {
 	}
 }
 
-bool AnimationCurveInternal::Sample(float time, glm::vec3& position, glm::quat& rotation, glm::vec3& scale) {
+bool AnimationCurveInternal::Sample(float time, AnimationFrame& frame) {
 	int index = FindInterpolateIndex(time);
 	if (index + 1 >= keyframes_.size()) {
-		SampleLastFrame(position, rotation, scale);
+		SampleLastFrame(frame);
 		return true;
 	}
 
-	Interpolate(index, time, position, rotation, scale);
+	Lerp(index, time, frame);
 	return false;
 }
 
 int AnimationCurveInternal::FindInterpolateIndex(float time) {
 	struct Comparerer {
-		bool operator ()(AnimationKeyframe& lhs, float time) const {
+		bool operator ()(AnimationFrame& lhs, float time) const {
 			return lhs->GetTime() < time;
 		}
 	};
@@ -286,43 +389,94 @@ int AnimationCurveInternal::FindInterpolateIndex(float time) {
 	return (int)std::distance(std::lower_bound(keyframes_.begin(), keyframes_.end(), time, Comparerer()), keyframes_.end());
 }
 
-void AnimationCurveInternal::SampleLastFrame(glm::vec3& position, glm::quat& rotation, glm::vec3& scale) {
+void AnimationCurveInternal::SampleLastFrame(AnimationFrame& frame) {
 	if (!keyframes_.empty()) {
-		AnimationKeyframe& frame = keyframes_.back();
-		position = frame->GetVector3(KeyframeAttributePosition);
-		rotation = frame->GetQuaternion(KeyframeAttributeRotation);
-		scale = frame->GetVector3(KeyframeAttributeScale);
+		frame = CREATE_OBJECT(AnimationFrame);
+		frame->Assign(keyframes_.back());
 	}
 }
 
-void AnimationCurveInternal::Interpolate(int index, float time, glm::vec3& position, glm::quat& rotation, glm::vec3& scale) {
+void AnimationCurveInternal::Lerp(int index, float time, AnimationFrame& frame) {
 	int next = index + 1;
 
 	float deltaTime = keyframes_[next]->GetTime() - keyframes_[index]->GetTime();
 	float factor = (time - keyframes_[index]->GetTime()) / deltaTime;
 
 	factor = Mathf::Clamp01(factor);
-
-	const int p = KeyframeAttributePosition, r = KeyframeAttributeRotation, s = KeyframeAttributeScale;
-
-	position = Mathf::Lerp(keyframes_[index]->GetVector3(p), keyframes_[next]->GetVector3(p), factor);
-	rotation = Mathf::Lerp(keyframes_[index]->GetQuaternion(r), keyframes_[next]->GetQuaternion(r), factor);
-	scale = Mathf::Lerp(keyframes_[index]->GetVector3(s), keyframes_[next]->GetVector3(s), factor);
+	frame = keyframes_[index]->Lerp(keyframes_[next], factor);
 }
 
-void AnimationKeyframeInternal::SetVector3(int id, const glm::vec3& value) {
+AnimationFrame AnimationFrameInternal::Lerp(AnimationFrame other, float factor) {
+	AnimationFrame ans = CREATE_OBJECT(AnimationFrame);
+	sorted_vector<Key>& otherAttributes = ((AnimationFrameInternal*)(other.get()))->attributes_;
+	AssertX(attributes_.size() == otherAttributes.size(), "attribute count mismatch");
+
+	for (int i = 0; i < attributes_.size(); ++i) {
+		Key& lhs = attributes_[i], &rhs = otherAttributes[i];
+		AssertX(lhs.id == rhs.id, "attribute id mismatch");
+		AssertX(lhs.value.GetType() == rhs.value.GetType(), "attribute type mismatch");
+
+		ans->SetTime(Mathf::Lerp(time_, other->GetTime(), factor));
+		LerpAttribute(ans, lhs, rhs, factor);
+	}
+
+	return ans;
+}
+
+void AnimationFrameInternal::Assign(AnimationFrame other) {
+	AnimationFrameInternal* ptr = ((AnimationFrameInternal*)(other.get()));
+	time_ = ptr->time_;
+	attributes_ = ptr->attributes_;
+}
+
+void AnimationFrameInternal::LerpAttribute(AnimationFrame ans, Key& lhs, Key& rhs, float factor) {
+	VariantType type = lhs.value.GetType();
+	switch (type) {
+		case VariantTypeFloat:
+			ans->SetFloat(lhs.id, Mathf::Lerp(lhs.value.GetFloat(), rhs.value.GetFloat(), factor));
+			break;
+		case VariantTypeVector3:
+			ans->SetVector3(lhs.id, Mathf::Lerp(lhs.value.GetVector3(), rhs.value.GetVector3(), factor));
+			break;
+		case VariantTypeQuaternion:
+			ans->SetQuaternion(lhs.id, Mathf::Lerp(lhs.value.GetQuaternion(), rhs.value.GetQuaternion(), factor));
+			break;
+		default:
+			AssertX(false, "can not lerp attribute type " + std::to_string(type));
+			break;
+	}
+}
+
+void AnimationFrameInternal::SetFloat(int id, float value) {
+	Key key = { id };
+	key.value.SetFloat(value);
+	attributes_.insert(key);
+}
+
+void AnimationFrameInternal::SetVector3(int id, const glm::vec3& value) {
 	Key key = { id };
 	key.value.SetVector3(value);
 	attributes_.insert(key);
 }
 
-void AnimationKeyframeInternal::SetQuaternion(int id, const glm::quat& value) {
+void AnimationFrameInternal::SetQuaternion(int id, const glm::quat& value) {
 	Key key = { id };
 	key.value.SetQuaternion(value);
 	attributes_.insert(key);
 }
 
-glm::vec3 AnimationKeyframeInternal::GetVector3(int id) {
+float AnimationFrameInternal::GetFloat(int id) {
+	Key key{ id };
+	if (!attributes_.get(key)) {
+		Debug::LogError("Animation keyframe attribute for id " + std::to_string(id) + " does not exist");
+		return 0;
+	}
+
+	return key.value.GetFloat();
+}
+
+
+glm::vec3 AnimationFrameInternal::GetVector3(int id) {
 	Key key{ id };
 	if (!attributes_.get(key)) {
 		Debug::LogError("Animation keyframe attribute for id " + std::to_string(id) + " does not exist");
@@ -332,7 +486,7 @@ glm::vec3 AnimationKeyframeInternal::GetVector3(int id) {
 	return key.value.GetVector3();
 }
 
-glm::quat AnimationKeyframeInternal::GetQuaternion(int id) {
+glm::quat AnimationFrameInternal::GetQuaternion(int id) {
 	Key key{ id };
 	if (!attributes_.get(key)) {
 		Debug::LogError("Animation keyframe attribute for id " + std::to_string(id) + " does not exist");

@@ -21,7 +21,7 @@ enum ObjectType {
 	ObjectTypeAnimationKeys,
 	ObjectTypeAnimationCurve,
 	ObjectTypeAnimationState,
-	ObjectTypeAnimationKeyframe,
+	ObjectTypeAnimationFrame,
 
 	// Sprites.
 	ObjectTypeSprite,

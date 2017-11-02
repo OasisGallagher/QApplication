@@ -44,6 +44,8 @@ public:
 		}
 	}
 
+	bool empty() { return container_.empty(); }
+
 	void contains(const value_type& value) {
 		iterator ite = find(value);
 		return ite != container_.end() && !comp(value, *ite);
@@ -57,6 +59,7 @@ public:
 	reference back() { return container_.back(); }
 	reference front() { return container_.front(); }
 
+	reference at(size_t i) { return container_.at(i); }
 	reference operator[] (size_t i) { return container_[i]; }
 
 private:

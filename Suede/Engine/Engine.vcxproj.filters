@@ -415,9 +415,4 @@
       <Filter>internal\base\src</Filter>
     </ClCompile>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="internal\base\animationinternal.inl">
-      <Filter>internal\base\include</Filter>
-    </None>
-  </ItemGroup>
 </Project>

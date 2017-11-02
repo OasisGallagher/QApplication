@@ -57,7 +57,9 @@ void Debug::Break(const std::string& expression, const std::string& message, con
 void Debug::BreakMessage(const std::string& message) {
 	// TODO: platform.
 #if defined(_WIN32) || defined(_WIN64)
-	__debugbreak();
+	wchar_t buffer[512];
+	mbstowcs(buffer, message.c_str(), CountOf(buffer));
+	_wassert(buffer, __FILEW__, __LINE__);
 #else
 	if (logReceiver_ != nullptr) { logReceiver_->OnEngineLogMessage(LogLevelFatal, message.c_str()); }
 #endif

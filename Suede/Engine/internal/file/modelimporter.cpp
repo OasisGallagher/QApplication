@@ -254,22 +254,22 @@ void ModelImporter::ImportAnimationNode(const aiAnimation* anim, const aiNode* p
 		for (int i = 0; i < channel->mNumPositionKeys; ++i) {
 			const aiVectorKey& key = channel->mPositionKeys[i];
 			glm::vec3 position;
-			keys->AddPosition((float)key.mTime, AIVector3ToGLM(position, key.mValue));
+			keys->AddVector3(FrameKeyPosition, (float)key.mTime, AIVector3ToGLM(position, key.mValue));
 		}
 
 		for (int i = 0; i < channel->mNumRotationKeys; ++i) {
 			const aiQuatKey& key = channel->mRotationKeys[i];
 			glm::quat rotation;
-			keys->AddRotation((float)key.mTime, AIQuaternionToGLM(rotation, key.mValue));
+			keys->AddQuaternion(FrameKeyRotation, (float)key.mTime, AIQuaternionToGLM(rotation, key.mValue));
 		}
 
 		for (int i = 0; i < channel->mNumScalingKeys; ++i) {
 			const aiVectorKey& key = channel->mScalingKeys[i];
 			glm::vec3 scale;
-			keys->AddScale((float)key.mTime, AIVector3ToGLM(scale, key.mValue));
+			keys->AddVector3(FrameKeyScale, (float)key.mTime, AIVector3ToGLM(scale, key.mValue));
 		}
 
-		std::vector<AnimationKeyframe> keyframes;
+		std::vector<AnimationFrame> keyframes;
 		keys->ToKeyframes(keyframes);
 
 		curve = CREATE_OBJECT(AnimationCurve);

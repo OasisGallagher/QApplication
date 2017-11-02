@@ -87,54 +87,43 @@ class AnimationKeysInternal : public IAnimationKeys, public ObjectInternal {
 	DEFINE_FACTORY_METHOD(AnimationKeys)
 
 public:
-	AnimationKeysInternal() :ObjectInternal(ObjectTypeAnimationKeys) {}
+	AnimationKeysInternal();
+	~AnimationKeysInternal();
 
 public:
-	virtual void AddPosition(float time, const glm::vec3& value);
-	virtual void AddRotation(float time, const glm::quat& value);
-	virtual void AddScale(float time, const glm::vec3& value);
+	virtual void AddFloat(int id, float time, float value);
+	virtual void AddVector3(int id, float time, const glm::vec3& value);
+	virtual void AddQuaternion(int id, float time, const glm::quat& value);
 
-	virtual void RemovePosition(float time);
-	virtual void RemoveRotation(float time);
-	virtual void RemoveScale(float time);
+	virtual void Remove(int id, float time);
 
-	virtual void ToKeyframes(std::vector<AnimationKeyframe>& keyframes);
-
-private:
-	void SmoothKeys();
+	virtual void ToKeyframes(std::vector<AnimationFrame>& keyframes);
 
 private:
 	struct Key {
+		int id;
 		float time;
+		Variant value;
 
 		bool operator < (const Key& other) const {
 			return time < other.time;
 		}
 	};
 
-	struct ScaleKey : Key {
-		typedef glm::vec3 T;
-		T value;
-	};
-
-	struct PositionKey : Key {
-		typedef glm::vec3 T;
-		T value;
-	};
-
-	struct RotationKey : Key {
-		typedef glm::quat T;
-		T value;
-	};
+	typedef sorted_vector<Key> Keys;
+	typedef std::vector<Keys*> Container;
 
 private:
-	template <class Cont>
-	void SmoothKey(Cont& container, float time);
+	void InsertKey(int id, const Key& key);
+	void RemoveKey(const Key& key);
+
+	int SmoothKeys();
+	void SmoothKey(Keys* keys, float time);
+
+	void InitializeKeyframes(int count, std::vector<AnimationFrame> &keyframes);
 
 private:
-	sorted_vector<ScaleKey> scaleKeys_;
-	sorted_vector<RotationKey> rotationKeys_;
-	sorted_vector<PositionKey> positionKeys_;
+	Container container_;
 };
 
 class AnimationInternal : public IAnimation, public ObjectInternal {
@@ -179,18 +168,24 @@ private:
 	sorted_vector<Key> clips_;
 };
 
-class AnimationKeyframeInternal : public IAnimationKeyframe, public ObjectInternal {
-	DEFINE_FACTORY_METHOD(AnimationKeyframe)
+class AnimationFrameInternal : public IAnimationFrame, public ObjectInternal {
+	DEFINE_FACTORY_METHOD(AnimationFrame)
 
 public:
-	AnimationKeyframeInternal() :ObjectInternal(ObjectTypeAnimationKeyframe) {}
+	AnimationFrameInternal() :ObjectInternal(ObjectTypeAnimationFrame) {}
 
 public:
 	virtual void SetTime(float value) { time_ = value; }
 	virtual float GetTime() { return time_; }
 
+	virtual void Assign(AnimationFrame other);
+	virtual AnimationFrame Lerp(AnimationFrame other, float factor);
+
+	virtual void SetFloat(int id, float value);
 	virtual void SetVector3(int id, const glm::vec3& value);
 	virtual void SetQuaternion(int id, const glm::quat& value);
+
+	virtual float GetFloat(int id);
 	virtual glm::vec3 GetVector3(int id);
 	virtual glm::quat GetQuaternion(int id);
 
@@ -204,6 +199,11 @@ private:
 		}
 	};
 
+private:
+	void LerpAttribute(AnimationFrame ans, Key& lhs, Key& rhs, float factor);
+
+private:
+
 	float time_;
 	sorted_vector<Key> attributes_;
 };
@@ -215,16 +215,14 @@ public:
 	AnimationCurveInternal() :ObjectInternal(ObjectTypeAnimationCurve) {}
 
 public:
-	virtual void SetKeyframes(const std::vector<AnimationKeyframe>& value) { keyframes_ = value; }
-	virtual bool Sample(float time, glm::vec3& position, glm::quat& rotation, glm::vec3& scale);
+	virtual void SetKeyframes(const std::vector<AnimationFrame>& value) { keyframes_ = value; }
+	virtual bool Sample(float time, AnimationFrame& frame);
 
 private:
 	int FindInterpolateIndex(float time);
-	void SampleLastFrame(glm::vec3& position, glm::quat& rotation, glm::vec3& scale);
-	void Interpolate(int index, float time, glm::vec3& position, glm::quat& rotation, glm::vec3& scale);
+	void SampleLastFrame(AnimationFrame& frame);
+	void Lerp(int index, float time, AnimationFrame& frame);
 
 private:
-	std::vector<AnimationKeyframe> keyframes_;
+	std::vector<AnimationFrame> keyframes_;
 };
-
-#include "animationinternal.inl"

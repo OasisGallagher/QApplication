@@ -8,7 +8,7 @@ class IAnimationClip;
 class IAnimationKeys;
 class IAnimationCurve;
 class IAnimationState;
-class IAnimationKeyframe;
+class IAnimationFrame;
 
 typedef std::shared_ptr<ISkeleton> Skeleton;
 typedef std::shared_ptr<IAnimation> Animation;
@@ -16,7 +16,7 @@ typedef std::shared_ptr<IAnimationClip> AnimationClip;
 typedef std::shared_ptr<IAnimationKeys> AnimationKeys;
 typedef std::shared_ptr<IAnimationCurve> AnimationCurve;
 typedef std::shared_ptr<IAnimationState> AnimationState;
-typedef std::shared_ptr<IAnimationKeyframe> AnimationKeyframe;
+typedef std::shared_ptr<IAnimationFrame> AnimationFrame;
 
 struct SkeletonBone {
 	std::string name;
@@ -79,42 +79,45 @@ class ENGINE_EXPORT IAnimationState : virtual public IObject {
 
 class ENGINE_EXPORT IAnimationKeys : virtual public IObject {
 public:
-	virtual void AddPosition(float time, const glm::vec3& value) = 0;
-	virtual void AddRotation(float time, const glm::quat& value) = 0;
-	virtual void AddScale(float time, const glm::vec3& value) = 0;
+	virtual void AddFloat(int id, float time, float value) = 0;
+	virtual void AddVector3(int id, float time, const glm::vec3& value) = 0;
+	virtual void AddQuaternion(int id, float time, const glm::quat& value) = 0;
 
-	virtual void RemovePosition(float time) = 0;
-	virtual void RemoveRotation(float time) = 0;
-	virtual void RemoveScale(float time) = 0;
+	virtual void Remove(int id, float time) = 0;
 
-	virtual void ToKeyframes(std::vector<AnimationKeyframe>& keyframes) = 0;
+	virtual void ToKeyframes(std::vector<AnimationFrame>& keyframes) = 0;
 };
 
 enum {
-	KeyframeAttributePosition,
-	KeyframeAttributeRotation,
-	KeyframeAttributeScale,
+	FrameKeyPosition,
+	FrameKeyRotation,
+	FrameKeyScale,
 
-	KeyframeAttributeUser = 8,
+	FrameKeyUser = 4,
+	FrameKeyMaxCount = 8,
 };
 
-class ENGINE_EXPORT IAnimationKeyframe : virtual public IObject {
+class ENGINE_EXPORT IAnimationFrame : virtual public IObject {
 public:
 	virtual void SetTime(float value) = 0;
 	virtual float GetTime() = 0;
 
+	virtual void Assign(AnimationFrame other) = 0;
+	virtual AnimationFrame Lerp(AnimationFrame other, float factor) = 0;
+
+	virtual void SetFloat(int id, float value) = 0;
 	virtual void SetVector3(int id, const glm::vec3& value) = 0;
 	virtual void SetQuaternion(int id, const glm::quat& value) = 0;
 
+	virtual float GetFloat(int id) = 0;
 	virtual glm::vec3 GetVector3(int id) = 0;
 	virtual glm::quat GetQuaternion(int id) = 0;
 };
 
 class ENGINE_EXPORT IAnimationCurve : virtual public IObject {
 public:
-	virtual void SetKeyframes(const std::vector<AnimationKeyframe>& value) = 0;
-	// TODO: Generic version.
-	virtual bool Sample(float time, glm::vec3& position, glm::quat& rotation, glm::vec3& scale) = 0;
+	virtual void SetKeyframes(const std::vector<AnimationFrame>& value) = 0;
+	virtual bool Sample(float time, AnimationFrame& frame) = 0;
 };
 
 class ENGINE_EXPORT IAnimation : virtual public IObject {
