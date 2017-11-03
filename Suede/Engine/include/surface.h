@@ -38,6 +38,10 @@ struct SurfaceAttribute {
 	std::vector<glm::vec3> tangents;
 	std::vector<BlendAttribute> blendAttrs;
 	std::vector<unsigned> indexes;
+
+	std::vector<glm::vec4> user0;
+	std::vector<glm::vec4> user1;
+	std::vector<glm::vec4> user2;
 };
 
 class ENGINE_EXPORT ISurface : virtual public IObject {

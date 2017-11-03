@@ -12,6 +12,10 @@ enum VertexAttributeIndex {
 	VertexAttributeIndexTangent,
 	VertexAttributeIndexBoneIndexes,
 	VertexAttributeIndexBoneWeights,
+
+	VertexAttributeIndexUser0,
+	VertexAttributeIndexUser1,
+	VertexAttributeIndexUser2,
 };
 
 class MaterialInternal : public IMaterial, public ObjectInternal {

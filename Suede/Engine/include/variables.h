@@ -16,6 +16,10 @@ namespace Variables {
 	DEFINE_VARIABLE(boneIndexes);
 	DEFINE_VARIABLE(boneWeights);
 
+	DEFINE_VARIABLE(user0);
+	DEFINE_VARIABLE(user1);
+	DEFINE_VARIABLE(user2);
+
 	DEFINE_VARIABLE(boneToRootSpaceMatrices);
 
 	DEFINE_VARIABLE(fragColor);

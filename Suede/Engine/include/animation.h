@@ -64,7 +64,9 @@ public:
 	virtual void SetTicksPerSecond(float value) = 0;
 	virtual float GetTicksPerSecond() = 0;
 
-	// Duration of the animation in ticks.
+	/**
+	 * @param value: Duration of the animation in ticks.
+	 */
 	virtual void SetDuration(float value) = 0;
 	virtual float GetDuration() = 0;
 

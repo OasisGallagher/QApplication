@@ -74,8 +74,6 @@ class ENGINE_EXPORT ISurfaceRenderer : virtual public IRenderer {
 };
 
 class ENGINE_EXPORT IParticleRenderer : virtual public IRenderer {
-public:
-
 };
 
 class ENGINE_EXPORT ISkinnedSurfaceRenderer : virtual public IRenderer {
@@ -87,3 +85,4 @@ typedef std::shared_ptr<IRenderer> Renderer;
 typedef std::shared_ptr<ISurfaceRenderer> SurfaceRenderer;
 typedef std::shared_ptr<IParticleRenderer> ParticleRenderer; 
 typedef std::shared_ptr<ISkinnedSurfaceRenderer> SkinnedSurfaceRenderer;
+

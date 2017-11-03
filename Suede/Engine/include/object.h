@@ -23,6 +23,8 @@ enum ObjectType {
 	ObjectTypeAnimationState,
 	ObjectTypeAnimationFrame,
 
+	ObjectTypeSphereParticleEmitter,
+
 	// Sprites.
 	ObjectTypeSprite,
 	ObjectTypeCamera,

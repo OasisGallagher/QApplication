@@ -9,24 +9,8 @@
 
 #define DEFAULT_TICKS_PER_SECOND	25
 
-static void LerpVariant(Variant& variant, Variant& lhs, Variant& rhs, float factor) {
-	AssertX(lhs.GetType() == rhs.GetType(), "variant type mismatch");
-	VariantType type = lhs.GetType();
-
-	switch (type) {
-		case VariantTypeFloat:
-			variant.SetFloat(Mathf::Lerp(lhs.GetFloat(), rhs.GetFloat(), factor));
-			break;
-		case VariantTypeVector3:
-			variant.SetVector3(Mathf::Lerp(lhs.GetVector3(), rhs.GetVector3(), factor));
-		case VariantTypeQuaternion:
-			variant.SetQuaternion(Mathf::Lerp(lhs.GetQuaternion(), rhs.GetQuaternion(), factor));
-			break;
-		default:
-			AssertX(false, "can not lerp attribute type " + std::to_string(type));
-			break;
-	}
-}
+static void SetVariant(AnimationFrame frame, int id, Variant& value);
+static void LerpVariant(Variant& variant, Variant& lhs, Variant& rhs, float factor);
 
 bool SkeletonInternal::AddBone(const SkeletonBone& bone) {
 	if (GetBone(bone.name) != nullptr) {
@@ -226,21 +210,7 @@ void AnimationKeysInternal::InitializeKeyframes(int count, std::vector<Animation
 				keyframes.push_back(keyframe);
 			}
 
-			VariantType type = key.value.GetType();
-			switch (type) {
-				case VariantTypeFloat:
-					keyframe->SetFloat(key.id, key.value.GetFloat());
-					break;
-				case VariantTypeVector3:
-					keyframe->SetVector3(key.id, key.value.GetVector3());
-					break;
-				case VariantTypeQuaternion:
-					keyframe->SetQuaternion(key.id, key.value.GetQuaternion());
-					break;
-				default:
-					AssertX(false, "can not lerp attribute type " + std::to_string(type));
-					break;
-			}
+			SetVariant(keyframe, key.id, key.value);
 		}
 	}
 }
@@ -431,20 +401,9 @@ void AnimationFrameInternal::Assign(AnimationFrame other) {
 
 void AnimationFrameInternal::LerpAttribute(AnimationFrame ans, Key& lhs, Key& rhs, float factor) {
 	VariantType type = lhs.value.GetType();
-	switch (type) {
-		case VariantTypeFloat:
-			ans->SetFloat(lhs.id, Mathf::Lerp(lhs.value.GetFloat(), rhs.value.GetFloat(), factor));
-			break;
-		case VariantTypeVector3:
-			ans->SetVector3(lhs.id, Mathf::Lerp(lhs.value.GetVector3(), rhs.value.GetVector3(), factor));
-			break;
-		case VariantTypeQuaternion:
-			ans->SetQuaternion(lhs.id, Mathf::Lerp(lhs.value.GetQuaternion(), rhs.value.GetQuaternion(), factor));
-			break;
-		default:
-			AssertX(false, "can not lerp attribute type " + std::to_string(type));
-			break;
-	}
+	Variant variant;
+	LerpVariant(variant, lhs.value, rhs.value, factor);
+	SetVariant(ans, lhs.id, variant);
 }
 
 void AnimationFrameInternal::SetFloat(int id, float value) {
@@ -494,4 +453,42 @@ glm::quat AnimationFrameInternal::GetQuaternion(int id) {
 	}
 
 	return key.value.GetQuaternion();
+}
+
+static void SetVariant(AnimationFrame frame, int id, Variant& value) {
+	VariantType type = value.GetType();
+	switch (type) {
+		case VariantTypeFloat:
+			frame->SetFloat(id, value.GetFloat());
+			break;
+		case VariantTypeVector3:
+			frame->SetVector3(id, value.GetVector3());
+			break;
+		case VariantTypeQuaternion:
+			frame->SetQuaternion(id, value.GetQuaternion());
+			break;
+		default:
+			AssertX(false, "can not set variant " + std::to_string(type));
+			break;
+	}
+}
+
+static void LerpVariant(Variant& variant, Variant& lhs, Variant& rhs, float factor) {
+	AssertX(lhs.GetType() == rhs.GetType(), "variant type mismatch");
+	VariantType type = lhs.GetType();
+
+	switch (type) {
+		case VariantTypeFloat:
+			variant.SetFloat(Mathf::Lerp(lhs.GetFloat(), rhs.GetFloat(), factor));
+			break;
+		case VariantTypeVector3:
+			variant.SetVector3(Mathf::Lerp(lhs.GetVector3(), rhs.GetVector3(), factor));
+			break;
+		case VariantTypeQuaternion:
+			variant.SetQuaternion(Mathf::Lerp(lhs.GetQuaternion(), rhs.GetQuaternion(), factor));
+			break;
+		default:
+			AssertX(false, "can not lerp attribute type " + std::to_string(type));
+			break;
+	}
 }

@@ -154,6 +154,10 @@ void MaterialInternal::UpdateVertexAttributes() {
 	glBindAttribLocation(program, VertexAttributeIndexTangent, Variables::tangent);
 	glBindAttribLocation(program, VertexAttributeIndexBoneIndexes, Variables::boneIndexes);
 	glBindAttribLocation(program, VertexAttributeIndexBoneWeights, Variables::boneWeights);
+
+	glBindAttribLocation(program, VertexAttributeIndexUser0, Variables::user0);
+	glBindAttribLocation(program, VertexAttributeIndexUser1, Variables::user1);
+	glBindAttribLocation(program, VertexAttributeIndexUser2, Variables::user2);
 }
 
 void MaterialInternal::UpdateFragmentAttributes() {

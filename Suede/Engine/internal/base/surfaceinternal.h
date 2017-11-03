@@ -51,6 +51,9 @@ private:
 		VBOTangents,
 		VBOBones,
 		VBOIndexes,
+		VBOUser0,
+		VBOUser1,
+		VBOUser2,
 		VBOCount,
 	};
 
