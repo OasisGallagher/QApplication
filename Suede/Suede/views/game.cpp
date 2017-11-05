@@ -9,6 +9,7 @@
 #include "engine.h"
 #include "texture.h"
 #include "surface.h"
+#include "particlesystem.h"
 
 #include "scripts/grayscale.h"
 #include "scripts/inversion.h"
@@ -128,16 +129,31 @@ void Game::createScene() {
 	camera->SetSkybox(skybox);
 
 	RenderTexture renderTexture = dsp_cast<RenderTexture>(world->Create(ObjectTypeRenderTexture));
-
 	renderTexture->Load(RenderTextureFormatRgba, canvas_->width(), canvas_->height());
 	//camera->SetRenderTexture(renderTexture);
 	//camera->SetClearColor(glm::vec3(0.0f, 0.0f, 0.4f));
 
-	Sprite sprite = dsp_cast<Sprite>(world->Create(ObjectTypeSprite));
+	ParticleSystem particleSystem = dsp_cast<ParticleSystem>(world->Create(ObjectTypeParticleSystem));
+	SphereParticleEmitter emitter = dsp_cast<SphereParticleEmitter>(world->Create(ObjectTypeSphereParticleEmitter));
+	emitter->SetRadius(5);
+	emitter->SetRate(10);
+	emitter->SetStartColor(glm::vec3(1, 0, 0));
+	emitter->SetStartDuration(5);
+	emitter->SetStartSize(10);
+	emitter->SetStartVelocity(glm::vec3(0, 3, 0));
+	ParticleBurst burst = { 4, 3, 20 };
+	particleSystem->SetEmitter(emitter);
+
+	ParticleAnimator animator = dsp_cast<ParticleAnimator>(world->Create(ObjectTypeParticleAnimator));
+	particleSystem->SetMaxParticles(1000);
+	particleSystem->SetDuration(5);
+	particleSystem->SetLooping(true);
+
+	//Sprite sprite = dsp_cast<Sprite>(world->Create(ObjectTypeSprite));
 	//sprite->SetParent(camera);
 	//light->SetParent(camera);
-	sprite->SetPosition(glm::vec3(0, 0, -70));
-	sprite->SetEulerAngles(glm::vec3(270, 180, 180));
+	//sprite->SetPosition(glm::vec3(0, 0, -70));
+	//sprite->SetEulerAngles(glm::vec3(270, 180, 180));
 
 	/* Mesh.
 	Mesh mesh = dynamic_ptr_cast<Mesh>(world->Create("Mesh"));
@@ -153,9 +169,10 @@ void Game::createScene() {
 	mesh->SetTriangles(3, 0, 0);
 	surface->AddMesh(mesh);
 	*/
-
+	/*
 	sprite->LoadModel("models/boblampclean.md5mesh");
 	sprite->GetAnimation()->SetWrapMode(AnimationWrapModePingPong);
+	*/
 	//sprite->GetAnimation()->Play("");
 	//Surface surface = sprite->GetSurface();
 

@@ -41,10 +41,12 @@ namespace Variables {
 
 	DEFINE_VARIABLE(cameraPosition);
 
+	DEFINE_VARIABLE(worldToCameraSpaceMatrix);
 	DEFINE_VARIABLE(localToClipSpaceMatrix);
 	DEFINE_VARIABLE(localToWorldSpaceMatrix);
 	DEFINE_VARIABLE(localToShadowSpaceMatrix);
 	DEFINE_VARIABLE(localToOrthographicLightSpaceMatrix);
+	DEFINE_VARIABLE(worldToClipSpaceMatrix);
 };
 
 #undef DEFINE_VARIABLE

@@ -46,9 +46,12 @@ enum RenderStateParameter {
 	OneMinusDestAlpha,
 };
 
+typedef std::shared_ptr<class ISprite> Sprite;
+
 class ENGINE_EXPORT IRenderer : virtual public IObject {
 public:
-	virtual void Render(Surface surface) = 0;
+	virtual void RenderSprite(Sprite sprite) = 0;
+	virtual void RenderSurface(Surface surface) = 0;
 	
 	virtual void AddMaterial(Material material) = 0;
 	virtual Material GetMaterial(int index) = 0;

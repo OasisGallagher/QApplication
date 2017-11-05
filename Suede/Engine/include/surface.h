@@ -5,6 +5,11 @@
 #include "object.h"
 #include "material.h"
 
+enum PrimaryType {
+	PrimaryTypeTriangle,
+	PrimaryTypeTriangleStripe,
+};
+
 struct MaterialTextures {
 	Texture bump;
 	Texture albedo;
@@ -13,6 +18,9 @@ struct MaterialTextures {
 
 class IMesh : virtual public IObject {
 public:
+	virtual void SetPrimaryType(PrimaryType value) = 0;
+	virtual PrimaryType GetPrimaryType() = 0;
+
 	virtual void SetMaterialTextures(const MaterialTextures& value) = 0;
 	virtual MaterialTextures& GetMaterialTextures() = 0;
 

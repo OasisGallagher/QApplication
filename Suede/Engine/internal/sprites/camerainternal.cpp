@@ -8,7 +8,6 @@
 #include "internal/memory/factory.h"
 #include "internal/file/imagecodec.h"
 #include "internal/base/framebuffer.h"
-#include "internal/misc/timefinternal.h"
 #include "internal/resources/resources.h"
 #include "internal/base/shaderinternal.h"
 #include "internal/world/worldinternal.h"
@@ -411,22 +410,24 @@ bool CameraInternal::GetRenderableSprites(std::vector<Sprite>& sprites) {
 }
 
 void CameraInternal::RenderSprite(Sprite sprite, Renderer renderer) {
-	Surface surface = sprite->GetSurface();
-	
-	Material material = renderer->GetMaterial(0);
+	for (int i = 0; i < renderer->GetMaterialCount(); ++i) {
+		UpdateMaterial(sprite, renderer->GetMaterial(i));
+	}
 
-	material->SetFloat(Variables::time, timeInstance->GetRealTimeSinceStartup());
-	material->SetFloat(Variables::deltaTime, timeInstance->GetDeltaTime());
+	renderer->RenderSprite(sprite);
+}
 
+void CameraInternal::UpdateMaterial(Sprite sprite, Material material) {
 	glm::mat4 localToWorldMatrix = sprite->GetLocalToWorldMatrix();
-	glm::mat4 localToClipSpaceMatrix = projection_ * GetWorldToLocalMatrix() * localToWorldMatrix;
+	glm::mat4 worldToCameraSpaceMatrix = GetWorldToLocalMatrix();
+	glm::mat4 worldToClipSpaceMatrix = projection_ * worldToCameraSpaceMatrix;
+	glm::mat4 localToClipSpaceMatrix = worldToClipSpaceMatrix * sprite->GetLocalToWorldMatrix();
+	material->SetMatrix4(Variables::worldToClipSpaceMatrix, worldToClipSpaceMatrix);
+	material->SetMatrix4(Variables::worldToCameraSpaceMatrix, worldToCameraSpaceMatrix);
 	material->SetMatrix4(Variables::localToClipSpaceMatrix, localToClipSpaceMatrix);
-	material->SetMatrix4(Variables::localToWorldSpaceMatrix, localToWorldMatrix);
 
 	if (pass_ >= RenderPassOpaque) {
 		material->SetMatrix4(Variables::localToShadowSpaceMatrix, viewToShadowSpaceMatrix_ * localToWorldMatrix);
 		material->SetTexture(Variables::shadowDepthTexture, fbShadow_->GetDepthTexture());
 	}
-
-	renderer->Render(surface);
 }

@@ -13,6 +13,7 @@ enum ObjectType {
 	ObjectTypeTextureCube,
 	ObjectTypeRenderTexture,
 	ObjectTypeSurfaceRenderer,
+	ObjectTypeParticleRenderer,
 	ObjectTypeSkinnedSurfaceRenderer,
 
 	ObjectTypeSkeleton,
@@ -23,6 +24,7 @@ enum ObjectType {
 	ObjectTypeAnimationState,
 	ObjectTypeAnimationFrame,
 
+	ObjectTypeParticleAnimator,
 	ObjectTypeSphereParticleEmitter,
 
 	// Sprites.

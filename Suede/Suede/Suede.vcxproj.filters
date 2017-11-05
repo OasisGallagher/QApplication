@@ -225,5 +225,8 @@
     <None Include="resources\buildin\shaders\lit_texture.glsl">
       <Filter>resources\buildin\shaders</Filter>
     </None>
+    <None Include="resources\buildin\shaders\particle.glsl">
+      <Filter>resources\buildin\shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

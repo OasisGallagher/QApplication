@@ -7,6 +7,15 @@ struct ParticleBurst {
 	unsigned max;
 };
 
+struct Particle {
+	float life;
+	float size;
+
+	glm::vec3 color;
+	glm::vec3 position;
+	glm::vec3 velocity;
+};
+
 class IParticleEmitter;
 class ISphereParticleEmitter;
 class IParticleAnimator;
@@ -17,8 +26,22 @@ typedef std::shared_ptr<IParticleAnimator> ParticleAnimator;
 
 class IParticleEmitter : virtual public IObject {
 public:
+	virtual void Emit(Particle* particles, unsigned& count) = 0;
+
 	virtual void SetRate(unsigned value) = 0;
 	virtual unsigned GetRate() = 0;
+
+	virtual void SetStartDuration(float value) = 0;
+	virtual float GetStartDuration() = 0;
+
+	virtual void SetStartSize(float value) = 0;
+	virtual float GetStartSize() = 0;
+
+	virtual void SetStartVelocity(const glm::vec3& value) = 0;
+	virtual glm::vec3 GetStartVelocity() = 0;
+
+	virtual void SetStartColor(const glm::vec3& value) = 0;
+	virtual glm::vec3 GetStartColor() = 0;
 
 	virtual void AddBurst(const ParticleBurst& value) = 0;
 	virtual void SetBurst(int i, const ParticleBurst& value) = 0;
@@ -40,6 +63,8 @@ public:
 
 	virtual void SetRandomForce(const glm::vec3& value) = 0;
 	virtual glm::vec3 GetRandomForce() = 0;
+
+	virtual void Animate(Particle& particle) = 0;
 };
 
 class ENGINE_EXPORT IParticleSystem : virtual public ISprite {
@@ -53,20 +78,20 @@ public:
 	virtual void SetStartDelay(float value) = 0;
 	virtual float GetStartDelay() = 0;
 
-	virtual void SetStartSpeed(float value) = 0;
-	virtual float GetStartSpeed() = 0;
-
-	virtual void SetStartColor(const glm::vec3& value) = 0;
-	virtual glm::vec3 GetStartColor() = 0;
-
 	virtual void SetGravityScale(float value) = 0;
+
 	virtual float GetGravityScale() = 0;
 
 	virtual void SetMaxParticles(unsigned value) = 0;
 	virtual unsigned GetMaxParticles() = 0;
 
+	virtual unsigned GetParticlesCount() = 0;
+
 	virtual void SetEmitter(ParticleEmitter value) = 0;
 	virtual ParticleEmitter GetEmitter() = 0;
+
+	virtual void SetParticleAnimator(ParticleAnimator value) = 0;
+	virtual ParticleAnimator GetParticleAnimator() = 0;
 };
 
 typedef std::shared_ptr<IParticleSystem> ParticleSystem;

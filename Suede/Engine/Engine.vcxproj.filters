@@ -292,6 +292,9 @@
     <ClInclude Include="internal\base\vertexarrayobject.h">
       <Filter>internal\base\include</Filter>
     </ClInclude>
+    <ClInclude Include="internal\containers\freelist.h">
+      <Filter>internal\containers\include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="internal\base\objectinternal.cpp">

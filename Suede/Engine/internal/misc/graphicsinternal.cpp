@@ -21,5 +21,5 @@ void GraphicsInternal::Blit(RenderTexture src, RenderTexture dest, Renderer rend
 	renderer->SetRenderState(DepthWrite, Off);
 	renderer->SetRenderState(DepthTest, Always);
 
-	renderer->Render(surface);
+	renderer->RenderSurface(surface);
 }

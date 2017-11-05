@@ -82,6 +82,8 @@ private:
 	bool IsRenderable(Sprite sprite);
 
 	void RenderSprite(Sprite sprite, Renderer renderer);
+	void UpdateMaterial(Sprite sprite, Material material);
+
 	bool GetRenderableSprites(std::vector<Sprite>& sprites);
 
 	void SetForwardBaseLightParameter(const std::vector<Sprite>& sprites, Light light);

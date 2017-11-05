@@ -2,7 +2,8 @@
 #include "surfaceinternal.h"
 #include "internal/base/materialinternal.h"
 
-MeshInternal::MeshInternal() :ObjectInternal(ObjectTypeMesh), vertexCount_(0), baseVertex_(0), baseIndex_(0) {
+MeshInternal::MeshInternal() :ObjectInternal(ObjectTypeMesh), vertexCount_(0), baseVertex_(0), baseIndex_(0)
+	, primaryType_(PrimaryTypeTriangle) {
 }
 
 void MeshInternal::SetTriangles(unsigned vertexCount, unsigned baseVertex, unsigned baseIndex) {
@@ -67,6 +68,21 @@ void SurfaceInternal::UpdateGLBuffers(const SurfaceAttribute& attribute) {
 
 	if (!attribute.indexes.empty()) {
 		vao_.SetBuffer(VBOIndexes, GL_ELEMENT_ARRAY_BUFFER, attribute.indexes, GL_STATIC_DRAW);
+	}
+
+	if (!attribute.user0.empty()) {
+		vao_.SetBuffer(VBOUser0, GL_ARRAY_BUFFER, attribute.user0, GL_STATIC_DRAW);
+		vao_.SetVertexDataSource(VBOUser0, VertexAttributeIndexUser0, 4, GL_FLOAT, false, 0, 0);
+	}
+
+	if (!attribute.user1.empty()) {
+		vao_.SetBuffer(VBOUser1, GL_ARRAY_BUFFER, attribute.user1, GL_STATIC_DRAW);
+		vao_.SetVertexDataSource(VBOUser1, VertexAttributeIndexUser1, 4, GL_FLOAT, false, 0, 0);
+	}
+
+	if (!attribute.user2.empty()) {
+		vao_.SetBuffer(VBOUser2, GL_ARRAY_BUFFER, attribute.user2, GL_STATIC_DRAW);
+		vao_.SetVertexDataSource(VBOUser2, VertexAttributeIndexUser2, 4, GL_FLOAT, false, 0, 0);
 	}
 }
 

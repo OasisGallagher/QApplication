@@ -1,5 +1,6 @@
 #include "surface.h"
 #include "renderer.h"
+#include "particlesystem.h"
 #include "internal/base/objectinternal.h"
 
 class RenderState;
@@ -10,7 +11,8 @@ public:
 	~RendererInternal();
 
 public:
-	virtual void Render(Surface surface);
+	virtual void RenderSprite(Sprite sprite);
+	virtual void RenderSurface(Surface surface);
 
 	virtual void AddMaterial(Material material) { materials_.push_back(material); }
 	virtual Material GetMaterial(int index) { return materials_[index]; }
@@ -22,8 +24,13 @@ public:
 
 	virtual void SetRenderState(RenderStateType type, RenderStateParameter parameter0, RenderStateParameter parameter1);
 
+protected:
+	virtual void DrawCall(Mesh mesh);
+
+	GLenum PrimaryTypeToGLEnum(PrimaryType type);
+
 private:
-	void DrawCall(Surface surface);
+	void DrawSurface(Surface surface);
 	void DrawMesh(Mesh mesh, Material material);
 
 	void BindRenderStates();
@@ -49,9 +56,25 @@ public:
 	SkinnedSurfaceRendererInternal() : RendererInternal(ObjectTypeSkinnedSurfaceRenderer) {}
 
 public:
-	virtual void Render(Surface surface);
+	virtual void RenderSurface(Surface surface);
 	virtual void SetSkeleton(Skeleton value) { skeleton_ = value; }
 
 private:
 	Skeleton skeleton_;
+};
+
+class ParticleRendererInternal : public IParticleRenderer, public RendererInternal {
+	DEFINE_FACTORY_METHOD(ParticleRenderer)
+
+public:
+	ParticleRendererInternal();
+
+public:
+	virtual void RenderSprite(Sprite sprite);
+
+protected:
+	virtual void DrawCall(Mesh mesh);
+
+private:
+	unsigned particleCount_;
 };

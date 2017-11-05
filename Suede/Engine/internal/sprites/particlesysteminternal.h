@@ -1,15 +1,30 @@
 #include <vector>
 
 #include "shader.h"
+#include "tools/mathf.h"
 #include "particlesystem.h"
 #include "internal/sprites/spriteinternal.h"
 
 class ParticleEmitterInternal : virtual public IParticleEmitter, public ObjectInternal {
 public:
-	ParticleEmitterInternal(ObjectType type) : ObjectInternal(type), rate_(1) {}
+	ParticleEmitterInternal(ObjectType type) : ObjectInternal(type), rate_(1), time_(-1) {}
 
 	virtual void SetRate(unsigned value) { rate_ = value; }
 	virtual unsigned GetRate() { return rate_; }
+
+	virtual void SetStartDuration(float value) { startLife_ = value; }
+	virtual float GetStartDuration() { return startLife_; }
+
+	virtual void SetStartSize(float value) { startSize_ = value; }
+	virtual float GetStartSize() { return startSize_; }
+
+	virtual void SetStartVelocity(const glm::vec3& value) { startVelocity_ = value; }
+	virtual glm::vec3 GetStartVelocity() { return startVelocity_; }
+
+	virtual void Emit(Particle* particles, unsigned& count);
+
+	virtual void SetStartColor(const glm::vec3& value) { startColor_ = value; }
+	virtual glm::vec3 GetStartColor() { return startColor_; }
 
 	virtual void AddBurst(const ParticleBurst& value) { bursts_.push_back(value); }
 	virtual void SetBurst(int i, const ParticleBurst& value) { bursts_[i] = value; }
@@ -17,12 +32,25 @@ public:
 	virtual void RemoveBurst(int i) { bursts_.erase(bursts_.begin() + i); }
 	virtual int GetBurstCount() { return bursts_.size(); }
 
+protected:
+	virtual glm::vec3 GetStartPosition() { return glm::vec3(0); }
+
+private:
+	unsigned CalculateEmitParticleCount(float current, float next);
+
 private:
 	unsigned rate_;
+	float time_;
+	float startLife_;
+	float startSize_;
+	glm::vec3 startColor_;
+	glm::vec3 startVelocity_;
 	std::vector<ParticleBurst> bursts_;
 };
 
 class SphereParticleEmitterInternal : public ISphereParticleEmitter, public ParticleEmitterInternal {
+	DEFINE_FACTORY_METHOD(SphereParticleEmitter)
+
 public:
 	SphereParticleEmitterInternal() : ParticleEmitterInternal(ObjectTypeSphereParticleEmitter) {}
 
@@ -30,17 +58,25 @@ public:
 	virtual void SetRadius(float value) { radius_ = value; }
 	virtual float GetRadius() { return radius_; }
 
+	virtual glm::vec3 GetStartPosition() { return Mathf::RandomInsideSphere(radius_); }
+
 private:
 	float radius_;
 };
 
 class ParticleAnimatorInternal : public IParticleAnimator, public ObjectInternal {
+	DEFINE_FACTORY_METHOD(ParticleAnimator)
+
+public:
+	ParticleAnimatorInternal() : ObjectInternal(ObjectTypeParticleAnimator) {}
 public:
 	virtual void SetForce(const glm::vec3& value) { force_ = value; }
 	virtual glm::vec3 GetForce() { return force_; }
 
 	virtual void SetRandomForce(const glm::vec3& value) { randomForce_ = value; }
 	virtual glm::vec3 GetRandomForce() { return randomForce_; }
+
+	virtual void Animate(Particle& particle);
 
 private:
 	glm::vec3 force_;
@@ -49,15 +85,6 @@ private:
 
 class ParticleSystemInternal : public IParticleSystem, public SpriteInternal {
 	DEFINE_FACTORY_METHOD(ParticleSystem)
-
-	struct Particle {
-		float size;
-		float rotation;
-
-		glm::vec3 color;
-		glm::vec3 position;
-		glm::vec3 velocity;
-	};
 
 public:
 	ParticleSystemInternal();
@@ -76,39 +103,36 @@ public:
 	virtual void SetStartDelay(float value) { startDelay_ = value; }
 	virtual float GetStartDelay() { return startDelay_; }
 
-	virtual void SetStartSpeed(float value) { startSpeed_ = value; }
-	virtual float GetStartSpeed() { return startSpeed_; }
-
-	virtual void SetStartColor(const glm::vec3 & value) { startColor_ = value; }
-	virtual glm::vec3 GetStartColor() { return startColor_; }
-
 	virtual void SetGravityScale(float value) { gravityScale_ = value; }
 	virtual float GetGravityScale() { return gravityScale_; }
+
+	virtual unsigned GetParticlesCount() { return particles_.size(); }
 
 	virtual void SetEmitter(ParticleEmitter value) { emitter_ = value; }
 	virtual ParticleEmitter GetEmitter() { return emitter_; }
 
+	virtual void SetParticleAnimator(ParticleAnimator value) { particleAnimator_ = value; }
+	virtual ParticleAnimator GetParticleAnimator() { return particleAnimator_; }
 public:
 	virtual void Update();
 
 private:
-	void Start();
-
-	void InitializeShader();
+	void InitializeSurface();
 	void InitializeRenderer();
 
+	void UpdateEmitter();
 	void UpdateParticles();
 
 private:
 	bool looping_;
 	int maxParticles_;
+	float time_;
 	float duration_;
 	float startDelay_;
-	float startSpeed_;
 	float gravityScale_;
-	glm::vec3 startColor_;
+
 	ParticleEmitter emitter_;
+	ParticleAnimator particleAnimator_;
 
 	std::vector<Particle> particles_;
 };
-

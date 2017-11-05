@@ -1,6 +1,7 @@
 #include "variables.h"
 #include "renderstate.h"
 #include "rendererinternal.h"
+#include "internal/misc/timefinternal.h"
 
 RendererInternal::RendererInternal(ObjectType type) : ObjectInternal(type), queue_(RenderQueueGeometry) {
 	std::fill(states_, states_ + RenderStateCount, nullptr);
@@ -12,9 +13,21 @@ RendererInternal::~RendererInternal() {
 	}
 }
 
-void RendererInternal::Render(Surface surface) {
+void RendererInternal::RenderSprite(Sprite sprite) {
+	Material material = GetMaterial(0);
+
+	material->SetFloat(Variables::time, timeInstance->GetRealTimeSinceStartup());
+	material->SetFloat(Variables::deltaTime, timeInstance->GetDeltaTime());
+
+	glm::mat4 localToWorldMatrix = sprite->GetLocalToWorldMatrix();
+	material->SetMatrix4(Variables::localToWorldSpaceMatrix, localToWorldMatrix);
+
+	RenderSurface(sprite->GetSurface());
+}
+
+void RendererInternal::RenderSurface(Surface surface) {
 	BindRenderStates();
-	DrawCall(surface);
+	DrawSurface(surface);
 	UnbindRenderStates();
 }
 
@@ -44,8 +57,16 @@ void RendererInternal::SetRenderState(RenderStateType type, RenderStateParameter
 	states_[type] = state;
 }
 
-void RendererInternal::DrawCall(Surface surface) {
+
+GLenum RendererInternal::PrimaryTypeToGLEnum(PrimaryType type) {
+	if (type == PrimaryTypeTriangle) { return GL_TRIANGLES; }
+	return GL_TRIANGLE_STRIP;
+}
+
+void RendererInternal::DrawSurface(Surface surface) {
 	surface->Bind();
+
+	// TODO: batch mesh if their materials are identical.
 	for (int i = 0; i < surface->GetMeshCount(); ++i) {
 		Mesh mesh = surface->GetMesh(i);
 
@@ -73,11 +94,16 @@ void RendererInternal::DrawMesh(Mesh mesh, Material material) {
 	}
 
 	material->Bind();
+	DrawCall(mesh);
+	material->Unbind();
+}
+
+void RendererInternal::DrawCall(Mesh mesh) {
 	unsigned vertexCount, baseVertex, baseIndex;
 	mesh->GetTriangles(vertexCount, baseVertex, baseIndex);
 
-	glDrawElementsBaseVertex(GL_TRIANGLES, vertexCount, GL_UNSIGNED_INT, (void*)(sizeof(unsigned)* baseIndex), baseVertex);
-	material->Unbind();
+	GLenum mode = PrimaryTypeToGLEnum(mesh->GetPrimaryType());
+	glDrawElementsBaseVertex(mode, vertexCount, GL_UNSIGNED_INT, (void*)(sizeof(unsigned)* baseIndex), baseVertex);
 }
 
 void RendererInternal::BindRenderStates() {
@@ -96,10 +122,33 @@ void RendererInternal::UnbindRenderStates() {
 	}
 }
 
-void SkinnedSurfaceRendererInternal::Render(Surface surface) {
+void SkinnedSurfaceRendererInternal::RenderSurface(Surface surface) {
 	for (int i = 0; i < GetMaterialCount(); ++i) {
 		GetMaterial(i)->SetMatrix4(Variables::boneToRootSpaceMatrices, *skeleton_->GetBoneToRootSpaceMatrices());
 	}
 
-	RendererInternal::Render(surface);
+	RendererInternal::RenderSurface(surface);
+}
+
+ParticleRendererInternal::ParticleRendererInternal()
+	: RendererInternal(ObjectTypeParticleRenderer), particleCount_(0) {
+	SetRenderQueue(RenderQueueTransparent);
+	SetRenderState(Blend, SrcAlpha, OneMinusSrcAlpha);
+}
+
+void ParticleRendererInternal::RenderSprite(Sprite sprite) {
+	ParticleSystem particleSystem = dsp_cast<ParticleSystem>(sprite);
+	AssertX(particleSystem, "invalid particle system");
+	particleCount_ = particleSystem->GetParticlesCount();
+
+	RendererInternal::RenderSprite(sprite);
+}
+
+void ParticleRendererInternal::DrawCall(Mesh mesh) {
+	if (particleCount_ == 0) { return; }
+	unsigned vertexCount, baseVertex, baseIndex;
+	mesh->GetTriangles(vertexCount, baseVertex, baseIndex);
+
+	GLenum mode = PrimaryTypeToGLEnum(mesh->GetPrimaryType());
+	glDrawElementsInstancedBaseVertex(mode, vertexCount, GL_UNSIGNALED, (void*)(sizeof(unsigned)* baseIndex), particleCount_, baseVertex);
 }
