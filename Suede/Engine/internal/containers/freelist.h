@@ -6,7 +6,8 @@
 template <class T>
 class free_list {
 	struct Head {
-		struct Block* nextBlock;
+		struct Block* prev;
+		struct Block* next;
 	};
 
 	struct Block {
@@ -14,82 +15,134 @@ class free_list {
 		T value;
 	};
 
-	struct Node {
-		Block* block;
-		Node* nextNode;
-	};
-
-	static const int HeadSize = sizeof(Head);
+	enum { HeadSize = sizeof(Head) };
 
 public:
-	free_list(size_t capacity) : nodes_(nullptr), freeBlocks_(nullptr), busyBlocks_(nullptr) {
-		capacity_ = grow_ = Mathf::NextPowerOfTwo(Mathf::Max(2, capacity));
-		Grow(capacity_);
+	class free_list_iterator {
+	public:
+		free_list_iterator(Block* block) :ptr_(block) {}
+
+		bool operator == (const free_list_iterator& other) const {
+			return ptr_ == other.ptr_;
+		}
+
+		bool operator != (const free_list_iterator& other) const {
+			return ptr_ != other.ptr_;
+		}
+
+		T* operator*() {
+			return &ptr_->value;
+		}
+
+		free_list_iterator& operator++() {
+			ptr_ = ptr_->head.next;
+			return *this;
+		}
+
+		free_list_iterator operator++(int) {
+			free_list_iterator ite = *this;
+			ptr_ = ptr_->head.next;
+			return ite;
+		}
+
+	private:
+		Block* ptr_;
+	};
+
+	typedef free_list_iterator iterator;
+
+public:
+	free_list(size_t capacity) : free_(nullptr), busy_(nullptr), size_(0) {
+		capacity_ = capacity;
+		allocate(capacity_);
 	}
 
 	~free_list() {
-		while (nodes_ != nullptr) {
-			Node* next = nodes_->nextNode;
-			Memory::Release(nodes_->block);
-			Memory::Release(nodes_);
-			nodes_ = next;
-		}
+		Memory::ReleaseArray(memory_);
 	}
 
+	void reallocate(size_t n) {
+		Memory::ReleaseArray(memory_);
+		size_ = 0;
+		capacity_ = n;
+		allocate(n);
+	}
+
+	iterator begin() { return iterator(busy_); }
+	iterator end() { return iterator(nullptr); }
+
+	size_t index(T* ptr) const {
+		Block* block = (Block*)advance(ptr, -HeadSize);
+		return block - memory_;
+	}
+
+	size_t size() const { return size_; }
+	size_t capacity() const { return capacity_; }
+
 	T* pop() {
-		if (freeBlocks_ == nullptr) {
-			Grow(grow_ *= 2);
-			capacity_ += grow_;
+		Assert(free_ != nullptr);
+
+		T* result = (T*)advance(free_, HeadSize);
+		Block* block = free_;
+		free_ = free_->head.next;
+
+		block->head.next = busy_;
+		block->head.prev = nullptr;
+
+		if (busy_ != nullptr) {
+			busy_->head.prev = block;
 		}
 
-		T* result = (T*)Advance(freeBlocks_, HeadSize);
-		freeBlocks_ = freeBlocks_->head.nextBlock;
+		busy_ = block;
+		++size_;
 		return result;
 	}
 
 	void push(T* ptr) {
-		Block* block = (Block*)Advance(ptr, -HeadSize);
-		block->head.nextBlock = freeBlocks_;
-		freeBlocks_ = block;
+		Block* block = (Block*)advance(ptr, -HeadSize);
+		block->head.next = free_;
+		block->head.prev = nullptr;
+
+		if (free_ != nullptr) {
+			free_->head.prev = block;
+		}
+		free_ = block;
+
+		if (busy_ == block) {
+			busy_ = busy_->head.next;
+		}
+
+		--size_;
 	}
 
 private:
-	void Grow(size_t size) {
-		AssertX(freeBlocks_ == nullptr, "Grow is not necessary");
+	void allocate(size_t size) {
+		memory_ = Memory::CreateArray<Block>(size);
+		for (size_t i = 0; i < size; ++i) {
+			if (i >= 1) {
+				memory_[i - 1].head.next = memory_ + i;
+			}
 
-		Block* memory = Memory::CreateArray<Block>(grow_);
-		for (size_t i = 0; i < grow_; ++i) {
-			if (i >= 1)
-				memory[i - 1].head.nextBlock = &memory[i];
-		}
-		memory[grow_ - 1].head.nextBlock = nullptr;
-
-		Node* node = Memory::Create<Node>();
-		node->block = memory;
-		node->nextNode = nullptr;
-
-		if (nodes_ == nullptr) {
-			nodes_ = last_ = node;
-		}
-		else {
-			last_->nextNode = node;
-			last_ = node;
+			if (i < size - 1) {
+				memory_[i + 1].head.prev = memory_ + i;
+			}
 		}
 
-		freeBlocks_ = memory;
+		memory_[size - 1].head.next = nullptr;
+		memory_[0].head.prev = nullptr;
+
+		free_ = memory_;
+		busy_ = nullptr;
 	}
 
-	template <class T>
-	void* Advance(T* ptr, int off) {
+	void* advance(void* ptr, int off) const {
 		return (char*)ptr + off;
 	}
 
-	size_t grow_;
-
+	size_t size_;
 	size_t capacity_;
 
-	Node* last_;
-	Node* nodes_;
-
-	Block* freeBlocks_;
+	Block* free_;
+	Block* busy_;
+	Block* memory_;
 };

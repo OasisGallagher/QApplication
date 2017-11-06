@@ -3,6 +3,7 @@
 #include "shader.h"
 #include "tools/mathf.h"
 #include "particlesystem.h"
+#include "internal/containers/freelist.h"
 #include "internal/sprites/spriteinternal.h"
 
 class ParticleEmitterInternal : virtual public IParticleEmitter, public ObjectInternal {
@@ -109,7 +110,7 @@ public:
 	virtual void SetGravityScale(float value) { gravityScale_ = value; }
 	virtual float GetGravityScale() { return gravityScale_; }
 
-	virtual unsigned GetParticlesCount() { return activeParticles_; }
+	virtual unsigned GetParticlesCount();
 
 	virtual void SetEmitter(ParticleEmitter value) { emitter_ = value; }
 	virtual ParticleEmitter GetEmitter() { return emitter_; }
@@ -130,8 +131,6 @@ private:
 
 	void UpdateParticles();
 
-	void FindUnusedParticles(Particle** container, unsigned count);
-
 private:
 	bool looping_;
 	int maxParticles_;
@@ -146,6 +145,5 @@ private:
 	std::vector<glm::vec4> colors_;
 	std::vector<glm::vec4> positions_;
 
-	unsigned activeParticles_;
-	std::vector<Particle> particles_;
+	free_list<Particle> particles_;
 };

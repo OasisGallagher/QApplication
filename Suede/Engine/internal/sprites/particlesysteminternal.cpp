@@ -16,22 +16,27 @@ static const glm::vec3 quadVertices[] = {
 	glm::vec3(0.5f,  0.5f, 0.f),
 };
 
+#define MAX_PARTICLE_COUNT	1000
+
 ParticleSystemInternal::ParticleSystemInternal()
-	: SpriteInternal(ObjectTypeParticleSystem), duration_(3), looping_(false)
-	, startDelay_(0), time_(0), gravityScale_(1), activeParticles_(0), maxParticles_(1000) {
+	: SpriteInternal(ObjectTypeParticleSystem), duration_(3)
+	, looping_(false), startDelay_(0), time_(0), gravityScale_(1)
+	, maxParticles_(MAX_PARTICLE_COUNT), particles_(MAX_PARTICLE_COUNT) 
+	, colors_(MAX_PARTICLE_COUNT), positions_(MAX_PARTICLE_COUNT) {
+	InitializeSurface();
+	InitializeRenderer();
 }
 
 ParticleSystemInternal::~ParticleSystemInternal() {
 }
 
 void ParticleSystemInternal::SetMaxParticles(unsigned value) {
+	if (maxParticles_ == value) { return; }
+
 	maxParticles_ = value;
 	colors_.resize(value);
 	positions_.resize(value);
-	particles_.resize(value);
-
-	InitializeSurface();
-	InitializeRenderer();
+	particles_.reallocate(value);
 }
 
 void ParticleSystemInternal::Update() {
@@ -45,21 +50,22 @@ void ParticleSystemInternal::Update() {
 }
 
 void ParticleSystemInternal::UpdateParticles() {
-	// TODO: suitable container.
-	for (int i = (int)particles_.size() - 1; i >= 0; --i) {
-		Particle& particle = particles_[i];
-		if (particle.life <= 0) {
-			continue;
-		}
-
-		float deltaTime = timeInstance->GetDeltaTime();
-		if ((particle.life -= deltaTime) > 0) {
-			*particle.position += particle.velocity * deltaTime;
-			particle.velocity -= 9.8f * deltaTime;
+	float deltaTime = timeInstance->GetDeltaTime();
+	std::vector<Particle*> unused;
+	for (free_list<Particle>::iterator ite = particles_.begin(); ite != particles_.end(); ++ite) {
+		Particle* particle = *ite;
+		if ((particle->life -= deltaTime) <= 0) {
+			unused.push_back(particle);
+			//particles_.push(particle);
 		}
 		else {
-			--activeParticles_;
+			*particle->position += particle->velocity * deltaTime;
+			particle->velocity -= 9.8f * deltaTime;
 		}
+	}
+
+	for (Particle* p : unused) {
+		particles_.push(p);
 	}
 
 	Surface surface = GetSurface();
@@ -83,22 +89,24 @@ void ParticleSystemInternal::UpdateEmitter() {
 }
 
 void ParticleSystemInternal::EmitParticles(unsigned count) {
-	std::vector<Particle*> cont(count);
-	FindUnusedParticles(&cont[0], count);
+	// TODO: use iterator instead.
+	std::vector<Particle*> cont;
 
-	int pos = activeParticles_;
 	for (int i = 0; i < count; ++i) {
-		cont[i]->color = &colors_[pos + i];
-		cont[i]->size = &positions_[pos + i].w;
-		cont[i]->position = (glm::vec3*)&positions_[pos + i];
+		cont.push_back(particles_.pop());
+	}
+
+	for (int i = 0; i < count; ++i) {
+		size_t pos = particles_.index(cont[i]);
+		cont[i]->color = &colors_[pos];
+		cont[i]->size = &positions_[pos].w;
+		cont[i]->position = (glm::vec3*)&positions_[pos];
 	}
 
 	emitter_->Emit(&cont[0], count);
 	for (int i = 0; i < count; ++i) {
 		*cont[i]->position += GetPosition();
 	}
-
-	activeParticles_ += count;
 }
 
 void ParticleSystemInternal::InitializeSurface() {
@@ -140,12 +148,8 @@ void ParticleSystemInternal::InitializeRenderer() {
 	SetRenderer(renderer);
 }
 
-void ParticleSystemInternal::FindUnusedParticles(Particle** container, unsigned count) {
-	for (int i = 0, j = 0; i < particles_.size() && j < count; ++i) {
-		if (particles_[i].life <= 0) {
-			container[j++] = &particles_[i];
-		}
-	}
+unsigned ParticleSystemInternal::GetParticlesCount() {
+	return particles_.size();
 }
 
 ParticleEmitterInternal::ParticleEmitterInternal(ObjectType type) : ObjectInternal(type)
