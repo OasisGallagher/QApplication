@@ -47,7 +47,10 @@ public:
 	virtual void Bind();
 	virtual void Unbind();
 
+	virtual void UpdateUserBuffer(unsigned i, size_t size, void* data);
+
 private:
+	// TODO: dynamic vbo count...
 	enum {
 		VBOPositions,
 		VBOTexCoords,

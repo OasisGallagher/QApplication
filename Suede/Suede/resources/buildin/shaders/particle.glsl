@@ -10,8 +10,8 @@ uniform mat4 c_worldToClipSpaceMatrix;
 uniform mat4 c_worldToCameraSpaceMatrix;
 
 void main() {
-	float size = c_user0.w;
-	vec3 center = c_user0.xyz;
+	float size = c_user1.w;
+	vec3 center = c_user1.xyz;
 
 	vec3 cameraUp = vec3(c_worldToCameraSpaceMatrix[0][1], c_worldToCameraSpaceMatrix[1][1], c_worldToCameraSpaceMatrix[2][1]);
 	vec3 cameraRight = vec3(c_worldToCameraSpaceMatrix[0][0], c_worldToCameraSpaceMatrix[1][0], c_worldToCameraSpaceMatrix[2][0]);
@@ -32,5 +32,5 @@ out vec4 c_fragColor;
 uniform sampler2D c_mainTexture;
 
 void main() {
-	c_fragColor = texture(c_mainTexture, texCoord) * color; 
+	c_fragColor = texture(c_mainTexture, texCoord); // * color; 
 }

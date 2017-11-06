@@ -9,11 +9,11 @@ struct ParticleBurst {
 
 struct Particle {
 	float life;
-	float size;
-
-	glm::vec3 color;
-	glm::vec3 position;
 	glm::vec3 velocity;
+
+	float* size;
+	glm::vec4* color;
+	glm::vec3* position;
 };
 
 class IParticleEmitter;
@@ -26,7 +26,7 @@ typedef std::shared_ptr<IParticleAnimator> ParticleAnimator;
 
 class IParticleEmitter : virtual public IObject {
 public:
-	virtual void Emit(Particle* particles, unsigned& count) = 0;
+	virtual void Emit(Particle** particles, unsigned& count) = 0;
 
 	virtual void SetRate(unsigned value) = 0;
 	virtual unsigned GetRate() = 0;
@@ -40,8 +40,8 @@ public:
 	virtual void SetStartVelocity(const glm::vec3& value) = 0;
 	virtual glm::vec3 GetStartVelocity() = 0;
 
-	virtual void SetStartColor(const glm::vec3& value) = 0;
-	virtual glm::vec3 GetStartColor() = 0;
+	virtual void SetStartColor(const glm::vec4& value) = 0;
+	virtual glm::vec4 GetStartColor() = 0;
 
 	virtual void AddBurst(const ParticleBurst& value) = 0;
 	virtual void SetBurst(int i, const ParticleBurst& value) = 0;

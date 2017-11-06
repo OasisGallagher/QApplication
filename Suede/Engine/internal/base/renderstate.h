@@ -6,6 +6,7 @@
 class RenderState {
 public:
 	virtual ~RenderState() {}
+	virtual void Initialize(RenderStateParameter parameter0, RenderStateParameter parameter1) = 0;
 	virtual void Bind() = 0;
 	virtual void Unbind() = 0;
 
@@ -17,8 +18,7 @@ protected:
 
 class CullState : public RenderState {
 public:
-	CullState(RenderStateParameter parameter);
-
+	virtual void Initialize(RenderStateParameter parameter0, RenderStateParameter);
 	virtual void Bind();
 	virtual void Unbind();
 
@@ -30,8 +30,7 @@ private:
 
 class DepthTestState : public RenderState {
 public:
-	DepthTestState(RenderStateParameter parameter);
-
+	virtual void Initialize(RenderStateParameter parameter0, RenderStateParameter);
 	virtual void Bind();
 	virtual void Unbind();
 
@@ -43,8 +42,7 @@ private:
 
 class DepthWriteState : public RenderState {
 public:
-	DepthWriteState(RenderStateParameter parameter);
-
+	virtual void Initialize(RenderStateParameter parameter0, RenderStateParameter);
 	virtual void Bind();
 	virtual void Unbind();
 
@@ -55,7 +53,7 @@ private:
 
 class RasterizerDiscardState : public RenderState {
 public:
-	RasterizerDiscardState(RenderStateParameter parameter);
+	virtual void Initialize(RenderStateParameter parameter0, RenderStateParameter);
 
 	virtual void Bind();
 	virtual void Unbind();
@@ -67,7 +65,7 @@ private:
 
 class BlendState : public RenderState {
 public:
-	BlendState(RenderStateParameter src, RenderStateParameter dest);
+	virtual void Initialize(RenderStateParameter parameter0, RenderStateParameter parameter1);
 
 	virtual void Bind();
 	virtual void Unbind();

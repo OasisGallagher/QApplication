@@ -59,6 +59,8 @@ public:
 	virtual int GetMeshCount() = 0;
 	virtual Mesh GetMesh(int index) = 0;
 
+	virtual void UpdateUserBuffer(unsigned i, size_t size, void* data) = 0;
+
 	virtual void Bind() = 0;
 	virtual void Unbind() = 0;
 };

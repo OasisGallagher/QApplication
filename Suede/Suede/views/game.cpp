@@ -134,12 +134,14 @@ void Game::createScene() {
 	//camera->SetClearColor(glm::vec3(0.0f, 0.0f, 0.4f));
 
 	ParticleSystem particleSystem = dsp_cast<ParticleSystem>(world->Create(ObjectTypeParticleSystem));
+	particleSystem->SetPosition(glm::vec3(0, 0, -50));
+
 	SphereParticleEmitter emitter = dsp_cast<SphereParticleEmitter>(world->Create(ObjectTypeSphereParticleEmitter));
 	emitter->SetRadius(5);
 	emitter->SetRate(10);
-	emitter->SetStartColor(glm::vec3(1, 0, 0));
-	emitter->SetStartDuration(5);
-	emitter->SetStartSize(10);
+	emitter->SetStartColor(glm::vec4(1, 0, 0, 0.5f));
+	emitter->SetStartDuration(1);
+	emitter->SetStartSize(1);
 	emitter->SetStartVelocity(glm::vec3(0, 3, 0));
 	ParticleBurst burst = { 4, 3, 20 };
 	particleSystem->SetEmitter(emitter);

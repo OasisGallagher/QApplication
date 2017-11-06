@@ -67,7 +67,6 @@ void VertexArrayObject::UpdateBuffer(int index, int offset, size_t size, const v
 	
 	glBufferData(attr.target, attr.size, nullptr, attr.usage); 
 	glBufferSubData(attr.target, offset, size, data);
-
 	UnbindBuffer(index);
 }
 

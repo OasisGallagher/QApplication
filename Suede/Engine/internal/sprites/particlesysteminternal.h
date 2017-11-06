@@ -7,7 +7,7 @@
 
 class ParticleEmitterInternal : virtual public IParticleEmitter, public ObjectInternal {
 public:
-	ParticleEmitterInternal(ObjectType type) : ObjectInternal(type), rate_(1), time_(-1) {}
+	ParticleEmitterInternal(ObjectType type);
 
 	virtual void SetRate(unsigned value) { rate_ = value; }
 	virtual unsigned GetRate() { return rate_; }
@@ -21,10 +21,10 @@ public:
 	virtual void SetStartVelocity(const glm::vec3& value) { startVelocity_ = value; }
 	virtual glm::vec3 GetStartVelocity() { return startVelocity_; }
 
-	virtual void Emit(Particle* particles, unsigned& count);
+	virtual void Emit(Particle** particles, unsigned& count);
 
-	virtual void SetStartColor(const glm::vec3& value) { startColor_ = value; }
-	virtual glm::vec3 GetStartColor() { return startColor_; }
+	virtual void SetStartColor(const glm::vec4& value) { startColor_ = value; }
+	virtual glm::vec4 GetStartColor() { return startColor_; }
 
 	virtual void AddBurst(const ParticleBurst& value) { bursts_.push_back(value); }
 	virtual void SetBurst(int i, const ParticleBurst& value) { bursts_[i] = value; }
@@ -36,14 +36,17 @@ protected:
 	virtual glm::vec3 GetStartPosition() { return glm::vec3(0); }
 
 private:
-	unsigned CalculateEmitParticleCount(float current, float next);
+	unsigned CalculateNextEmissionParticleCount();
+	void EmitParticles(Particle** particles, unsigned count);
 
 private:
 	unsigned rate_;
 	float time_;
+	float remainder_;
 	float startLife_;
 	float startSize_;
-	glm::vec3 startColor_;
+	
+	glm::vec4 startColor_;
 	glm::vec3 startVelocity_;
 	std::vector<ParticleBurst> bursts_;
 };
@@ -106,13 +109,14 @@ public:
 	virtual void SetGravityScale(float value) { gravityScale_ = value; }
 	virtual float GetGravityScale() { return gravityScale_; }
 
-	virtual unsigned GetParticlesCount() { return particles_.size(); }
+	virtual unsigned GetParticlesCount() { return activeParticles_; }
 
 	virtual void SetEmitter(ParticleEmitter value) { emitter_ = value; }
 	virtual ParticleEmitter GetEmitter() { return emitter_; }
 
 	virtual void SetParticleAnimator(ParticleAnimator value) { particleAnimator_ = value; }
 	virtual ParticleAnimator GetParticleAnimator() { return particleAnimator_; }
+
 public:
 	virtual void Update();
 
@@ -121,7 +125,12 @@ private:
 	void InitializeRenderer();
 
 	void UpdateEmitter();
+
+	void EmitParticles(unsigned count);
+
 	void UpdateParticles();
+
+	void FindUnusedParticles(Particle** container, unsigned count);
 
 private:
 	bool looping_;
@@ -134,5 +143,9 @@ private:
 	ParticleEmitter emitter_;
 	ParticleAnimator particleAnimator_;
 
+	std::vector<glm::vec4> colors_;
+	std::vector<glm::vec4> positions_;
+
+	unsigned activeParticles_;
 	std::vector<Particle> particles_;
 };

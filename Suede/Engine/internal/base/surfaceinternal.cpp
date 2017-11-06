@@ -95,3 +95,8 @@ void SurfaceInternal::Unbind() {
 	vao_.Unbind();
 	vao_.UnbindBuffer(VBOIndexes);
 }
+
+void SurfaceInternal::UpdateUserBuffer(unsigned i, size_t size, void* data) {
+	Assert(i < VBOCount - VBOUser0);
+	vao_.UpdateBuffer(VBOUser0 + i, 0, size, data);
+}

@@ -2,11 +2,12 @@
 #include "tools/debug.h"
 #include "renderstate.h"
 
-CullState::CullState(RenderStateParameter parameter) {
-	AssertX(IsValidParamter(parameter, 3,
+void CullState::Initialize(RenderStateParameter parameter0, RenderStateParameter) {
+	AssertX(IsValidParamter(parameter0, 3,
 		Front, Back, Off
 	), "invalid paramter for 'Cull'.");
-	parameter_ = parameter;
+
+	parameter_ = parameter0;
 }
 
 void CullState::Bind() {
@@ -24,12 +25,12 @@ void CullState::Unbind() {
 	glCullFace(oldMode_);
 }
 
-DepthTestState::DepthTestState(RenderStateParameter parameter) {
-	AssertX(IsValidParamter(parameter, 8,
+void DepthTestState::Initialize(RenderStateParameter parameter0, RenderStateParameter) {
+	AssertX(IsValidParamter(parameter0, 8,
 		Never, Less, LessEqual, Equal, Greater, NotEqual, GreaterEqual, Always
-	), "invalid parameter for 'DepthTest'.");
+	), "invalid parameter0 for 'DepthTest'.");
 
-	parameter_ = parameter;
+	parameter_ = parameter0;
 }
 
 void DepthTestState::Bind() {
@@ -45,11 +46,11 @@ void DepthTestState::Unbind() {
 	glDepthFunc(oldMode_);
 }
 
-DepthWriteState::DepthWriteState(RenderStateParameter parameter) {
-	AssertX(IsValidParamter(parameter, 2,
+void DepthWriteState::Initialize(RenderStateParameter parameter0, RenderStateParameter) {
+	AssertX(IsValidParamter(parameter0, 2,
 		On, Off
 	), "invalid paramter for 'DepthWrite'.");
-	parameter_ = parameter;
+	parameter_ = parameter0;
 }
 
 void DepthWriteState::Bind() {
@@ -61,11 +62,11 @@ void DepthWriteState::Unbind() {
 	glDepthMask(oldMask_);
 }
 
-RasterizerDiscardState::RasterizerDiscardState(RenderStateParameter parameter) {
-	AssertX(IsValidParamter(parameter, 2,
+void RasterizerDiscardState::Initialize(RenderStateParameter parameter0, RenderStateParameter) {
+	AssertX(IsValidParamter(parameter0, 2,
 		On, Off
 	), "invalid paramter for 'RasterizerDiscard'.");
-	parameter_ = parameter;
+	parameter_ = parameter0;
 }
 
 void RasterizerDiscardState::Bind() {
@@ -77,17 +78,17 @@ void RasterizerDiscardState::Unbind() {
 	Enable(GL_RASTERIZER_DISCARD, oldEnabled_);
 }
 
-BlendState::BlendState(RenderStateParameter src, RenderStateParameter dest) {
-	AssertX(IsValidParamter(src, 9,
+void BlendState::Initialize(RenderStateParameter parameter0, RenderStateParameter parameter1) {
+	AssertX(IsValidParamter(parameter0, 9,
 		Off, Zero, One, SrcColor, OneMinusSrcColor, SrcAlpha, OneMinusSrcAlpha, DestAlpha, OneMinusDestAlpha
 	), "invalid paramter for 'Blend'.");
 
-	AssertX(IsValidParamter(dest, 9,
+	AssertX(IsValidParamter(parameter1, 9,
 		None, Zero, One, SrcColor, OneMinusSrcColor, SrcAlpha, OneMinusSrcAlpha, DestAlpha, OneMinusDestAlpha
 	), "invalid paramter for 'Blend'.");
 
-	src_ = src;
-	dest_ = dest;
+	src_ = parameter0;
+	dest_ = parameter1;
 }
 
 void BlendState::Bind() {
@@ -109,13 +110,13 @@ void RenderState::Enable(GLenum cap, GLboolean enable) {
 	else { glDisable(cap); }
 }
 
-bool RenderState::IsValidParamter(RenderStateParameter parameter, int count, ...) {
+bool RenderState::IsValidParamter(RenderStateParameter parameter0, int count, ...) {
 	va_list vl;
 	va_start(vl, count);
 
 	int i = 0;
 	for (; i < count; ++i) {
-		if (parameter == va_arg(vl, RenderStateParameter)) {
+		if (parameter0 == va_arg(vl, RenderStateParameter)) {
 			break;
 		}
 	}
@@ -125,9 +126,9 @@ bool RenderState::IsValidParamter(RenderStateParameter parameter, int count, ...
 	return (i < count);
 }
 
-GLenum RenderState::RenderParamterToGLEnum(RenderStateParameter parameter) {
+GLenum RenderState::RenderParamterToGLEnum(RenderStateParameter parameter0) {
 	GLenum value = GL_NONE;
-	switch (parameter) {
+	switch (parameter0) {
 		case Front:
 			value = GL_FRONT;
 			break;
@@ -184,6 +185,6 @@ GLenum RenderState::RenderParamterToGLEnum(RenderStateParameter parameter) {
 			break;
 	}
 
-	AssertX(value != GL_NONE, "invalid render paramter " + std::to_string(parameter));
+	AssertX(value != GL_NONE, "invalid render paramter " + std::to_string(parameter0));
 	return value;
 }

@@ -35,24 +35,25 @@ void RendererInternal::SetRenderState(RenderStateType type, RenderStateParameter
 	RenderState* state = nullptr;
 	switch (type) {
 		case Cull:
-			state = Memory::Create<CullState>(parameter0);
+			state = Memory::Create<CullState>();
 			break;
 		case DepthTest:
-			state = Memory::Create<DepthTestState>(parameter0);
+			state = Memory::Create<DepthTestState>();
 			break;
 		case Blend:
-			state = Memory::Create<BlendState>(parameter0, parameter1);
+			state = Memory::Create<BlendState>();
 			break;
 		case DepthWrite:
-			state = Memory::Create<DepthWriteState>(parameter0);
+			state = Memory::Create<DepthWriteState>();
 			break;
 		case RasterizerDiscard:
-			state = Memory::Create<RasterizerDiscardState>(parameter0);
+			state = Memory::Create<RasterizerDiscardState>();
 		default:
 			Debug::LogError("invalid render capacity " + std::to_string(type));
 			break;
 	}
 
+	state->Initialize(parameter0, parameter1);
 	Memory::Release(states_[type]);
 	states_[type] = state;
 }
@@ -150,5 +151,10 @@ void ParticleRendererInternal::DrawCall(Mesh mesh) {
 	mesh->GetTriangles(vertexCount, baseVertex, baseIndex);
 
 	GLenum mode = PrimaryTypeToGLEnum(mesh->GetPrimaryType());
-	glDrawElementsInstancedBaseVertex(mode, vertexCount, GL_UNSIGNALED, (void*)(sizeof(unsigned)* baseIndex), particleCount_, baseVertex);
+	// TODO: 
+	glVertexAttribDivisor(0, 0); // particles vertices : always reuse the same 4 vertices -> 0
+	glVertexAttribDivisor(6, 1); // positions : one per quad (its center)                 -> 1
+	glVertexAttribDivisor(7, 1); // color : one per quad                                  -> 1
+
+	glDrawElementsInstancedBaseVertex(mode, vertexCount, GL_UNSIGNED_INT, (void*)(sizeof(unsigned)* baseIndex), particleCount_, baseVertex);
 }
