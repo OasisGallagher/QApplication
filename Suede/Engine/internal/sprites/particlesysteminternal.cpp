@@ -17,12 +17,12 @@ static const glm::vec3 quadVertices[] = {
 };
 
 #define MAX_PARTICLE_COUNT	1000
+#define GRAVITATIONAL_ACCELERATION	9.8f
 
 ParticleSystemInternal::ParticleSystemInternal()
 	: SpriteInternal(ObjectTypeParticleSystem), duration_(3)
 	, looping_(false), startDelay_(0), time_(0), gravityScale_(1)
-	, maxParticles_(MAX_PARTICLE_COUNT), particles_(MAX_PARTICLE_COUNT) 
-	, colors_(MAX_PARTICLE_COUNT), positions_(MAX_PARTICLE_COUNT) {
+	, maxParticles_(MAX_PARTICLE_COUNT), particles_(MAX_PARTICLE_COUNT) {
 	InitializeSurface();
 	InitializeRenderer();
 }
@@ -31,12 +31,10 @@ ParticleSystemInternal::~ParticleSystemInternal() {
 }
 
 void ParticleSystemInternal::SetMaxParticles(unsigned value) {
-	if (maxParticles_ == value) { return; }
-
-	maxParticles_ = value;
-	colors_.resize(value);
-	positions_.resize(value);
-	particles_.reallocate(value);
+	if (maxParticles_ != value) {
+		maxParticles_ = value;
+		particles_.reallocate(value);
+	}
 }
 
 void ParticleSystemInternal::Update() {
@@ -49,39 +47,56 @@ void ParticleSystemInternal::Update() {
 	time_ += timeInstance->GetDeltaTime();
 }
 
+void ParticleSystemInternal::SortParticles() {
+}
+
 void ParticleSystemInternal::UpdateParticles() {
+	size_t count = particles_.size();
+	if (count != 0) {
+		UpdateAttributes();
+		SortParticles();
+
+		count = particles_.size();
+		Surface surface = GetSurface();
+		surface->UpdateUserBuffer(0, count * sizeof(glm::vec4), &colors_[0]);
+		surface->UpdateUserBuffer(1, count * sizeof(glm::vec4), &positions_[0]);
+	}
+}
+
+void ParticleSystemInternal::UpdateAttributes() {
 	float deltaTime = timeInstance->GetDeltaTime();
-	std::vector<Particle*> unused;
-	for (free_list<Particle>::iterator ite = particles_.begin(); ite != particles_.end(); ++ite) {
-		Particle* particle = *ite;
+
+	unsigned index = 0;
+	unsigned count = Mathf::NextPowerOfTwo(particles_.size());
+
+	if (colors_.size() < count) { colors_.resize(count); }
+	if (positions_.size() < count) { positions_.resize(count); }
+
+	for (free_list<Particle>::iterator ite = particles_.begin(); ite != particles_.end(); ) {
+		Particle* particle = *ite++;
+
 		if ((particle->life -= deltaTime) <= 0) {
-			unused.push_back(particle);
-			//particles_.push(particle);
+			particles_.push(particle);
 		}
 		else {
-			*particle->position += particle->velocity * deltaTime;
-			particle->velocity -= 9.8f * deltaTime;
+			particle->position += particle->velocity * deltaTime;
+			particle->velocity -= GRAVITATIONAL_ACCELERATION * gravityScale_ * deltaTime;
+
+			colors_[index] = particle->color;
+			positions_[index++] = glm::vec4(particle->position, particle->size);
 		}
 	}
-
-	for (Particle* p : unused) {
-		particles_.push(p);
-	}
-
-	Surface surface = GetSurface();
-	surface->UpdateUserBuffer(0, maxParticles_ * sizeof(glm::vec4), &colors_[0]);
-	surface->UpdateUserBuffer(1, maxParticles_ * sizeof(glm::vec4), &positions_[0]);
 }
 
 void ParticleSystemInternal::UpdateEmitter() {
-	unsigned count = Mathf::Max(0, int(GetMaxParticles() - GetParticlesCount()));
-	if (count == 0) {
+	unsigned maxCount = Mathf::Max(0, int(GetMaxParticles() - GetParticlesCount()));
+	if (maxCount == 0) {
 		return;
 	}
 
-	unsigned desired = 0;
-	emitter_->Emit(nullptr, desired);
-	count = Mathf::Min(desired, count);
+	unsigned count = 0;
+	emitter_->Emit(nullptr, count);
+	count = Mathf::Min(count, maxCount);
 
 	if (count != 0) {
 		EmitParticles(count);
@@ -89,23 +104,18 @@ void ParticleSystemInternal::UpdateEmitter() {
 }
 
 void ParticleSystemInternal::EmitParticles(unsigned count) {
-	// TODO: use iterator instead.
-	std::vector<Particle*> cont;
-
-	for (int i = 0; i < count; ++i) {
-		cont.push_back(particles_.pop());
+	unsigned size = Mathf::NextPowerOfTwo(count);
+	if (size > buffer_.size()) {
+		buffer_.resize(size);
 	}
 
 	for (int i = 0; i < count; ++i) {
-		size_t pos = particles_.index(cont[i]);
-		cont[i]->color = &colors_[pos];
-		cont[i]->size = &positions_[pos].w;
-		cont[i]->position = (glm::vec3*)&positions_[pos];
+		buffer_[i] = particles_.pop();
 	}
 
-	emitter_->Emit(&cont[0], count);
+	emitter_->Emit(&buffer_[0], count);
 	for (int i = 0; i < count; ++i) {
-		*cont[i]->position += GetPosition();
+		buffer_[i]->position += GetPosition();
 	}
 }
 
@@ -123,10 +133,10 @@ void ParticleSystemInternal::InitializeSurface() {
 	// vertices.
 	attribute.positions.assign(quadVertices, quadVertices + CountOf(quadVertices));
 
-	// positions.
+	// colors.
 	attribute.user0.resize(maxParticles_);
 
-	// colors.
+	// positions.
 	attribute.user1.resize(maxParticles_);
 
 	surface->SetAttribute(attribute);
@@ -171,11 +181,11 @@ void ParticleEmitterInternal::EmitParticles(Particle** particles, unsigned count
 	for (unsigned i = 0; i < count; ++i) {
 		Particle* item = particles[i];
 		item->life = GetStartDuration();
-		*item->size = GetStartSize();
+		item->size = GetStartSize();
 		item->velocity = GetStartVelocity();
 
-		*item->color = GetStartColor();
-		*item->position = GetStartPosition();
+		item->color = GetStartColor();
+		item->position = GetStartPosition();
 	}
 }
 

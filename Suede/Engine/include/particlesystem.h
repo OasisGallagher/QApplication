@@ -11,9 +11,9 @@ struct Particle {
 	float life;
 	glm::vec3 velocity;
 
-	float* size;
-	glm::vec4* color;
-	glm::vec3* position;
+	float size;
+	glm::vec4 color;
+	glm::vec3 position;
 };
 
 class IParticleEmitter;

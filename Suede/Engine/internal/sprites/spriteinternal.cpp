@@ -428,6 +428,12 @@ const char* SpriteInternal::SpriteTypeToString(ObjectType type) {
 		case ObjectTypeDirectionalLight:
 			name = "DirectionalLight";
 			break;
+		case ObjectTypeParticleSystem:
+			name = "ParticleSystem";
+			break;
+		default:
+			AssertX(false, "Sprite name for " + std::to_string(type) + " does not exist");
+			break;
 	}
 
 	return name;

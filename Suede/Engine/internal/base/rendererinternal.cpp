@@ -31,7 +31,7 @@ void RendererInternal::RenderSurface(Surface surface) {
 	UnbindRenderStates();
 }
 
-void RendererInternal::SetRenderState(RenderStateType type, RenderStateParameter parameter0, RenderStateParameter parameter1) {
+void RendererInternal::SetRenderState(RenderStateType type, int parameter0, int parameter1) {
 	RenderState* state = nullptr;
 	switch (type) {
 		case Cull:
@@ -48,6 +48,7 @@ void RendererInternal::SetRenderState(RenderStateType type, RenderStateParameter
 			break;
 		case RasterizerDiscard:
 			state = Memory::Create<RasterizerDiscardState>();
+			break;
 		default:
 			Debug::LogError("invalid render capacity " + std::to_string(type));
 			break;
@@ -152,9 +153,10 @@ void ParticleRendererInternal::DrawCall(Mesh mesh) {
 
 	GLenum mode = PrimaryTypeToGLEnum(mesh->GetPrimaryType());
 	// TODO: 
+	
 	glVertexAttribDivisor(0, 0); // particles vertices : always reuse the same 4 vertices -> 0
 	glVertexAttribDivisor(6, 1); // positions : one per quad (its center)                 -> 1
 	glVertexAttribDivisor(7, 1); // color : one per quad                                  -> 1
-
+	
 	glDrawElementsInstancedBaseVertex(mode, vertexCount, GL_UNSIGNED_INT, (void*)(sizeof(unsigned)* baseIndex), particleCount_, baseVertex);
 }

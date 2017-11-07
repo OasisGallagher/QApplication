@@ -129,7 +129,9 @@ private:
 
 	void EmitParticles(unsigned count);
 
+	void SortParticles();
 	void UpdateParticles();
+	void UpdateAttributes();
 
 private:
 	bool looping_;
@@ -144,6 +146,7 @@ private:
 
 	std::vector<glm::vec4> colors_;
 	std::vector<glm::vec4> positions_;
-
+	
 	free_list<Particle> particles_;
+	std::vector<Particle*> buffer_;
 };

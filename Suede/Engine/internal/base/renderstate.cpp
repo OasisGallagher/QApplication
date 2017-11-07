@@ -2,7 +2,7 @@
 #include "tools/debug.h"
 #include "renderstate.h"
 
-void CullState::Initialize(RenderStateParameter parameter0, RenderStateParameter) {
+void CullState::Initialize(int parameter0, int) {
 	AssertX(IsValidParamter(parameter0, 3,
 		Front, Back, Off
 	), "invalid paramter for 'Cull'.");
@@ -25,7 +25,7 @@ void CullState::Unbind() {
 	glCullFace(oldMode_);
 }
 
-void DepthTestState::Initialize(RenderStateParameter parameter0, RenderStateParameter) {
+void DepthTestState::Initialize(int parameter0, int) {
 	AssertX(IsValidParamter(parameter0, 8,
 		Never, Less, LessEqual, Equal, Greater, NotEqual, GreaterEqual, Always
 	), "invalid parameter0 for 'DepthTest'.");
@@ -46,7 +46,7 @@ void DepthTestState::Unbind() {
 	glDepthFunc(oldMode_);
 }
 
-void DepthWriteState::Initialize(RenderStateParameter parameter0, RenderStateParameter) {
+void DepthWriteState::Initialize(int parameter0, int) {
 	AssertX(IsValidParamter(parameter0, 2,
 		On, Off
 	), "invalid paramter for 'DepthWrite'.");
@@ -62,7 +62,7 @@ void DepthWriteState::Unbind() {
 	glDepthMask(oldMask_);
 }
 
-void RasterizerDiscardState::Initialize(RenderStateParameter parameter0, RenderStateParameter) {
+void RasterizerDiscardState::Initialize(int parameter0, int) {
 	AssertX(IsValidParamter(parameter0, 2,
 		On, Off
 	), "invalid paramter for 'RasterizerDiscard'.");
@@ -78,7 +78,7 @@ void RasterizerDiscardState::Unbind() {
 	Enable(GL_RASTERIZER_DISCARD, oldEnabled_);
 }
 
-void BlendState::Initialize(RenderStateParameter parameter0, RenderStateParameter parameter1) {
+void BlendState::Initialize(int parameter0, int parameter1) {
 	AssertX(IsValidParamter(parameter0, 9,
 		Off, Zero, One, SrcColor, OneMinusSrcColor, SrcAlpha, OneMinusSrcAlpha, DestAlpha, OneMinusDestAlpha
 	), "invalid paramter for 'Blend'.");
@@ -100,6 +100,18 @@ void BlendState::Bind() {
 	glBlendFunc(RenderParamterToGLEnum(src_), RenderParamterToGLEnum(dest_));
 }
 
+void VertexAttribDivisorState::Initialize(int parameter0, int parameter1) {
+	index_ = parameter0;
+	value_ = parameter1;
+}
+
+void VertexAttribDivisorState::Bind() {
+	glVertexAttribDivisor(index_, value_);
+}
+
+void VertexAttribDivisorState::Unbind() {
+}
+
 void BlendState::Unbind() {
 	Enable(GL_BLEND, oldEnabled_);
 	glBlendFunc(oldSrc_, oldDest_);
@@ -110,13 +122,13 @@ void RenderState::Enable(GLenum cap, GLboolean enable) {
 	else { glDisable(cap); }
 }
 
-bool RenderState::IsValidParamter(RenderStateParameter parameter0, int count, ...) {
+bool RenderState::IsValidParamter(int parameter0, int count, ...) {
 	va_list vl;
 	va_start(vl, count);
 
 	int i = 0;
 	for (; i < count; ++i) {
-		if (parameter0 == va_arg(vl, RenderStateParameter)) {
+		if (parameter0 == va_arg(vl, int)) {
 			break;
 		}
 	}
@@ -126,7 +138,7 @@ bool RenderState::IsValidParamter(RenderStateParameter parameter0, int count, ..
 	return (i < count);
 }
 
-GLenum RenderState::RenderParamterToGLEnum(RenderStateParameter parameter0) {
+GLenum RenderState::RenderParamterToGLEnum(int parameter0) {
 	GLenum value = GL_NONE;
 	switch (parameter0) {
 		case Front:

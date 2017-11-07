@@ -22,7 +22,7 @@ public:
 	virtual int GetRenderQueue() { return queue_; }
 	virtual void SetRenderQueue(int value) { queue_ = value; }
 
-	virtual void SetRenderState(RenderStateType type, RenderStateParameter parameter0, RenderStateParameter parameter1);
+	virtual void SetRenderState(RenderStateType type, int parameter0, int parameter1);
 
 protected:
 	virtual void DrawCall(Mesh mesh);

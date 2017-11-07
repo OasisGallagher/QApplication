@@ -14,7 +14,7 @@ class free_list {
 		Head head;
 		T value;
 	};
-
+	
 	enum { HeadSize = sizeof(Head) };
 
 public:
@@ -71,20 +71,18 @@ public:
 	iterator begin() { return iterator(busy_); }
 	iterator end() { return iterator(nullptr); }
 
-	size_t index(T* ptr) const {
-		Block* block = (Block*)advance(ptr, -HeadSize);
-		return block - memory_;
-	}
-
 	size_t size() const { return size_; }
 	size_t capacity() const { return capacity_; }
 
 	T* pop() {
-		Assert(free_ != nullptr);
+		AssertX(free_ != nullptr, "out of memory");
 
 		T* result = (T*)advance(free_, HeadSize);
 		Block* block = free_;
 		free_ = free_->head.next;
+		if (free_ != nullptr) {
+			free_->head.prev = nullptr;
+		}
 
 		block->head.next = busy_;
 		block->head.prev = nullptr;
@@ -100,17 +98,26 @@ public:
 
 	void push(T* ptr) {
 		Block* block = (Block*)advance(ptr, -HeadSize);
+		if (busy_ == block) {
+			busy_ = busy_->head.next;
+		}
+
+		if (block->head.prev != nullptr) {
+			block->head.prev->head.next = block->head.next;
+		}
+
+		if (block->head.next != nullptr) {
+			block->head.next->head.prev = block->head.prev;
+		}
+
 		block->head.next = free_;
 		block->head.prev = nullptr;
 
 		if (free_ != nullptr) {
 			free_->head.prev = block;
 		}
-		free_ = block;
 
-		if (busy_ == block) {
-			busy_ = busy_->head.next;
-		}
+		free_ = block;
 
 		--size_;
 	}

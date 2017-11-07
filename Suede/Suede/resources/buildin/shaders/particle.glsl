@@ -20,7 +20,7 @@ void main() {
 	gl_Position = c_worldToClipSpaceMatrix * vec4(position, 1);
 
 	texCoord = c_position.xy + vec2(0.5f);
-	color = c_user1;
+	color = c_user0;
 }
 
 #shader fragment
@@ -32,5 +32,5 @@ out vec4 c_fragColor;
 uniform sampler2D c_mainTexture;
 
 void main() {
-	c_fragColor = texture(c_mainTexture, texCoord); // * color; 
+	c_fragColor = texture(c_mainTexture, texCoord) * color; 
 }

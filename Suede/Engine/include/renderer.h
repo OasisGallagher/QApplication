@@ -17,10 +17,11 @@ enum RenderStateType {
 	DepthTest,
 	DepthWrite,
 	RasterizerDiscard,
+
 	RenderStateCount,
 };
 
-enum RenderStateParameter {
+enum {
 	None,
 	Front,
 	Back,
@@ -69,7 +70,7 @@ public:
 	 * @param Blend1: None, Zero, One, SrcColor, OneMinusSrcColor, SrcAlpha, OneMinusSrcAlpha, DestAlpha, OneMinusDestAlpha
 	 * @param RasterizerDiscard: On, Off
 	 */
-	virtual void SetRenderState(RenderStateType type, RenderStateParameter parameter0, RenderStateParameter parameter1 = (RenderStateParameter)None) = 0;
+	virtual void SetRenderState(RenderStateType type, int parameter0, int parameter1 = 0) = 0;
 };
 
 class ENGINE_EXPORT ISurfaceRenderer : virtual public IRenderer {
